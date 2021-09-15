@@ -16,3 +16,10 @@ MM/DD/YY:
   -Added and edited main.cpp, robot.h, robot.cpp
 -Copied readme.md (now README.md) and stevensonlogo.png (now stevensonvexlogo.png) from https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp
 -Edited README.md to be accurate
+-Created Github repository here https://github.com/IyadHamid/StevensonVex1965Y-TippingPoint
+ -Added GNU GPL3 License
+-Copied common.h, intedrive.h, inteldrive.cpp from https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp
+-Edited inteldrive.h and inteldrive.cpp
+ -Simplifed by removing untested/unreliable functions
+ -Simplified by removing unused data
+ -Renamed leftDrive/rightDrive to left/right

@@ -1,13 +1,13 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       PID.cpp                                                   */
-/*    Author:       Iyad H                                                    */
+/*    Author:       Iyad Hamid                                                */
 /*    Created:      10 Sep 2020                                               */
 /*    Description:  Proportional Integral Derivative controller               */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "PID.h"
-#include "common.h"
+#include "v5_vcs.h"
 
 void PID::run(double goal) {
   double integral = 0.0;   //integral/sum of all errors
