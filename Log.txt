@@ -1,0 +1,18 @@
+2021-2022 Vex 1965Y Coding Log
+
+MM/DD/YY:
+-Description
+ -Details
+-Description
+
+09/09/21:
+-Copied PID.h and PID.cpp from https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp
+-Edited PID.h and PID.cpp
+ -Added additional comments/descriptions
+ -Accounted for time (dt) in equations
+
+ 09/15/21:
+ -Created V5 project file
+  -Added and edited main.cpp, robot.h, robot.cpp
+-Copied readme.md (now README.md) and stevensonlogo.png (now stevensonvexlogo.png) from https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp
+-Edited README.md to be accurate
