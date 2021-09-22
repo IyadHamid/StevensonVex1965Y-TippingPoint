@@ -12,14 +12,35 @@
 #include "common.h"
 #include "PID.h"
 
+constexpr double turn_kp = 1.0, turn_ki = 1.0, turn_kd = 1.0;
+constexpr double drive_kp = 1.0, drive_ki = 1.0, drive_kd = 1.0;
+
 inteldrive::inteldrive(vex::inertial i, double ratio, 
                        vex::motor_group l, vex::motor_group r,
                        double rw)
-                      : inchesRatio{ratio}, absoluteLocation{0.0, 0.0}, 
-                        inertialSensor{i}, left{l}, right{r},
-                        robotWidth{rw} {
+                      : inertialSensor{i}, left{l}, right{r},
+                        robotWidth{rw}, inchesRatio{ratio}
+{
+  inertialSensor.calibrate();
+  while (inertialSensor.isCalibrating());
 }
 
+double inteldrive::heading(vex::rotationUnits units) {
+  return inertialSensor.orientation(vex::orientationType::yaw, units);
+}
+
+double inteldrive::position(vex::rotationUnits units) {
+  return (left.rotation(units) + right.rotation(units)) / 2.0;
+}
+
+void inteldrive::resetHeading() {
+  inertialSensor.resetHeading();
+}
+
+void inteldrive::resetPosition() {
+  left .resetPosition();
+  right.resetPosition();
+}
 
 void inteldrive::drive(vex::directionType dir, double vel, vex::velocityUnits units, double ratio) {
   ratio = sqrt(ratio);
@@ -38,9 +59,11 @@ void inteldrive::stop(vex::brakeType mode) {
 }
 
 
-void inteldrive::turnTo(double a, double vel, vex::velocityUnits units) {
+void inteldrive::turnTo(double ang, double vel, vex::velocityUnits units, bool additive) {
+  if (not additive)
+    resetHeading();
   auto error = [this](double goal) {
-    return angle_difference(goal, getYaw());
+    return angle_difference(goal, heading());
   };
   auto output = [this, units](double input) {
     left .spin(vex::directionType::fwd, input, units);
@@ -50,15 +73,15 @@ void inteldrive::turnTo(double a, double vel, vex::velocityUnits units) {
     return input * vel;
   };
 
-  PID pid(1.0, 1.0, 1.0, error, output, func);
-  pid.run(a);
+  PID pid(turn_kp, turn_ki, turn_kd, error, output, func);
+  pid.run(ang);
 }
 
-void inteldrive::driveTo(vec2 loc, double vel, vex::velocityUnits units) {
-  vec2 disp = loc - absoluteLocation;
-  turnTo(disp.ang(), vel);
-  auto error = [this, loc](double goal)->double {
-    return (const_cast<vec2&>(loc) - absoluteLocation).mag();
+void inteldrive::driveTo(double dist, double vel, vex::velocityUnits units, bool additive) {
+  if (not additive)
+    resetPosition();
+  auto error = [this](double goal) {
+    return goal - position();
   };
   auto output = [this, units](double input) {
     drive(vex::directionType::fwd, input, units);
@@ -67,8 +90,13 @@ void inteldrive::driveTo(vec2 loc, double vel, vex::velocityUnits units) {
     return input * vel;
   };
 
-  PID pid(1.0, 1.0, 1.0, error, output, func);
-  pid.run(error(0.0));
+  PID pid(drive_kp, drive_ki, drive_kd, error, output, func);
+  pid.run(dist);
+}
+
+void inteldrive::driveTo(vec2 loc, double vel, vex::velocityUnits units, bool additive) {
+  turnTo(loc.ang(), vel, units, additive);
+  driveTo(loc.mag(), vel, units, additive);
 }
 
 void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {
@@ -99,9 +127,6 @@ void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {
   pid.run(error(0.0));
 }
 
-double inteldrive::getYaw(vex::rotationUnits units) {
-  return inertialSensor.orientation(vex::orientationType::yaw, units);
-}
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {
   vertical *= vertModifer;
   horizontal *= horiModifer;

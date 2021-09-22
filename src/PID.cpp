@@ -10,7 +10,7 @@
 #include "v5_vcs.h"
 
 void PID::run(double goal) {
-  double integral = 0.0;   //integral/sum of all errors
+  double integral = 0.0;  //integral/sum of all errors
   double e = error(goal); //current error
   double pe = e;          //previous error
   vex::timer timer;       //used to calculate dt
@@ -29,7 +29,7 @@ void PID::run(double goal) {
 
     output(out); //send output value back
 
-    pe = e;
-    e = error(goal);
+    pe = e;          //Set previous error
+    e = error(goal); //Set new error
   }
 }
