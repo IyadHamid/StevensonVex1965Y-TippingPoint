@@ -20,7 +20,7 @@ public:
   vex::inertial inertialSensor;
   vex::motor_group left, right;
 
-  inteldrive(vex::inertial i, double ratio, vex::motor_group l, vex::motor_group r, double robotWidth);
+  inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, double ratio, double robotWidth);
   ~inteldrive() {}
   
   double heading(vex::rotationUnits units = vex::rotationUnits::deg);

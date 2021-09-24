@@ -8,6 +8,34 @@
 /*----------------------------------------------------------------------------*/
 #include "robot.h"
 
+constexpr int32_t inertial_port     = 1;
+
+constexpr int32_t left_front_port   = 1;
+constexpr int32_t left_middle_port  = 1;
+constexpr int32_t left_back_port    = 1;
+
+constexpr int32_t right_front_port  = 1;
+constexpr int32_t right_middle_port = 1;
+constexpr int32_t right_back_port   = 1;
+
+
+constexpr double wheel2inches_ratio = 1.0;
+constexpr double robot_width = 13.0;
+
 namespace robot {
   vex::brain brain;
+  vex::controller primary;
+
+
+  vex::motor lfront (left_front_port  , vex::gearSetting::ratio6_1, false);
+  vex::motor lmiddle(left_middle_port , vex::gearSetting::ratio6_1, false);
+  vex::motor lback  (left_back_port   , vex::gearSetting::ratio6_1, false);
+  vex::motor rfront (right_front_port , vex::gearSetting::ratio6_1, false);
+  vex::motor rmiddle(right_middle_port, vex::gearSetting::ratio6_1, false);
+  vex::motor rback  (right_back_port  , vex::gearSetting::ratio6_1, false);
+
+  inteldrive idrive(vex::inertial(inertial_port), 
+                    vex::motor_group(lfront, lmiddle, lback), 
+                    vex::motor_group(rfront, rmiddle, rback), 
+                    wheel2inches_ratio, robot_width);
 }

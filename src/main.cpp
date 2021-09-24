@@ -8,8 +8,20 @@
 /*----------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "robot.h"
+
+void autonomous() {
+
+}
+
+void drivercontrol() {
+
+}
 
 int main() {
+  vex::competition competition;
+  competition.autonomous(autonomous);
+  competition.drivercontrol(drivercontrol);
   
-  
+  while (true);
 }

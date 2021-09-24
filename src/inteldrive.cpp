@@ -14,10 +14,11 @@
 
 constexpr double turn_kp = 1.0, turn_ki = 1.0, turn_kd = 1.0;
 constexpr double drive_kp = 1.0, drive_ki = 1.0, drive_kd = 1.0;
+constexpr double arc_kp = 1.0, arc_ki = 1.0, arc_kd = 1.0;
 
-inteldrive::inteldrive(vex::inertial i, double ratio, 
+inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
-                       double rw)
+                       double ratio, double rw)
                       : inertialSensor{i}, left{l}, right{r},
                         robotWidth{rw}, inchesRatio{ratio}
 {
@@ -101,7 +102,7 @@ void inteldrive::driveTo(vec2 loc, double vel, vex::velocityUnits units, bool ad
 
 void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {
   double dist = (absoluteLocation - loc).mag();
-  //cos(ang)=(r^2+r^2-d^2)/(2*r*r)
+  //cos(ang)=(r^2+r^2-d^2)/(2*r^2)
   //r^2=-d^2/(2*cos(ang)-2)
   double radius = sqrt((-dist*dist)/(2*cos(ang)-2));
   radius *= cw ? 1.0 : -1.0;
@@ -123,7 +124,7 @@ void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {
     return input * vel;
   };
 
-  PID pid(1.0, 1.0, 1.0, error, output, func);
+  PID pid(arc_kp, arc_ki, arc_kd, error, output, func);
   pid.run(error(0.0));
 }
 
