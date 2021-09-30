@@ -17,8 +17,8 @@
 
 class inteldrive {
 public:
-  vex::inertial inertialSensor;
-  vex::motor_group left, right;
+  vex::inertial inertialSensor; //vex v5 inertial sensor
+  vex::motor_group left, right; //vex v5 left/right motor groups
 
   inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, double ratio, double robotWidth);
   ~inteldrive() {}
@@ -41,6 +41,6 @@ public:
   void tank(double l, double r, double modifer = 1.0);
 
 protected:
-  const double robotWidth;
-  double inchesRatio;
+  const double robotWidth; //robot width in inches
+  double inchesRatio; //ratio from wheel spins to inches
 };

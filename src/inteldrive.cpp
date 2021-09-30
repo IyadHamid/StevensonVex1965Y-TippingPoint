@@ -79,10 +79,11 @@ void inteldrive::turnTo(double ang, double vel, vex::velocityUnits units, bool a
 }
 
 void inteldrive::driveTo(double dist, double vel, vex::velocityUnits units, bool additive) {
+  dist *= inchesRatio;
   if (not additive)
     resetPosition();
   auto error = [this](double goal) {
-    return goal - position();
+    return goal - position() * inchesRatio;
   };
   auto output = [this, units](double input) {
     drive(vex::directionType::fwd, input, units);
@@ -101,31 +102,31 @@ void inteldrive::driveTo(vec2 loc, double vel, vex::velocityUnits units, bool ad
 }
 
 void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {
-  double dist = (absoluteLocation - loc).mag();
-  //cos(ang)=(r^2+r^2-d^2)/(2*r^2)
-  //r^2=-d^2/(2*cos(ang)-2)
-  double radius = sqrt((-dist*dist)/(2*cos(ang)-2));
-  radius *= cw ? 1.0 : -1.0;
-  double r = (radius-(robotWidth/2.0))*ang;
-  double l = (radius+(robotWidth/2.0))*ang;
-  double ratio = cw ? r/l : l/r;
-
-  double iang = (180.0-ang)/2.0 + (loc - absoluteLocation).ang();
-  //vec2 center = absoluteLocation + vec2{cos(iang) * radius, sin(iang) * radius};
-  turnTo(-1/iang, vel);
-
-  std::function<double(double)> error = [this, loc](double goal)->double {
-    return (const_cast<vec2&>(loc) - absoluteLocation).mag();
-  };
-  std::function<void(double)> output = [this, ratio](double input) { 
-    drive(vex::directionType::fwd, input, vex::velocityUnits::rpm, ratio);
-  };
-  std::function<double(double)> func = [vel](double input) {
-    return input * vel;
-  };
-
-  PID pid(arc_kp, arc_ki, arc_kd, error, output, func);
-  pid.run(error(0.0));
+//  double dist = (absoluteLocation - loc).mag();
+//  //cos(ang)=(r^2+r^2-d^2)/(2*r^2)
+//  //r^2=-d^2/(2*cos(ang)-2)
+//  double radius = sqrt((-dist*dist)/(2*cos(ang)-2));
+//  radius *= cw ? 1.0 : -1.0;
+//  double r = (radius-(robotWidth/2.0))*ang;
+//  double l = (radius+(robotWidth/2.0))*ang;
+//  double ratio = cw ? r/l : l/r;
+//
+//  double iang = (180.0-ang)/2.0 + (loc - absoluteLocation).ang();
+//  //vec2 center = absoluteLocation + vec2{cos(iang) * radius, sin(iang) * radius};
+//  turnTo(-1/iang, vel);
+//
+//  std::function<double(double)> error = [this, loc](double goal)->double {
+//    return (const_cast<vec2&>(loc) - absoluteLocation).mag();
+//  };
+//  std::function<void(double)> output = [this, ratio](double input) { 
+//    drive(vex::directionType::fwd, input, vex::velocityUnits::rpm, ratio);
+//  };
+//  std::function<double(double)> func = [vel](double input) {
+//    return input * vel;
+//  };
+//
+//  PID pid(arc_kp, arc_ki, arc_kd, error, output, func);
+//  pid.run(error(0.0));
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {

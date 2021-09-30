@@ -19,7 +19,7 @@ constexpr int32_t right_middle_port = 1;
 constexpr int32_t right_back_port   = 1;
 
 
-constexpr double wheel2inches_ratio = 1.0;
+constexpr double inches2wheel_ratio = 1.0;
 constexpr double robot_width = 13.0;
 
 namespace robot {
@@ -37,5 +37,5 @@ namespace robot {
   inteldrive idrive(vex::inertial(inertial_port), 
                     vex::motor_group(lfront, lmiddle, lback), 
                     vex::motor_group(rfront, rmiddle, rback), 
-                    wheel2inches_ratio, robot_width);
+                    inches2wheel_ratio, robot_width);
 }
