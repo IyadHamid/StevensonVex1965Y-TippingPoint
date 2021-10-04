@@ -6,6 +6,8 @@ Stevenson 1965Y 2021-2022
 Competition styled for Vex EDR [Tipping Point](https://www.vexrobotics.com/vexedr/competition/vrc-current-game "VEX Current Game"). Coded with [VEXCode V5 Pro](https://www.vexrobotics.com/vexcode "VEXCode V5") in C++ using [VEXcode API](https://api.vexcode.cloud/v5/).
 Find this code [here](https://www.github.com/IyadHamid/StevensonVex1965Y-TippingPoint "Stevenson 1965Y Repository") on GitHub!
 
+This repository/project also contains a regular log [here](Log.md).
+
 ## **The Team:**
 
 - Adam Taylor

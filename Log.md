@@ -58,3 +58,7 @@
  - Does not work, nothing happens
 #### Notes:
 - Need to debug and fix `inteldrive::driveTo`
+
+### 10/04/2021:
+- Added missing `Log.md` to github repository
+- Updated `README.md` to mention `Log.md`
