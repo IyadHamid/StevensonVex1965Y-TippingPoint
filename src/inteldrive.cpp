@@ -12,9 +12,9 @@
 #include "common.h"
 #include "PID.h"
 
-constexpr double turn_kp = 1.0, turn_ki = 1.0, turn_kd = 1.0;
+constexpr double turn_kp = 1.0, turn_ki = 0.0, turn_kd = 0.0;
 constexpr double drive_kp = 1.0, drive_ki = 1.0, drive_kd = 1.0;
-constexpr double arc_kp = 1.0, arc_ki = 1.0, arc_kd = 1.0;
+//constexpr double arc_kp = 1.0, arc_ki = 1.0, arc_kd = 1.0;
 
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
@@ -31,7 +31,7 @@ double inteldrive::heading(vex::rotationUnits units) {
 }
 
 double inteldrive::position(vex::rotationUnits units) {
-  return (left.rotation(units) + right.rotation(units)) / 2.0;
+  return (left.position(units) + right.position(units)) / 2.0;
 }
 
 void inteldrive::resetHeading() {
@@ -61,7 +61,7 @@ void inteldrive::stop(vex::brakeType mode) {
 
 
 void inteldrive::turnTo(double ang, double vel, vex::velocityUnits units, bool additive) {
-  if (not additive)
+  if (!additive)
     resetHeading();
   auto error = [this](double goal) {
     return angle_difference(goal, heading());
@@ -80,7 +80,7 @@ void inteldrive::turnTo(double ang, double vel, vex::velocityUnits units, bool a
 
 void inteldrive::driveTo(double dist, double vel, vex::velocityUnits units, bool additive) {
   dist *= inchesRatio;
-  if (not additive)
+  if (!additive)
     resetPosition();
   auto error = [this](double goal) {
     return goal - position() * inchesRatio;

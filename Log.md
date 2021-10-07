@@ -1,7 +1,7 @@
 # 2021 - 2022 Vex 1965Y Coding Log
 
 ### 09/09/21:
-- Copied `PID.h` and `PID.cpp` from [IyadHamid/StevensonVex1965Y- ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y- ChangeUp)
+- Copied `PID.h` and `PID.cpp` from [IyadHamid/StevensonVex1965Y-ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp)
 - Edited `PID.h` and `PID.cpp`
  - Added additional comments/descriptions
  - Accounted for time (`dt`) in equations
@@ -9,11 +9,11 @@
 ### 09/15/21:
 - Created V5 project file
   - Added and edited `main.cpp`, `robot.h`, `robot.cpp`
-- Copied `readme.md` (now `README.md`) and `stevensonlogo.png` (now `stevensonvexlogo.png`) from [IyadHamid/StevensonVex1965Y- ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y- ChangeUp)
+- Copied `readme.md` (now `README.md`) and `stevensonlogo.png` (now `stevensonvexlogo.png`) from [IyadHamid/StevensonVex1965Y-ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp)
 - Edited `README.md` to be accurate
-- Created Github repository [IyadHamid/StevensonVex1965Y- TippingPoint](https://github.com/IyadHamid/StevensonVex1965Y- TippingPoint)
+- Created Github repository [IyadHamid/StevensonVex1965Y-TippingPoint](https://github.com/IyadHamid/StevensonVex1965Y-TippingPoint)
  - Added GNU GPL3 License
-- Copied `common.h`, `inteldrive.h`, `inteldrive.cpp` from [IyadHamid/StevensonVex1965Y- ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y- ChangeUp)
+- Copied `common.h`, `inteldrive.h`, `inteldrive.cpp` from [IyadHamid/StevensonVex1965Y- ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp)
 - Edited `inteldrive.h` and `inteldrive.cpp`
  - Simplifed by removing untested/unreliable functions
  - Simplified by removing unused data
@@ -54,6 +54,7 @@
 - Added support for `inchesRatio` in `inteldrive`
  - Now is ratio for inches : spin
  - `constexpr wheel2inches_ratio` now `constexpr inches2wheel_ratio` in `robot.h` to match
+#### Testing:
 - Made an attempt to run `inteldrive::driveTo`
  - Does not work, nothing happens
 #### Notes:
@@ -62,3 +63,19 @@
 ### 10/04/2021:
 - Added missing `Log.md` to github repository
 - Updated `README.md` to mention `Log.md`
+
+### 10/06/2021:
+- Fixed link formating in `Log.md`
+- Added debugging to `PID` enabled by `DEBUG` macro in `PID.h`
+- Added new log category to `Log.md` titled `Testing`specifically to `09/30/2021`
+#### Testing:
+- Tested `inteldrive::driveTo`
+ - Does not work, found program hangs in `PID`
+
+ ### 10/07/21
+- Made debugging for `PID::run` viewable/function
+- Replaced `not` with `!` in `inteldrive.cpp`
+ #### Testing:
+- Isolated problem from above to `vex::motor` constructor
+ - Fixed by using `vex::PORT{number}` instead of literals.
+ - Found another issue with `PID`/`inteldrive` not updating position error
