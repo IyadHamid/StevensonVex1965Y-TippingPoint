@@ -18,9 +18,11 @@ constexpr int32_t right_front_port  = 1;
 constexpr int32_t right_middle_port = 1;
 constexpr int32_t right_back_port   = 1;
 
-
 constexpr double inches2wheel_ratio = 1.0;
 constexpr double robot_width = 13.0;
+
+constexpr PID::kPID drive_k = { 1.0, 1.0, 1.0 };
+constexpr PID::kPID turn_k = { 1.0, 1.0, 1.0 };
 
 namespace robot {
   vex::brain brain;
@@ -36,6 +38,7 @@ namespace robot {
 
   inteldrive idrive(vex::inertial(inertial_port), 
                     vex::motor_group(lfront, lmiddle, lback), 
-                    vex::motor_group(rfront, rmiddle, rback), 
+                    vex::motor_group(rfront, rmiddle, rback),
+                    drive_k, turn_k,
                     inches2wheel_ratio, robot_width);
 }

@@ -13,14 +13,14 @@
 #include "v5_vcs.h"
 
 #include "common.h"
-
+#include "PID.h"
 
 class inteldrive {
 public:
   vex::inertial inertialSensor; //vex v5 inertial sensor
   vex::motor_group left, right; //vex v5 left/right motor groups
 
-  inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, double ratio, double robotWidth);
+  inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, PID::kPID drive_k, PID::kPID turn_k, double ratio, double robotWidth);
   ~inteldrive() {}
   
   double heading(vex::rotationUnits units = vex::rotationUnits::deg);
@@ -41,6 +41,8 @@ public:
   void tank(double l, double r, double modifer = 1.0);
 
 protected:
+  PID drivePID, turnPID;
+
   const double robotWidth; //robot width in inches
   double inchesRatio; //ratio from wheel spins to inches
 };

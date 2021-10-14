@@ -12,24 +12,29 @@
 
 #define DEBUG
 
+
 //PID controller class 
 class PID {
 public:
+  
+  //structure containing the 3 PID constants (kp, ki, kd)
+  struct kPID {
+    double p, i, d;
+  };
+
   //constructor
-  PID(double p, double i, double d, 
-      std::function<double(double)> func_e, 
+  PID(std::function<double(double)> func_e, 
       std::function<void(double)> func_out,
-      std::function<double(double)> func_p,
+      kPID k,
       double t = .1
-    ) : kp{p}, ki{i}, kd{d}, error{func_e}, output{func_out}, func{func_p}, tolerance{t} {}
+    ) : k{k}, error{func_e}, output{func_out}, tolerance{t} {}
 
   void run(double goal);
   
 protected:
   //keep protected (instead of private) so it can be overrided in child class
-  double kp, ki, kd; //constants
+  kPID k; //constants for PID equation
   double tolerance;  //tolerance accepted
   std::function<double(double)> error; //function to calculate error
   std::function<void(double)> output;  //function to run output
-  std::function<double(double)> func;  //function for proportional
 };

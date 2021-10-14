@@ -72,10 +72,28 @@
 - Tested `inteldrive::driveTo`
  - Does not work, found program hangs in `PID`
 
- ### 10/07/21
+### 10/07/21
 - Made debugging for `PID::run` viewable/function
 - Replaced `not` with `!` in `inteldrive.cpp`
  #### Testing:
 - Isolated problem from above to `vex::motor` constructor
  - Fixed by using `vex::PORT{number}` instead of literals.
  - Found another issue with `PID`/`inteldrive` not updating position error
+
+### 10/13/21
+#### Testing:
+- Made PID for `inteldrive::driveTo` to `PID::run` again after 100 ms
+- Found motors do not stop for `inteldrive::driveTo`
+ - Changed accordingly
+ 
+### 10/14/21
+- Made `pid`s for `inteldrive::driveTo` and `inteldrive::turnTo` to class members `drivePID` and `turnPID`
+ - Reasoning: no need to reinitialize same `PID` object for the same purpose
+- Removed `func` from `PID`
+ - Updated `PID` calls to match
+ - Reasoning: `error` should account for change and integral/derivative will linearize
+- Defined `struct kPID` in `PID`
+ - Used to replace `kp`, `ki`, and `kd` in `PID` and for `PID` users
+ - Reasoning: ease of variable sharing
+- Added `drive_k` and `turn_k` in `inteldrive` constructor
+ - Reasoning: Used to define constants in `robot.cpp` instead of using `kp`, `ki`, `kd`

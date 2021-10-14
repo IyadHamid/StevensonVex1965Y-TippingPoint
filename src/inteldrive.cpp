@@ -12,15 +12,30 @@
 #include "common.h"
 #include "PID.h"
 
-constexpr double turn_kp = 1.0, turn_ki = 0.0, turn_kd = 0.0;
-constexpr double drive_kp = 1.0, drive_ki = 1.0, drive_kd = 1.0;
-//constexpr double arc_kp = 1.0, arc_ki = 1.0, arc_kd = 1.0;
-
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
+                       PID::kPID drive_k, PID::kPID turn_k,
                        double ratio, double rw)
-                      : inertialSensor{i}, left{l}, right{r},
-                        robotWidth{rw}, inchesRatio{ratio}
+: inertialSensor{i}, left{l}, right{r},
+  drivePID{ //initalizes drivePID
+    [this](double goal) {
+      return goal - position();
+    },
+    [this](double input) {
+      drive(vex::directionType::fwd, input, vex::velocityUnits::rpm);
+    }, 
+    drive_k
+  },
+  turnPID{ //initalizes turnPID
+    [this](double goal) {
+      return goal - position();
+    },
+    [this](double input) {
+      drive(vex::directionType::fwd, input, vex::velocityUnits::rpm);
+    },
+    turn_k
+  },
+  robotWidth{rw}, inchesRatio{ratio}
 {
   inertialSensor.calibrate();
   while (inertialSensor.isCalibrating());
@@ -59,41 +74,21 @@ void inteldrive::stop(vex::brakeType mode) {
   right.stop(mode);
 }
 
-
 void inteldrive::turnTo(double ang, double vel, vex::velocityUnits units, bool additive) {
   if (!additive)
     resetHeading();
-  auto error = [this](double goal) {
-    return angle_difference(goal, heading());
-  };
-  auto output = [this, units](double input) {
-    left .spin(vex::directionType::fwd, input, units);
-    right.spin(vex::directionType::rev, input, units);
-  };
-  auto func = [vel](double input) {
-    return input * vel;
-  };
-
-  PID pid(turn_kp, turn_ki, turn_kd, error, output, func);
-  pid.run(ang);
+  turnPID.run(ang);
 }
 
 void inteldrive::driveTo(double dist, double vel, vex::velocityUnits units, bool additive) {
-  dist *= inchesRatio;
+  dist *= inchesRatio; //Now in rotations
   if (!additive)
     resetPosition();
-  auto error = [this](double goal) {
-    return goal - position() * inchesRatio;
-  };
-  auto output = [this, units](double input) {
-    drive(vex::directionType::fwd, input, units);
-  };
-  auto func = [vel](double input) {
-    return input * vel;
-  };
-
-  PID pid(drive_kp, drive_ki, drive_kd, error, output, func);
-  pid.run(dist);
+  
+  drivePID.run(dist / inchesRatio);
+  vex::task::sleep(100);
+  drivePID.run(dist / inchesRatio); //Likely temporary
+  stop(vex::brakeType::brake);
 }
 
 void inteldrive::driveTo(vec2 loc, double vel, vex::velocityUnits units, bool additive) {
