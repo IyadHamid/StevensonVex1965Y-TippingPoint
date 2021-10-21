@@ -17,24 +17,22 @@
 class PID {
 public:
   
-  //structure containing the 3 PID constants (kp, ki, kd)
+  //structure containing the 3 PID constants (kp, ki, kd) and tolerance
   struct kPID {
-    double p, i, d;
+    double p, i, d, t;
   };
 
   //constructor
   PID(std::function<double(double)> func_e, 
       std::function<void(double)> func_out,
-      kPID k,
-      double t = .1
-    ) : k{k}, error{func_e}, output{func_out}, tolerance{t} {}
+      kPID k
+    ) : k{k}, error{func_e}, output{func_out} {}
 
   void run(double goal);
   
 protected:
   //keep protected (instead of private) so it can be overrided in child class
   kPID k; //constants for PID equation
-  double tolerance;  //tolerance accepted
   std::function<double(double)> error; //function to calculate error
   std::function<void(double)> output;  //function to run output
 };

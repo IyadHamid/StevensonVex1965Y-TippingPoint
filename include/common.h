@@ -10,7 +10,16 @@
 #include <cmath>
 
 constexpr double pi = 3.14159265359;
+constexpr double tau = pi * 2.0;
+
 constexpr double deg2rad(double a) { return a * pi/180.0; }
+constexpr double deg2rev(double a) { return a * 1.0/360.0; }
+
+constexpr double rad2deg(double a) { return a * 180.0/pi; }
+constexpr double rad2rev(double a) { return a / tau; }
+
+constexpr double rev2deg(double a) { return a * 360.0; }
+constexpr double rev2rad(double a) { return a * tau; }
 
 // is A within T of B
 constexpr bool within_tolerance(double a, double b, double t) { 
@@ -24,9 +33,19 @@ constexpr bool within_angle_range(double a, double x, double y) {
 }
 // Difference of A and B in degrees
 // Positive : A is right of B
-static const double angle_difference(double a, double b) {
+static const double angle_difference_deg(double a, double b) {
   return std::fmod((a - b + 180.0), 360.0) - 180.0;
-}                             
+}
+// Difference of A and B in degrees
+// Positive : A is right of B
+static const double angle_difference_rad(double a, double b) {
+  return std::fmod((a - b + pi), tau) - pi;
+}
+// Difference of A and B in degrees
+// Positive : A is right of B
+static const double angle_difference_rev(double a, double b) {
+  return std::fmod((a - b + 0.5), 1.0) - 0.5;
+}
 
 struct vec2 {
   double x, y;

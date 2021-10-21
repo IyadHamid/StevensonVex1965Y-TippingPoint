@@ -7,6 +7,7 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "PID.h"
+
 #include "v5_vcs.h"
 
 #ifdef DEBUG
@@ -20,13 +21,14 @@ void PID::run(double goal) {
 
   
 #ifdef DEBUG
-  robot::brain.Screen.printAt(0, 20,  "P: ");
-  robot::brain.Screen.printAt(0, 40,  "I: ");
-  robot::brain.Screen.printAt(0, 60,  "D: ");
+  robot::brain.Screen.printAt(0, 20, "P: ");
+  robot::brain.Screen.printAt(0, 40, "I: ");
+  robot::brain.Screen.printAt(0, 60, "D: ");
   robot::brain.Screen.printAt(0, 80, "o: ");
+  robot::brain.Screen.printAt(20, 20, "%4.4f", e);
 #endif
 
-  while (e > tolerance) {
+  while (std::abs(e) > k.t) {
     //integral of error = ∫e(t)dt = Σe(t)dt
     integral += e;
     //derivative of error = d/dt * e(t) = (e(t) - e(t-h))/h

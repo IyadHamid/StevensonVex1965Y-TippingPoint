@@ -97,3 +97,37 @@
  - Reasoning: ease of variable sharing
 - Added `drive_k` and `turn_k` in `inteldrive` constructor
  - Reasoning: Used to define constants in `robot.cpp` instead of using `kp`, `ki`, `kd`
+
+ ### 10/20/21
+- Added object/global units to `inteldrive`
+ - Stored in `velUnits` for velocity and `rotUnits` for angles
+ - Changed all functions and function calls with units
+ - Removed resulting ambiguity between drive by not having `ratio` set to a value
+ - Reasoning: units are getting lost with `PID` usage and compacts function declaration
+- Fixed `inteldrive::driveTo` not scaling inches to rotations
+- Added `deg2rev`, `rad2deg`, `rad2rev`, `rev2deg`, and `rev2rad`
+ - Reasoning: `inteldrive` is using multiple rotation units for math/input and requires translation
+#### Notes:
+- `inteldrive::turnTo` not functional
+- `inteldrive::driveTo` and `inteldrive::turnTo` does not implement speed
+ - Possibly use `std::max` or multiplication to set speed
+ - Possibly require velocity in percent as limits may be inaccurate/nonexistent
+
+### 10/21/21
+- Made `inteldrive` fully support `vex::rotationUnits::rev`
+- Used `assert` to assert `inteldrive` does not use `vex::rotationUnits::raw`
+ - Reasoning: unable to use raw units in math
+- Fixed `PID` not using negative error
+- `inteldrive` now only uses radians
+ - Reverted changes today
+ - Reasoning: internally complicates when using degrees/revolutions instead of radians
+- Added tolerance `t` to `kPID`
+ - Reasoning: forces user to add own tolerance
+- Declared `inchesRatio` in `inteldrive` to be `radians : inches`
+ - Reasoning: uncomplicates internal code
+#### Notes:
+- May want to remove `velUnits` from `inteldrive` to match with removal of `rotUnits`
+- Should change `integral` in `PID::run` to only be sum of last few iterations
+#### Testing: 
+- `inteldrive::driveTo(double,...)` and `inteldrive::turnTo` now functional
+ - `inteldrive::driveTo(vec2,...)` and `inteldrive::arcTo` still NOT functional
