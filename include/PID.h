@@ -28,7 +28,7 @@ public:
       kPID k
     ) : k{k}, error{func_e}, output{func_out} {}
 
-  void run(double goal);
+  void run(double goal, uint32_t dt = 50);
   
 protected:
   //keep protected (instead of private) so it can be overrided in child class

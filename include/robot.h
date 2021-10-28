@@ -14,6 +14,7 @@
 #include "inteldrive.h"
 
 //classes found here https://api.vexcode.cloud/v5/
+//ports/settings are set up in config.h
 namespace robot {
   //"brain"/computer of the robot
   extern vex::brain brain;

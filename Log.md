@@ -131,3 +131,29 @@
 #### Testing: 
 - `inteldrive::driveTo(double,...)` and `inteldrive::turnTo` now functional
  - `inteldrive::driveTo(vec2,...)` and `inteldrive::arcTo` still NOT functional
+
+### 10/27/21
+- Set limit to `integral` in `PID::run` through dividing by `2.0`
+ - Reasoning: without limit, integral often gets out of hand and will overpower PID
+- Created `config.h`
+ - Moved port/setting definition from `robot.cpp`
+ - Reasoning: only has settings for readablity
+- Created [TODO](###TODO)
+ - Reasoning: things to fix described in the `Notes:` section are lost in log
+
+### 10/27/21
+- Locked `PID::run` to account for time
+ - Reasoning: integral/derivative were not accounting for time and may mess output
+- Flashdrive got corrupted
+ - Part of yesterday's and today's work got deleted, had to rewrite
+- Removed test code from `main`
+ - Reasoning: test base got deconstructed, new testing will be done on final base
+- Renamed `[left/right]_middle` to `[left/right]_top` in `config.h`
+#### Testing:
+- Experimented with accelerometer of inertial sensor
+ - Accelerometer is not accurate/local enough to be useful
+
+### TODO
+- May want to remove `velUnits` from `inteldrive`
+- Possibly use `std::max` or multiplication to set speed in `PID`
+
