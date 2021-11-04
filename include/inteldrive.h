@@ -34,8 +34,8 @@ public:
   void resetHeading();
   void resetPosition();
 
-  void drive(vex::directionType dir, double vel, double ratio);
-  void drive(vex::directionType dir, double vel);
+  void drive(double vel, double ratio);
+  void drive(double vel);
   void stop(vex::brakeType mode = vex::brakeType::brake);
 
   void turnTo(double ang, double vel, bool additive = false);

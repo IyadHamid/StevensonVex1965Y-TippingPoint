@@ -22,7 +22,7 @@ inteldrive::inteldrive(vex::inertial i,
 : inertialSensor{i}, left{l}, right{r}, velUnits {vUnits},
   drivePID{ //initalizes drivePID
     [this](double goal) { return goal - position();},
-    [this](double input) { drive(vex::directionType::fwd, input); }, 
+    [this](double input) { drive(input); }, 
     drive_k
   },
   turnPID{ //initalizes turnPID
@@ -64,15 +64,15 @@ void inteldrive::resetPosition() {
   right.resetPosition();
 }
 
-void inteldrive::drive(vex::directionType dir, double vel, double ratio) {
+void inteldrive::drive(double vel, double ratio) {
   ratio = sqrt(ratio);
-  left .spin(dir, vel / ratio, velUnits);
-  right.spin(dir, vel * ratio, velUnits);
+  left .spin(vex::directionType::fwd, vel / ratio, velUnits);
+  right.spin(vex::directionType::fwd, vel * ratio, velUnits);
 }
 
-void inteldrive::drive(vex::directionType dir, double vel) {
-  left .spin(dir, vel, velUnits);
-  right.spin(dir, vel, velUnits);
+void inteldrive::drive(double vel) {
+  left .spin(vex::directionType::fwd, vel, velUnits);
+  right.spin(vex::directionType::fwd, vel, velUnits);
 }
 
 void inteldrive::stop(vex::brakeType mode) {

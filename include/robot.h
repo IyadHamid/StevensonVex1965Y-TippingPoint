@@ -21,11 +21,15 @@ namespace robot {
   //primary controller connected
   extern vex::controller primary;
 
+
+  //left motors
+  extern vex::motor lfront, ltop, lback;
+  //right motors
+  extern vex::motor rfront, rtop, rback;
+  
   //intelligent drive train
   extern inteldrive idrive;
 
-  //left motors
-  extern vex::motor lfront, lmiddle, lback;
-  //right motors
-  extern vex::motor rfront, rmiddle, rback;
+  //solenoid attached to piston controlling the claw
+  extern vex::pneumatics claw;
 }
