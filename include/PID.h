@@ -10,9 +10,6 @@
 
 #include <functional>
 
-//#define DEBUG
-
-
 //PID controller class 
 class PID {
 public:

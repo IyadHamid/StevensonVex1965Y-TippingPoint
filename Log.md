@@ -180,7 +180,25 @@
   - Discovered issue was in `left` and `right` due to initialization of `motor_group` inside constructor in `robot.cpp`
   - Solved by constructing `motor_group`s outside of `inteldrive`constructor
 
+### 11/10/21
+- Added controls to `main.cpp` and `robot.h`/`robot.cpp`
+  - Added specific functions to `robot` namespace (TO BE IMPLEMENTED)
+- Removed `velUnits` from `inteldrive`
+  - Replaced internally with `vex::velocityUnits::pct`
+  - Reasoning: matches with `rotUnits` and keeps code cleaner
+- Added comments to `inteldrive.h`
+- Renamed `inchesRatio` to `distanceRatio` in `inteldrive`
+  - Updated comments to match arbitrariness
+  - Reasoning: `inteldrive` distance units are not necessarily in inches
+#### Notes: 
+- Should add controls to `README.md`
+  - Should provide wiring diagram and control diagram
+- Need to add auto-straightening to `inteldrive::driveTo` to prevent skewed driving
+- Need to fix units for `drivePID` and `turnPID` velocities
+
 ## TODO
-- May want to remove `velUnits` from `inteldrive`
 - Possibly use `std::max` or multiplication to set speed in `PID`
-- Fix `Log.md` formatting in Github
+- Need to add things to `README.md`
+  - Add controls and wiring
+    - Create diagrams for each
+- Need to fix units for `drivePID` and `turnPID` velocities

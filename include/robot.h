@@ -32,4 +32,9 @@ namespace robot {
 
   //solenoid attached to piston controlling the claw
   extern vex::pneumatics claw;
+
+  void liftUp();
+  void liftDown();
+
+  void backToggle();
 }

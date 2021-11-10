@@ -31,10 +31,21 @@ namespace robot {
     lgroup, 
     rgroup,
     drive_k, turn_k,
-    inches2units_ratio, robot_width,
-    vex::velocityUnits::pct
+    inches2units_ratio, robot_width
   );
 
   vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
 
+  
+  void liftUp() {
+
+  }
+
+  void liftDown() {
+
+  }
+
+  void backToggle() {
+
+  }
 }

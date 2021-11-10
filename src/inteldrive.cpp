@@ -17,9 +17,8 @@
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
                        PID::kPID drive_k, PID::kPID turn_k,
-                       double ratio, double rw,
-                       vex::velocityUnits vUnits)
-: inertialSensor{i}, left{l}, right{r}, velUnits {vUnits},
+                       double ratio, double rw)
+: inertialSensor{i}, left{l}, right{r},
   drivePID{ //initalizes drivePID
     [this](double goal) { return goal - position();},
     [this](double input) { drive(input); }, 
@@ -28,12 +27,12 @@ inteldrive::inteldrive(vex::inertial i,
   turnPID{ //initalizes turnPID
     [this](double goal) { return angle_difference_rad(goal, heading()); }, //turnPID internally uses radians
     [this](double input) {
-      left .spin(vex::directionType::fwd, input, velUnits);
-      right.spin(vex::directionType::rev, input, velUnits);
+      left .spin(vex::directionType::fwd, input, vex::velocityUnits::pct);
+      right.spin(vex::directionType::rev, input, vex::velocityUnits::pct);
     },
     turn_k
   },
-  robotWidth{rw}, inchesRatio{ratio}
+  robotWidth{rw}, distanceRatio{ratio}
 {
   inertialSensor.calibrate();
   while (inertialSensor.isCalibrating());
@@ -66,13 +65,13 @@ void inteldrive::resetPosition() {
 
 void inteldrive::drive(double vel, double ratio) {
   ratio = sqrt(ratio);
-  left .spin(vex::directionType::fwd, vel / ratio, velUnits);
-  right.spin(vex::directionType::fwd, vel * ratio, velUnits);
+  left .spin(vex::directionType::fwd, vel / ratio, vex::velocityUnits::pct);
+  right.spin(vex::directionType::fwd, vel * ratio, vex::velocityUnits::pct);
 }
 
 void inteldrive::drive(double vel) {
-  left .spin(vex::directionType::fwd, vel, velUnits);
-  right.spin(vex::directionType::fwd, vel, velUnits);
+  left .spin(vex::directionType::fwd, vel, vex::velocityUnits::pct);
+  right.spin(vex::directionType::fwd, vel, vex::velocityUnits::pct);
 }
 
 void inteldrive::stop(vex::brakeType mode) {
@@ -88,19 +87,17 @@ void inteldrive::turnTo(double ang, double vel, bool additive) {
 }
 
 void inteldrive::driveTo(double dist, double vel, bool additive) {
-  dist *= inchesRatio; //From inches to rotations to radians
+  dist *= distanceRatio; //From inches to rotations
   if (!additive)
     resetPosition();
   
   drivePID.run(dist);
-  //vex::task::sleep(100);
-  //drivePID.run(dist / inchesRatio); //Likely temporary
   stop(vex::brakeType::brake);
 }
 
 void inteldrive::driveTo(vec2 loc, double vel, bool additive) {
   turnTo(loc.ang(), vel, additive);
-  driveTo(loc.mag() * inchesRatio, vel, additive);
+  driveTo(loc.mag() * distanceRatio, vel, additive);
 }
 
 void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {

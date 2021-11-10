@@ -18,7 +18,6 @@ This repository/project also contains a regular log [here](Log.md).
 - Tanmay Panchpor
 	
 ## **Functionality**
-
 - TBD
 
 ## **Robot Configuration**

@@ -7,6 +7,7 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #pragma once
+
 #include <cmath>
 
 constexpr double pi = 3.14159265359;
@@ -31,22 +32,23 @@ constexpr bool within_angle_range(double a, double x, double y) {
          (a < y && y < x) ||
          (y < x && x < a);
 }
-// Difference of A and B in degrees
-// Positive : A is right of B
+// difference of A and B in degrees
+//returns positive : A is right of B
 static const double angle_difference_deg(double a, double b) {
   return std::fmod((a - b + 180.0), 360.0) - 180.0;
 }
-// Difference of A and B in degrees
-// Positive : A is right of B
+// difference of A and B in degrees
+//returns positive : A is right of B
 static const double angle_difference_rad(double a, double b) {
   return std::fmod((a - b + pi), tau) - pi;
 }
-// Difference of A and B in degrees
-// Positive : A is right of B
+// difference of A and B in degrees
+//returns positive : A is right of B
 static const double angle_difference_rev(double a, double b) {
   return std::fmod((a - b + 0.5), 1.0) - 0.5;
 }
 
+//
 struct vec2 {
   double x, y;
 
@@ -63,5 +65,5 @@ struct vec2 {
   double mag() { return sqrt(x*x + y*y); }
 };
 
-//Got from 1,000,000 year simulation
+//got from 1,000,000 year simulation
 constexpr int answerToLifeTheUniverseAndEverything = 42;
