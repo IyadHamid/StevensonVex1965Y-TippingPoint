@@ -8,12 +8,11 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "v5.h"
-#include "v5_vcs.h"
+#include "v5_cpp.h"
 
 #include "inteldrive.h"
 
-//classes found here https://api.vexcode.cloud/v5/
+//base classes found here https://api.vexcode.cloud/v5/
 //ports/settings are set up in config.h
 namespace robot {
   //"brain"/computer of the robot
@@ -27,14 +26,21 @@ namespace robot {
   //right motors
   extern vex::motor rfront, rtop, rback;
   
+  //lift motor
+  extern vex::motor lift;
+  //back motor
+  extern vex::motor back;
+
   //intelligent drive train
   extern inteldrive idrive;
 
   //solenoid attached to piston controlling the claw
   extern vex::pneumatics claw;
 
+  //sets lift up
   void liftUp();
+  //sets lift down
   void liftDown();
-
+  //toggles back from being up/down
   void backToggle();
 }

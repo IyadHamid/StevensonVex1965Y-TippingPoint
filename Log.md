@@ -196,6 +196,12 @@
 - Need to add auto-straightening to `inteldrive::driveTo` to prevent skewed driving
 - Need to fix units for `drivePID` and `turnPID` velocities
 
+### 11/11/2021
+- Added straight-stabilization to `inteldrive::driveTo`
+- Added definitions/declarations for `lift` and `back` motors
+  - Added `motor_setting`s in `config.h` named `claw_lift` and `back_lift`
+- Added additional comments to all files
+
 ## TODO
 - Possibly use `std::max` or multiplication to set speed in `PID`
 - Need to add things to `README.md`

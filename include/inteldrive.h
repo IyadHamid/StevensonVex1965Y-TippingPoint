@@ -9,8 +9,7 @@
 #pragma once
 
 #include <vector>
-#include "v5.h"
-#include "v5_vcs.h"
+#include "v5_cpp.h"
 
 #include "common.h"
 #include "PID.h"
@@ -44,7 +43,7 @@ public:
   // resets motor encoder's to 0 revolutions
   void resetPosition();
 
-  // drives at velocity with turning ratio; percent velocity, ratio for left : right
+  // drives at velocity with turning ratio; percent velocity, ratio for right : left
   void drive(double vel, double ratio);
   // drives at velocity; percent velocity
   void drive(double vel);

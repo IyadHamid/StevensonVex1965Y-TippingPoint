@@ -10,16 +10,22 @@
 
 #include <cmath>
 
-constexpr double pi = 3.14159265359;
-constexpr double tau = pi * 2.0;
+constexpr double pi = 3.14159265359; //mathmatical π
+constexpr double tau = pi * 2.0; //mathmatical τ
 
+// degreees to radians
 constexpr double deg2rad(double a) { return a * pi/180.0; }
+// degreees to revolutions
 constexpr double deg2rev(double a) { return a * 1.0/360.0; }
 
+// radians to degrees
 constexpr double rad2deg(double a) { return a * 180.0/pi; }
+// radians to revolutions
 constexpr double rad2rev(double a) { return a / tau; }
 
+// revolutions to degrees
 constexpr double rev2deg(double a) { return a * 360.0; }
+// revolutions to radians
 constexpr double rev2rad(double a) { return a * tau; }
 
 // is A within T of B
@@ -48,10 +54,11 @@ static const double angle_difference_rev(double a, double b) {
   return std::fmod((a - b + 0.5), 1.0) - 0.5;
 }
 
-//
+// mathmatical 2-dimensional vector
 struct vec2 {
   double x, y;
-
+  
+  // creates vector from polar coordinates
   static vec2 polar(double mag, double ang) { return vec2{cos(ang) * mag, sin(ang) * mag}; };
 
   vec2 operator+(vec2 other) { return vec2{x+other.x, y+other.y}; }
@@ -61,7 +68,9 @@ struct vec2 {
   void operator+=(vec2 other) { *this = *this + other; }
   void operator-=(vec2 other) { *this = *this - other; }
 
+  // gets polar angle
   double ang() { return tan(y / x); }
+  // gets magnitude
   double mag() { return sqrt(x*x + y*y); }
 };
 

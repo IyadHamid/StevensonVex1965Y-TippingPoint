@@ -8,7 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "PID.h"
 
-#include "v5_vcs.h"
+#include "v5_cpp.h"
 
 #include "config.h"
 
@@ -23,17 +23,18 @@ void PID::run(double goal, uint32_t dt) {
   uint32_t ptime;         //previous time
   
 #ifdef DEBUG
-  robot::brain.Screen.printAt(0, 20, "P: ");
-  robot::brain.Screen.printAt(0, 40, "I: ");
-  robot::brain.Screen.printAt(0, 60, "D: ");
-  robot::brain.Screen.printAt(0, 80, "o: ");
-  robot::brain.Screen.printAt(20, 20, "%4.4f", e);
+  //prints out debugging values for PID
+  robot::brain.Screen.printAt(0, 20, "P: "); //proportional component
+  robot::brain.Screen.printAt(0, 40, "I: "); //integral component
+  robot::brain.Screen.printAt(0, 60, "D: "); //derivative component
+  robot::brain.Screen.printAt(0, 80, "o: "); //final output
+  robot::brain.Screen.printAt(20, 20, "%4.4f", e); //error
 #endif
 
   ptime = vex::timer::system();
   while (std::abs(e) > k.t) {
 
-    //smooths integral to 'forget' past
+    //smooths integral to 'forget' past used to not overcompensate
     integral /= 2.0;
     //integral of error = ∫e(t)dt = Σe(t)dt
     integral += e;
@@ -43,6 +44,7 @@ void PID::run(double goal, uint32_t dt) {
     const double out = k.p * e + k.i * integral + k.d * derivative;
 
 #ifdef DEBUG
+    //prints actual number corresponding to label above
     robot::brain.Screen.printAt(20, 20, "%4.4f", e);
     robot::brain.Screen.printAt(20, 40, "%4.4f", integral);
     robot::brain.Screen.printAt(20, 60, "%4.4f", derivative);
