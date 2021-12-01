@@ -202,9 +202,46 @@
   - Added `motor_setting`s in `config.h` named `claw_lift` and `back_lift`
 - Added additional comments to all files
 
+### 11/17/2021
+- Added `robot::init()` function
+  - Checks if all devices are connected and prints if they are not
+- Added empty `inteldrive` constructor
+  - Made `incehsRatio` not constant to not delete implicit move constructor
+  - Reasoning: allows to redefine object after creation
+    - Used to fix issue described below
+- Made `PID` member variables public
+  - Reasoning: allows functions/constants to be overriden
+- Implemented maxmium output to `PID`
+- Created `robot::multitask`
+  - Reasoning: using lambdas (anonymous functions) instead of creating new functions for multitasking/multithreading is easier
+#### Testing:
+- `inteldrive` constructor causing memory error
+  - Determined `inertialSensor` to be causing the issue
+  - Issue actually is `vex::task::sleep`
+  - Fixed, initalized `idrive` in `robot::init`
+
+## 12/1/2021
+- Renamed `robot::multitask` to functionally-same class `multithread` and moved to `common.h`
+  - Now uses `vex::thread`
+  - Uses a protected function to offload `std::function`
+- Renamed class `multithread` to `simplethread`
+  - Functionality now more like `vex::thread`
+  - Manages internal `vex::thread`
+- Removed `simplethread` as `vex::thread` accepts lambdas
+- Created helper macro `MEMBER_FUNCTION_THREAD`
+  - Helps create `vex::thread` to call member functions
+- Removed `inteldrive::arcTo`
+  - Reasoning: unnecessary/unimplemented
+- Debug macro now is assigned to some value
+  - Value is what to debug
+  - Reasoning: Cannot print all debug information
+- Created `inteldrive::runLPS`
+  - Prototyped local position system in new thread (under `lpsThread`)
+  - Reasoning: drive algorithms can be improved with absolute location tracking
+
 ## TODO
-- Possibly use `std::max` or multiplication to set speed in `PID`
 - Need to add things to `README.md`
   - Add controls and wiring
     - Create diagrams for each
-- Need to fix units for `drivePID` and `turnPID` velocities
+- Need to 'fix' units for `drivePID` and `turnPID` velocities
+- Need to test `inteldrive::runLPS`

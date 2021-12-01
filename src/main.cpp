@@ -24,7 +24,7 @@ void drivercontrol() {
   robot::primary.ButtonR1.pressed(robot::backToggle);
   
   while (1) {
-    //uses modifers from config unless turbo button is pressed, then uses maximum power
+    //if turbo button is pressed, use maximum power, else use controller modifers from config.h
     const vec2 modifiers = robot::primary.ButtonR1.pressing() ? vec2{ 1.1, 1.1 } : controller_modifiers;
 #if DRIVE_MODE == ARCADE
     robot::idrive.arcade(robot::primary.Axis3.value(), robot::primary.Axis4.value(), modifiers.x, modifiers.y);
@@ -38,10 +38,10 @@ void drivercontrol() {
 
 int main() {
   vex::competition competition;
-
+  
+  robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
-
   while (1) 
     vex::task::sleep(100); //sleeps to save cpu resources
 }

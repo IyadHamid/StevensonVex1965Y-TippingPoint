@@ -74,5 +74,8 @@ struct vec2 {
   double mag() { return sqrt(x*x + y*y); }
 };
 
-//got from 1,000,000 year simulation
+// helper function to create a vex::thread to run a member class function; class name, function with parameters
+#define MEMBER_FUNCTION_THREAD( CLASS, FUNCTION ) vex::thread([](void* self) { static_cast<CLASS*>(self)->FUNCTION; }, this);
+
+// got from 1,000,000 year simulation
 constexpr int answerToLifeTheUniverseAndEverything = 42;

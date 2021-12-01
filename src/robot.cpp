@@ -8,6 +8,9 @@
 /*----------------------------------------------------------------------------*/
 #include "robot.h"
 
+#include <vector>
+#include <utility>
+
 #include "config.h"
 
 namespace robot {
@@ -34,21 +37,44 @@ namespace robot {
   //initalizes inertial sensor with port from config.h
   vex::inertial isensor(inertial_port);
 
+  //creates empty inteldrive which gets initalized later in robot::init()
+  inteldrive idrive;
+
+  //initalizes claw with triport from config.h
+  vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
+}
+
+void robot::init() {
+  //prints if any device is not installed
+  std::vector<std::pair<vex::device, std::string>> devices{ 
+    { lfront, "left front motor"  }, { ltop, "left top motor"  }, { lback, "left back motor"  }, //left motors
+    { rfront, "right front motor" }, { rtop, "right top motor" }, { rback, "right back motor" }, //left motors
+    { isensor, "inertial sensor" } //sensors
+  };
+  for (auto d : devices) {
+    if (!d.first.installed()) {
+      brain.Screen.print("Warning: %s not installed!", d.second.c_str());
+      brain.Screen.newLine();
+    }
+  }
+  //prints if controllers are not connected
+  if (!primary.installed())
+    brain.Screen.print("Warning: primary controller not connected!");
+  brain.Screen.newLine();
+
+  
   //initalizes intelligent drivetrain with above sensor, motor groups, and constants from config.h
-  inteldrive idrive(
+  idrive = inteldrive(
     isensor, 
     lgroup, 
     rgroup,
     drive_k, turn_k,
     inches2units_ratio, robot_width
   );
-
-  //initalizes claw with triport from config.h
-  vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
 }
 
 void robot::liftUp() {
-
+  
 }
 
 void robot::liftDown() {

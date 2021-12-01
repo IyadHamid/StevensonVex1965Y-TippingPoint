@@ -16,13 +16,13 @@
 #include "robot.h"
 #endif
 
-void PID::run(double goal, uint32_t dt) {
+void PID::run(double goal, double dmax, uint32_t dt) {
   double integral = 0.0;  //integral/sum of all errors
   double e = error(goal); //current error
   double pe = e;          //previous error
   uint32_t ptime;         //previous time
   
-#ifdef DEBUG
+#if DEBUG == PID
   //prints out debugging values for PID
   robot::brain.Screen.printAt(0, 20, "P: "); //proportional component
   robot::brain.Screen.printAt(0, 40, "I: "); //integral component
@@ -41,9 +41,9 @@ void PID::run(double goal, uint32_t dt) {
     //derivative of error = d/dt * e(t) = (e(t) - e(t-h))/h
     const double derivative = (e - pe); //change in error
     //PID = Kp*e(t) + Ki*(∫e(t)dt) + Kd*(d/dt*e(t))
-    const double out = k.p * e + k.i * integral + k.d * derivative;
+    double out = k.p * e + k.i * integral + k.d * derivative;
 
-#ifdef DEBUG
+#if DEBUG == PID
     //prints actual number corresponding to label above
     robot::brain.Screen.printAt(20, 20, "%4.4f", e);
     robot::brain.Screen.printAt(20, 40, "%4.4f", integral);
@@ -51,7 +51,9 @@ void PID::run(double goal, uint32_t dt) {
     robot::brain.Screen.printAt(20, 80, "%4.4f", out);
 #endif
 
-    output(out); //send output value back
+    if (dmax > 0.0 ) //if dmax > 0, max out to dmax
+      out = std::min(out, dmax);
+    output(std::min(out, dmax)); //send output value back
 
     pe = e;          //set previous error
     e = error(goal); //set new error

@@ -36,6 +36,9 @@ namespace robot {
 
   //solenoid attached to piston controlling the claw
   extern vex::pneumatics claw;
+  
+  //init function
+  void init();
 
   //sets lift up
   void liftUp();
@@ -43,4 +46,5 @@ namespace robot {
   void liftDown();
   //toggles back from being up/down
   void backToggle();
+
 }

@@ -27,6 +27,9 @@ public:
   inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, 
              PID::kPID drive_k, PID::kPID turn_k, 
              double ratio, double robotWidth);
+  // inteldrive constructor (creates empty inteldrive)
+  inteldrive();
+  // inteldrive destructor (does nothing)
   ~inteldrive() {}
   
   // gyrometer's heading; units for returned rotation
@@ -56,8 +59,6 @@ public:
   void driveTo(double dist, double vel, bool additive = false);
   // drives robot to displacement; 2D vector inches displacement, percent velocity, should not reset motor encoders/gyrometer? (defaulted to false)
   void driveTo(vec2 loc, double vel, bool additive = false);
-  // currently non-functional
-  void arcTo(vec2 loc, double ang, bool cw, double vel);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
@@ -65,8 +66,16 @@ public:
   void tank(double l, double r, double modifer = 1.0);
 
 protected:
+  // local position system
+  void runLPS();
+
+  vex::thread lpsThread; // thread to run the local positioning system
+  vec2 location;
+  
   PID drivePID, turnPID; // PID constants
 
-  const double robotWidth; // robot width in distance units
+  double robotWidth; // robot width in distance units
   double distanceRatio; // ratio from distance units to revolutions (revolutions/distance units)
+
+
 };

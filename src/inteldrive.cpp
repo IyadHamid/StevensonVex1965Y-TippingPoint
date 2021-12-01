@@ -14,6 +14,10 @@
 #include "common.h"
 #include "PID.h"
 
+#if DEBUG == LPS
+#include "robot.h"
+#endif
+
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
                        PID::kPID drive_k, PID::kPID turn_k,
@@ -38,8 +42,15 @@ inteldrive::inteldrive(vex::inertial i,
   inertialSensor.calibrate();
   //waits until it is done calibrating
   while (inertialSensor.isCalibrating())
-    vex::task::sleep(100); //sleeps to save cpu resources
+    vex::this_thread::sleep_for(100); //sleeps to save cpu resources
+  lpsThread = MEMBER_FUNCTION_THREAD( inteldrive, runLPS() );
 }
+
+inteldrive::inteldrive() //initalizes an unusable/empty inteldrive
+: inertialSensor(-1),
+  drivePID{ nullptr, nullptr, { 0.0, 0.0, 0.0, 0.0 } },
+  turnPID { nullptr, nullptr, { 0.0, 0.0, 0.0, 0.0 } }
+{}
 
 double inteldrive::heading(vex::rotationUnits units) {
   //redirects to inertial sensor
@@ -119,37 +130,6 @@ void inteldrive::driveTo(vec2 loc, double vel, bool additive) {
   driveTo(loc.mag() * distanceRatio, vel, additive);
 }
 
-void inteldrive::arcTo(vec2 loc, double ang, bool cw, double vel) {
-  //TBD, math is unconfirmed to work
-/*  
-  double dist = (absoluteLocation - loc).mag();
-  //cos(ang)=(r^2+r^2-d^2)/(2*r^2)
-  //r^2=-d^2/(2*cos(ang)-2)
-  double radius = sqrt((-dist*dist)/(2*cos(ang)-2));
-  radius *= cw ? 1.0 : -1.0;
-  double r = (radius-(robotWidth/2.0))*ang;
-  double l = (radius+(robotWidth/2.0))*ang;
-  double ratio = cw ? r/l : l/r;
-
-  double iang = (180.0-ang)/2.0 + (loc - absoluteLocation).ang();
-  //vec2 center = absoluteLocation + vec2{cos(iang) * radius, sin(iang) * radius};
-  turnTo(-1/iang, vel);
-
-  std::function<double(double)> error = [this, loc](double goal)->double {
-    return (const_cast<vec2&>(loc) - absoluteLocation).mag();
-  };
-  std::function<void(double)> output = [this, ratio](double input) { 
-    drive(vex::directionType::fwd, input, vex::velocityUnits::rpm, ratio);
-  };
-  std::function<double(double)> func = [vel](double input) {
-    return input * vel;
-  };
-
-  PID pid(arc_kp, arc_ki, arc_kd, error, output, func);
-  pid.run(error(0.0));
-*/
-}
-
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {
   //multiplies the vertical/horizontal with corresponding modifiers
   vertical *= vertModifer;
@@ -163,4 +143,29 @@ void inteldrive::tank(double l, double r, double modifer) {
   //spins left and right motors with corresponding inputs multiplied by modifer
   left .spin(vex::directionType::fwd, l * modifer, vex::percentUnits::pct);
   right.spin(vex::directionType::fwd, r * modifer, vex::percentUnits::pct);
+}
+
+void inteldrive::runLPS() {
+  uint32_t dt = 50; //change in time
+  uint32_t ptime = vex::timer::system(); //previous time
+
+#if DEBUG == LPS
+  //prints out debugging header for LPS
+  robot::brain.Screen.printAt(0, 20, "L: "); //Location
+#endif
+
+  while (1) { //should get interrupted elsewhere
+    location += vec2::polar(position() / distanceRatio, heading());
+    
+#if DEBUG == LPS
+    //prints actual vector corresponding to label above
+    robot::brain.Screen.printAt(20, 20, "<%4.4f, %4.4f>", location.x, location.y);
+#endif
+
+    uint32_t ctime; //current time
+    do //waits for one dt to pass
+      ctime = vex::timer::system();
+    while (ctime < ptime + dt);
+    ptime = ctime; //updates previous time to current time
+  }
 }
