@@ -42,6 +42,8 @@ namespace robot {
 
   //initalizes claw with triport from config.h
   vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
+  //initalizes left/right hook with triport from config.h
+  vex::pneumatics hook(brain.ThreeWirePort.HOOKS_PORT);
 }
 
 void robot::init() {
@@ -57,6 +59,18 @@ void robot::init() {
       brain.Screen.newLine();
     }
   }
+  std::vector<std::pair<vex::triport::port, std::string>> legacy{
+    { brain.ThreeWirePort.CLAW_PORT, "claw"} , { brain.ThreeWirePort.HOOKS_PORT, "hook" }
+  };
+  
+  for (auto d : legacy) {
+
+    if (!d.first.installed()) {
+      brain.Screen.print("Warning: %s not installed!", d.second.c_str());
+      brain.Screen.newLine();
+    }
+  }
+  brain.Screen.print("Warning: ");
   //prints if controllers are not connected
   if (!primary.installed())
     brain.Screen.print("Warning: primary controller not connected!");
@@ -73,14 +87,30 @@ void robot::init() {
   );
 }
 
-void robot::liftUp() {
-  
+bool lift_isUp = false; //lift is initally down
+bool back_isUp = true; //back is initally up
+
+void robot::liftSet(bool goUp) { 
+  //set lift to up if going up
+  lift.rotateTo(goUp ? lift_up : lift_down, vex::rotationUnits::rev);
+  lift_isUp = goUp;
 }
 
-void robot::liftDown() {
+void robot::liftToggle() {
+  //set lift to lift_down if is up
+  lift.rotateTo(lift_isUp ? lift_down : lift_up, vex::rotationUnits::rev);
+  lift_isUp = !lift_isUp;
 
+}
+
+void robot::backSet(bool goUp) { 
+  //set lift to up if going up
+  back.rotateTo(goUp ? back_up : back_down, vex::rotationUnits::rev);
+  back_isUp = goUp;
 }
 
 void robot::backToggle() {
-
+  //set lift to lift_down if is up
+  back.rotateTo(back_isUp ? back_down : back_up, vex::rotationUnits::rev);
+  back_isUp = !back_isUp;
 }

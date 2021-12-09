@@ -162,10 +162,7 @@ void inteldrive::runLPS() {
     robot::brain.Screen.printAt(20, 20, "<%4.4f, %4.4f>", location.x, location.y);
 #endif
 
-    uint32_t ctime; //current time
-    do //waits for one dt to pass
-      ctime = vex::timer::system();
-    while (ctime < ptime + dt);
-    ptime = ctime; //updates previous time to current time
+    vex::this_thread::sleep_until(ptime + dt);
+    ptime = vex::timer::system(); //updates previous time to current time
   }
 }

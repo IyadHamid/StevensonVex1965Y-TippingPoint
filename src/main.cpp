@@ -14,7 +14,10 @@
 #include "config.h"
 
 void autonomous() {
-
+  robot::hook.open();
+  vex::thread([]{
+    robot::backToggle();
+  });
 }
 
 void drivercontrol() {
@@ -33,6 +36,19 @@ void drivercontrol() {
 #else //DRIVE_MODE == TANK
     robot::idrive.TANK(robot::primary.Axis3.value(), robot::primary.Axis2.value(), modifiers.x);
 #endif
+
+    //enables manual control
+    if (robot::primary.ButtonUp.pressing()) {
+      //prints options
+      robot::brain.Screen.printAt(0, 20, "Left : toggle hooks");
+      
+      //toggles hook
+      if (robot::primary.ButtonLeft.pressing()) {
+        static bool state = true;
+        robot::hook.set(!state);
+        state = !state;
+      }
+    }
   }
 }
 

@@ -12,7 +12,7 @@
 
 #include "config.h"
 
-#ifdef DEBUG
+#if DEBUG == PID
 #include "robot.h"
 #endif
 
@@ -24,10 +24,10 @@ void PID::run(double goal, double dmax, uint32_t dt) {
   
 #if DEBUG == PID
   //prints out debugging values for PID
-  robot::brain.Screen.printAt(0, 20, "P: "); //proportional component
-  robot::brain.Screen.printAt(0, 40, "I: "); //integral component
-  robot::brain.Screen.printAt(0, 60, "D: "); //derivative component
-  robot::brain.Screen.printAt(0, 80, "o: "); //final output
+  robot::brain.Screen.printAt(0, 20, "P: ");       //proportional component
+  robot::brain.Screen.printAt(0, 40, "I: ");       //integral component
+  robot::brain.Screen.printAt(0, 60, "D: ");       //derivative component
+  robot::brain.Screen.printAt(0, 80, "o: ");       //final output
   robot::brain.Screen.printAt(20, 20, "%4.4f", e); //error
 #endif
 
@@ -58,10 +58,7 @@ void PID::run(double goal, double dmax, uint32_t dt) {
     pe = e;          //set previous error
     e = error(goal); //set new error
 
-    uint32_t ctime; //current time
-    do //waits for one dt to pass
-      ctime = vex::timer::system();
-    while (ctime < ptime + dt);
-    ptime = ctime; //updates previous time to current time
+    vex::this_thread::sleep_until(ptime + dt);
+    ptime = vex::timer::system(); //updates previous time to current time
   }
 }

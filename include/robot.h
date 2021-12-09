@@ -34,16 +34,21 @@ namespace robot {
   //intelligent drive train
   extern inteldrive idrive;
 
-  //solenoid attached to piston controlling the claw
+  //single-acting solenoid attached to a piston controlling the claw
   extern vex::pneumatics claw;
+  //double-acting solenoid attached to the pistons controlling the each hook
+  extern vex::pneumatics hook;
   
   //init function
   void init();
 
-  //sets lift up
-  void liftUp();
-  //sets lift down
-  void liftDown();
+  //sets lift up/down; boolean new state (false = down)
+  void liftSet(bool newState);
+  //toggles lift from being up/down
+  void liftToggle();
+
+  //sets lift up/down; boolean new state (false = down)
+  void backSet(bool newState);
   //toggles back from being up/down
   void backToggle();
 

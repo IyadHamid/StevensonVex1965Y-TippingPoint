@@ -239,9 +239,20 @@
   - Prototyped local position system in new thread (under `lpsThread`)
   - Reasoning: drive algorithms can be improved with absolute location tracking
 
+## 12/2/2021
+- Replaced custom wait algorithm with `vex::this_thread::sleep_until`
+  - Reasoning: custom algorithm may hog CPU resources
+- Added left/right hook pnuematics declaration/definition/parameters in `robot.h`, `robot.cpp`, and `config.h`
+
+# 12/8/2021
+- Merged left/right pnuematic hooks together
+  - Reasoning: physical robot using 1 double-acting solenoid for both piston-controlled hooks 
+- Implemented pneumatic control for `robot::lift` and `robot::hook`
+
 ## TODO
 - Need to add things to `README.md`
   - Add controls and wiring
     - Create diagrams for each
 - Need to 'fix' units for `drivePID` and `turnPID` velocities
 - Need to test `inteldrive::runLPS`
+- Test autonomous start
