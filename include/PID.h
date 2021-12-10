@@ -19,6 +19,7 @@ public:
     double p, i, d, t;
   };
 
+  PID() {};
   // constructor; error input function, output function, PID constants
   PID(std::function<double(double)> func_e, 
       std::function<void(double)> func_out,

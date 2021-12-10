@@ -196,13 +196,13 @@
 - Need to add auto-straightening to `inteldrive::driveTo` to prevent skewed driving
 - Need to fix units for `drivePID` and `turnPID` velocities
 
-### 11/11/2021
+### 11/11/21
 - Added straight-stabilization to `inteldrive::driveTo`
 - Added definitions/declarations for `lift` and `back` motors
   - Added `motor_setting`s in `config.h` named `claw_lift` and `back_lift`
 - Added additional comments to all files
 
-### 11/17/2021
+### 11/17/21
 - Added `robot::init()` function
   - Checks if all devices are connected and prints if they are not
 - Added empty `inteldrive` constructor
@@ -220,7 +220,7 @@
   - Issue actually is `vex::task::sleep`
   - Fixed, initalized `idrive` in `robot::init`
 
-## 12/1/2021
+### 12/1/21
 - Renamed `robot::multitask` to functionally-same class `multithread` and moved to `common.h`
   - Now uses `vex::thread`
   - Uses a protected function to offload `std::function`
@@ -239,15 +239,33 @@
   - Prototyped local position system in new thread (under `lpsThread`)
   - Reasoning: drive algorithms can be improved with absolute location tracking
 
-## 12/2/2021
+### 12/2/21
 - Replaced custom wait algorithm with `vex::this_thread::sleep_until`
   - Reasoning: custom algorithm may hog CPU resources
 - Added left/right hook pnuematics declaration/definition/parameters in `robot.h`, `robot.cpp`, and `config.h`
 
-# 12/8/2021
+### 12/8/21
 - Merged left/right pnuematic hooks together
   - Reasoning: physical robot using 1 double-acting solenoid for both piston-controlled hooks 
 - Implemented pneumatic control for `robot::lift` and `robot::hook`
+#### Testing:
+- Tested pnuematic hooks
+  - Mechanical issue, control works as expected
+
+### 12/9/21
+- Used new lift controller functions in `main.cpp`
+- Assigned new ports in `config.h`
+- Fixed `Log.md` formatting
+- Temporarily disableed `inteldrive::runLPS`
+  - Currently unnecessary
+#### Testing:
+- Tested `inteldrive::driveTo` and `inteldrive::turnTo`
+  - Experienced memory permission error for PID control
+    - Hotfixed with using `robot::idrive` instead of `this` inside lambda function
+  - Found adequate PID values
+    - drive: kp=12.0, ki=7.0, kd=0.0, tolerance=0.1
+    - turn: kp=120.0, ki=25.0, kd=0.05, tolerance=0.01
+
 
 ## TODO
 - Need to add things to `README.md`
@@ -256,3 +274,5 @@
 - Need to 'fix' units for `drivePID` and `turnPID` velocities
 - Need to test `inteldrive::runLPS`
 - Test autonomous start
+- Fix memory permission error for `inteldrive`
+- Refined PID values (could be faster)

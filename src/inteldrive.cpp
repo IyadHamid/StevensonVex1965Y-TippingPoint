@@ -14,9 +14,9 @@
 #include "common.h"
 #include "PID.h"
 
-#if DEBUG == LPS
+//#if DEBUG == LPS
 #include "robot.h"
-#endif
+//#endif
 
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
@@ -24,15 +24,15 @@ inteldrive::inteldrive(vex::inertial i,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
   drivePID{ //initalizes drivePID
-    [this](double goal) { return goal - position(); },
-    [this](double input) { drive(input, angle_difference_rev(0, heading()) + 1.0); }, 
+    [=](double goal) { return goal - robot::idrive.position(); },
+    [=](double input) { robot::idrive.drive(input); }, 
     drive_k
   },
   turnPID{ //initalizes turnPID
-    [this](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
-    [this](double input) {
-      left .spin(vex::directionType::fwd, input, vex::velocityUnits::pct);
-      right.spin(vex::directionType::rev, input, vex::velocityUnits::pct);
+    [=](double goal) { return angle_difference_rev(goal, robot::idrive.heading()); }, //turnPID internally uses radians
+    [=](double input) {
+      robot::idrive.left .spin(vex::directionType::fwd, input, vex::velocityUnits::pct);
+      robot::idrive.right.spin(vex::directionType::rev, input, vex::velocityUnits::pct);
     },
     turn_k
   },
@@ -43,7 +43,7 @@ inteldrive::inteldrive(vex::inertial i,
   //waits until it is done calibrating
   while (inertialSensor.isCalibrating())
     vex::this_thread::sleep_for(100); //sleeps to save cpu resources
-  lpsThread = MEMBER_FUNCTION_THREAD( inteldrive, runLPS() );
+  //lpsThread = MEMBER_FUNCTION_THREAD( inteldrive, runLPS() );
 }
 
 inteldrive::inteldrive() //initalizes an unusable/empty inteldrive

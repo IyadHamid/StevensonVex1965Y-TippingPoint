@@ -65,12 +65,11 @@ void robot::init() {
   
   for (auto d : legacy) {
 
-    if (!d.first.installed()) {
-      brain.Screen.print("Warning: %s not installed!", d.second.c_str());
-      brain.Screen.newLine();
-    }
+    //if (!d.first.installed()) {
+    //  brain.Screen.print("Warning: %s not installed!", d.second.c_str());
+    //  brain.Screen.newLine();
+    //}
   }
-  brain.Screen.print("Warning: ");
   //prints if controllers are not connected
   if (!primary.installed())
     brain.Screen.print("Warning: primary controller not connected!");
@@ -92,25 +91,25 @@ bool back_isUp = true; //back is initally up
 
 void robot::liftSet(bool goUp) { 
   //set lift to up if going up
-  lift.rotateTo(goUp ? lift_up : lift_down, vex::rotationUnits::rev);
+  lift.rotateTo(goUp ? lift_up : lift_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   lift_isUp = goUp;
 }
 
 void robot::liftToggle() {
   //set lift to lift_down if is up
-  lift.rotateTo(lift_isUp ? lift_down : lift_up, vex::rotationUnits::rev);
+  lift.rotateTo(lift_isUp ? lift_down : lift_up, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   lift_isUp = !lift_isUp;
 
 }
 
 void robot::backSet(bool goUp) { 
   //set lift to up if going up
-  back.rotateTo(goUp ? back_up : back_down, vex::rotationUnits::rev);
+  back.rotateTo(goUp ? back_up : back_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   back_isUp = goUp;
 }
 
 void robot::backToggle() {
   //set lift to lift_down if is up
-  back.rotateTo(back_isUp ? back_down : back_up, vex::rotationUnits::rev);
+  back.rotateTo(back_isUp ? back_down : back_up, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   back_isUp = !back_isUp;
 }

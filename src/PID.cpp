@@ -23,6 +23,7 @@ void PID::run(double goal, double dmax, uint32_t dt) {
   uint32_t ptime;         //previous time
   
 #if DEBUG == PID
+  robot::brain.Screen.clearScreen();
   //prints out debugging values for PID
   robot::brain.Screen.printAt(0, 20, "P: ");       //proportional component
   robot::brain.Screen.printAt(0, 40, "I: ");       //integral component
@@ -53,7 +54,7 @@ void PID::run(double goal, double dmax, uint32_t dt) {
 
     if (dmax > 0.0 ) //if dmax > 0, max out to dmax
       out = std::min(out, dmax);
-    output(std::min(out, dmax)); //send output value back
+    output(out); //send output value back
 
     pe = e;          //set previous error
     e = error(goal); //set new error
