@@ -166,7 +166,7 @@
     - Duct-tape fix of creating new `inteldrive` and using that works
     - Unable to fix
 
-### 1/4/21
+### 11/4/21
 - Renamed `lmiddle` and `rmiddle` to `ltop` and `rtop` respectively
   - Reasoning: matches what they are called
 - Moved `inertial` constructor outside of `inteldrive` constructor in `robot.cpp`
@@ -276,6 +276,9 @@
 - Tested relative coordinate system
   - Works
 - Refined PID through driving along a square
+
+### 12/11/21
+- `11/4/21` incorrectly labeled as `1/4/21` in `Log.md`, fixed
 
 ## TODO
 - Need to add things to `README.md`
