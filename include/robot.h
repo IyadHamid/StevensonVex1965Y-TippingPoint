@@ -42,12 +42,14 @@ namespace robot {
   //init function
   void init();
 
-  //sets lift up/down; boolean new state (false = down)
+  //sets lift up/down; boolean go up?
   void liftSet(bool newState);
   //toggles lift from being up/down
   void liftToggle();
+  //moves lift up/down with limits; boolean go up?, return at a maximum
+  bool liftAnalog(bool goUp);
 
-  //sets lift up/down; boolean new state (false = down)
+  //sets lift up/down; boolean go up?
   void backSet(bool newState);
   //toggles back from being up/down
   void backToggle();

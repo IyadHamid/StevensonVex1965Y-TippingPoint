@@ -26,8 +26,8 @@ public:
       kPID k
     ) : k{k}, error{func_e}, output{func_out} {}
 
-  // runner; goal to achieve, maximum change for output (defaulted to 0, 0 is no maximum), change in time per cycle in ms (defaulted to 50)
-  void run(double goal, double dmax = 0.0, uint32_t dt = 50);
+  // runner; goal to achieve, timeout (0 is no timeout) maximum change for output (defaulted to 0, 0 is no maximum), change in time per cycle in ms (defaulted to 50)
+  void run(double goal, uint32_t timeout = 0, double dmax = 0.0, uint32_t dt = 50);
   
   //keeps public (instead of private/protected) so it can be changed during runtime
   kPID k; //constants for PID equation

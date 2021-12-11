@@ -54,7 +54,7 @@ inteldrive::inteldrive() //initalizes an unusable/empty inteldrive
 
 double inteldrive::heading(vex::rotationUnits units) {
   //redirects to inertial sensor
-  return inertialSensor.orientation(vex::orientationType::yaw, units);
+  return inertialSensor.heading(units);
 }
 
 double inteldrive::heading() {

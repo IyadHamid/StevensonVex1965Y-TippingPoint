@@ -16,12 +16,14 @@
 #include "robot.h"
 #endif
 
-void PID::run(double goal, double dmax, uint32_t dt) {
+void PID::run(double goal, uint32_t timeout, double dmax, uint32_t dt) {
+  const auto start = vex::timer::system(); //start time (used for timeout)
+
   double integral = 0.0;  //integral/sum of all errors
   double e = error(goal); //current error
   double pe = e;          //previous error
-  uint32_t ptime;         //previous time
-  
+  uint32_t now;           //current time
+
 #if DEBUG == PID
   robot::brain.Screen.clearScreen();
   //prints out debugging values for PID
@@ -32,8 +34,8 @@ void PID::run(double goal, double dmax, uint32_t dt) {
   robot::brain.Screen.printAt(20, 20, "%4.4f", e); //error
 #endif
 
-  ptime = vex::timer::system();
-  while (std::abs(e) > k.t) {
+  now = vex::timer::system();
+  while (std::abs(e) > k.t || (timeout != 0 && now - start > timeout )) {
 
     //smooths integral to 'forget' past used to not overcompensate
     integral /= 2.0;
@@ -59,7 +61,7 @@ void PID::run(double goal, double dmax, uint32_t dt) {
     pe = e;          //set previous error
     e = error(goal); //set new error
 
-    vex::this_thread::sleep_until(ptime + dt);
-    ptime = vex::timer::system(); //updates previous time to current time
+    vex::this_thread::sleep_until(now + dt);
+    now = vex::timer::system(); //updates previous time to current time
   }
 }

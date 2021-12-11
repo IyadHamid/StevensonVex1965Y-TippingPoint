@@ -266,12 +266,23 @@
     - drive: kp=12.0, ki=7.0, kd=0.0, tolerance=0.1
     - turn: kp=120.0, ki=25.0, kd=0.05, tolerance=0.01
 
+### 12/10/21
+- Added rumble feedback if claw is closed
+- Added timeout to `PID`
+  - Reasoning: `PID` may fail and get stuck in an infinite loop
+- Added analog control with maximums for lift
+  - Rumbles controller when at a maximum
+#### Testing:
+- Tested relative coordinate system
+  - Works
+- Refined PID through driving along a square
 
 ## TODO
 - Need to add things to `README.md`
   - Add controls and wiring
-    - Create diagrams for each
+    - Create diagrams for each 
 - Need to 'fix' units for `drivePID` and `turnPID` velocities
+  - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
 - Need to test `inteldrive::runLPS`
 - Test autonomous start
 - Fix memory permission error for `inteldrive`

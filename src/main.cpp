@@ -15,22 +15,35 @@
 
 void autonomous() {
   robot::hook.open();
-  vex::thread([]{
+  vex::thread t([]{
     robot::backToggle();
   });
+  robot::idrive.driveTo(20, 100);
+  t.join();
 }
 
 void drivercontrol() {
   //adds control function feedbacks
-  robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); } );
-  robot::primary.ButtonL2.pressed([]{ robot::liftSet(false); } );
+  robot::primary.ButtonL1.pressed([]{ robot::liftAnalog(true); } );
+  robot::primary.ButtonL2.pressed([]{ robot::liftAnalog(false); } );
   robot::primary.ButtonA.pressed(robot::backToggle);
   robot::primary.ButtonR2.pressed([]{ //toggle claw
-    static bool isOpen = false;
-    if (isOpen) 
+    static bool isOpen = false; //piston starts out closed
+    static vex::thread rumbleThread; //thread to rumble controller
+    if (isOpen) {
       robot::claw.close();
-    else
-      robot::claw.open(); 
+      rumbleThread.interrupt();
+    }
+    else {
+      robot::claw.open();
+      rumbleThread = vex::thread([]{ //rumbles thread until interrupted
+        while (1) {
+          robot::primary.rumble("-");
+          vex::this_thread::sleep_for(500);
+        }
+      });
+      rumbleThread.setPriority(vex::thread::threadPrioritylow);
+    }
     isOpen = !isOpen;
   });
   
@@ -45,8 +58,21 @@ void drivercontrol() {
     robot::idrive.tank(robot::primary.Axis3.value(), robot::primary.Axis2.value(), modifiers.x);
 #endif
 
-    //enables manual control
-    if (robot::primary.ButtonUp.pressing()) {
+    
+
+    if (robot::primary.ButtonL1.pressing()) {
+      if (robot::liftAnalog(true))
+        robot::primary.rumble(".");
+    }
+    else if (robot::primary.ButtonL2.pressing()) {
+      if (robot::liftAnalog(false))
+        robot::primary.rumble(".");
+    }
+    else 
+      robot::lift.stop(vex::brakeType::hold);
+
+
+    if (robot::primary.ButtonUp.pressing()) { //enables manual control
       //prints options
       robot::brain.Screen.printAt(0, 20, "Left : toggle hooks");
       
@@ -66,11 +92,17 @@ int main() {
   robot::init();
   competition.autonomous(autonomous);
   //competition.drivercontrol(drivercontrol);
-  
-  //robot::idrive.driveTo(40, 100);
-  robot::idrive.turnTo(.5, 100);
-  
-  //robot::idrive.turnTo(.5, 100);
+
+  using namespace robot;
+  double dist = 15;
+  idrive.driveTo(dist, 100);
+  idrive.turnTo(.25, 100);
+  idrive.driveTo(dist, 100);
+  idrive.turnTo(.25, 100);
+  idrive.driveTo(dist, 100);
+  idrive.turnTo(.25, 100);
+  idrive.driveTo(dist, 100);
+  idrive.turnTo(.25, 100);
 
   while (1) 
     vex::task::sleep(100); //sleeps to save cpu resources

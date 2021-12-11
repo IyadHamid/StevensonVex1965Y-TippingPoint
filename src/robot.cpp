@@ -99,7 +99,18 @@ void robot::liftToggle() {
   //set lift to lift_down if is up
   lift.rotateTo(lift_isUp ? lift_down : lift_up, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   lift_isUp = !lift_isUp;
+}
 
+bool robot::liftAnalog(bool goUp) {
+  if (goUp && lift.rotation(rotationUnits::rev) < lift_up)
+    lift.spin(directionType::fwd, 100, vex::velocityUnits::pct);
+  else if (!goUp && lift.rotation(rotationUnits::rev) > lift_down)
+    lift.spin(directionType::rev, 100, vex::velocityUnits::pct);
+  else {
+    lift.stop(vex::brakeType::hold);
+    return true;
+  }
+  return false;
 }
 
 void robot::backSet(bool goUp) { 
