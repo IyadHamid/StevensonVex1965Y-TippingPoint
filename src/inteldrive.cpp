@@ -57,19 +57,9 @@ double inteldrive::heading(vex::rotationUnits units) {
   return inertialSensor.heading(units);
 }
 
-double inteldrive::heading() {
-  //redirects to heading(units) with revolution as supplied unit
-  return heading(vex::rotationUnits::rev);
-}
-
 double inteldrive::position(vex::rotationUnits units) {
   //gets average of left motor group and right motor group positions in given units
   return (left.position(units) + right.position(units)) / 2.0;
-}
-
-double inteldrive::position() {
-  //redirects to position(units) with revolutions as supplied unit
-  return position(vex::rotationUnits::rev);
 }
 
 void inteldrive::resetHeading() {
@@ -149,7 +139,7 @@ void inteldrive::runLPS() {
   uint32_t dt = 50; //change in time
   uint32_t ptime = vex::timer::system(); //previous time
 
-#if DEBUG == LPS
+#if DEBUG
   //prints out debugging header for LPS
   robot::brain.Screen.printAt(0, 20, "L: "); //Location
 #endif
@@ -157,7 +147,7 @@ void inteldrive::runLPS() {
   while (1) { //should get interrupted elsewhere
     location += vec2::polar(position() / distanceRatio, heading());
     
-#if DEBUG == LPS
+#if DEBUG
     //prints actual vector corresponding to label above
     robot::brain.Screen.printAt(20, 20, "<%4.4f, %4.4f>", location.x, location.y);
 #endif
@@ -165,4 +155,8 @@ void inteldrive::runLPS() {
     vex::this_thread::sleep_until(ptime + dt);
     ptime = vex::timer::system(); //updates previous time to current time
   }
+}
+
+double inteldrive::getDistanceRatio() {
+  return distanceRatio;
 }

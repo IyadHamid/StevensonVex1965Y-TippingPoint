@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/*    Module:       robot.h                                                   */
+/*    Module:       robot.cpp                                                 */
 /*    Author:       Iyad Hamid                                                */
 /*    Created:      Wed 15 Sep 2021                                           */
 /*    Description:  Defines robot namespace                                   */
@@ -75,6 +75,9 @@ void robot::init() {
     brain.Screen.print("Warning: primary controller not connected!");
   brain.Screen.newLine();
 
+  
+  robot::hook.set(false);
+  robot::lift.stop(vex::brakeType::hold);
   
   //initalizes intelligent drivetrain with above sensor, motor groups, and constants from config.h
   idrive = inteldrive(

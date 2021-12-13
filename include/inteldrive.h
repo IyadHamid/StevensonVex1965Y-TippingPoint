@@ -32,14 +32,10 @@ public:
   // inteldrive destructor (does nothing)
   ~inteldrive() {}
   
-  // gyrometer's heading; units for returned rotation
-  double heading(vex::rotationUnits units);
-  // gyrometer's heading in revolutions
-  double heading();
-  // motor encoder's rotational; units for returned rotation
-  double position(vex::rotationUnits unit);
-  // motor encoder's rotational position in revolutions
-  double position();
+  // gyrometer's heading; units for returned rotation (defaulted to revolution)
+  double heading(vex::rotationUnits units = vex::rotationUnits::rev);
+  // motor encoder's rotational; units for returned rotation (defaulted to revolution)
+  double position(vex::rotationUnits unit = vex::rotationUnits::rev);
 
   // resets inertial sensor's heading to 0 revolutions
   void resetHeading();
@@ -64,6 +60,9 @@ public:
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
   // tank style drive controls; left percent, right percent, percent modifer (defaulted to 1)
   void tank(double l, double r, double modifer = 1.0);
+
+  // gets distance ratio
+  double getDistanceRatio();
 
 protected:
   // local position system

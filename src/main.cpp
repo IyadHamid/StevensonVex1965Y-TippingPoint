@@ -14,18 +14,53 @@
 #include "config.h"
 
 void autonomous() {
-  robot::hook.open();
-  vex::thread t([]{
-    robot::backToggle();
+  vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
+  using namespace robot;
+#if defined(AUTON_A)
+  robot::primary.Screen.clearScreen();
+  robot::primary.Screen.print("Auton");
+  //robot::hook.open();
+  vex::thread t1([]{
+    while (idrive.position() < idrive.getDistanceRatio() * 43.5)
+      vex::this_thread::sleep_for(50);
+    claw.open();
   });
-  robot::idrive.driveTo(20, 100);
-  t.join();
+  idrive.driveTo(45, 100);
+  vex::this_thread::sleep_for(150);
+  idrive.driveTo(-41, 100);
+  t1.join();
+  claw.close();
+
+#elif defined(AUTON_B)
+
+  idrive.driveTo(80, 100);
+  idrive.turnTo(.75, 100);
+  idrive.driveTo(48, 100);
+  idrive.turnTo(.75, 100);
+  idrive.driveTo(80, 100);
+
+  idrive.turnTo(.25, 100);
+  idrive.driveTo(48, 100);
+
+#else // defined(C)
+  vex::thread t2([]{
+    backSet(false);
+    hook.open();
+  });
+  idrive.driveTo(-45, 100);
+  t2.join();
+  back.rotateTo(back_high, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
+
+#endif
 }
 
 void drivercontrol() {
+  vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
+  robot::primary.Screen.clearScreen();
+  robot::primary.Screen.print("Driver");
   //adds control function feedbacks
-  robot::primary.ButtonL1.pressed([]{ robot::liftAnalog(true); } );
-  robot::primary.ButtonL2.pressed([]{ robot::liftAnalog(false); } );
+  robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); } );
+  robot::primary.ButtonL2.pressed([]{ robot::liftSet(false); } );
   robot::primary.ButtonA.pressed(robot::backToggle);
   robot::primary.ButtonR2.pressed([]{ //toggle claw
     static bool isOpen = false; //piston starts out closed
@@ -58,19 +93,6 @@ void drivercontrol() {
     robot::idrive.tank(robot::primary.Axis3.value(), robot::primary.Axis2.value(), modifiers.x);
 #endif
 
-    
-
-    if (robot::primary.ButtonL1.pressing()) {
-      if (robot::liftAnalog(true))
-        robot::primary.rumble(".");
-    }
-    else if (robot::primary.ButtonL2.pressing()) {
-      if (robot::liftAnalog(false))
-        robot::primary.rumble(".");
-    }
-    else 
-      robot::lift.stop(vex::brakeType::hold);
-
 
     if (robot::primary.ButtonUp.pressing()) { //enables manual control
       //prints options
@@ -90,19 +112,25 @@ int main() {
   vex::competition competition;
   
   robot::init();
-  competition.autonomous(autonomous);
-  //competition.drivercontrol(drivercontrol);
 
+#ifndef TEST
+    competition.autonomous(autonomous);
+    competition.drivercontrol(drivercontrol);
+#endif
+
+
+#ifdef TEST
   using namespace robot;
-  double dist = 15;
-  idrive.driveTo(dist, 100);
-  idrive.turnTo(.25, 100);
-  idrive.driveTo(dist, 100);
-  idrive.turnTo(.25, 100);
-  idrive.driveTo(dist, 100);
-  idrive.turnTo(.25, 100);
-  idrive.driveTo(dist, 100);
-  idrive.turnTo(.25, 100);
+ //test code
+  double dist = 40;
+  const double sides = 3.0;
+    const double ang = 1.0/3.0;
+  for (double i = 0.0; i < sides; i++) {
+    idrive.driveTo(dist, 100);
+    idrive.turnTo(ang, 100);
+  }
+#endif
+  vex::this_thread::setPriority(vex::thread::threadPrioritylow);
 
   while (1) 
     vex::task::sleep(100); //sleeps to save cpu resources

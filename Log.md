@@ -39,7 +39,7 @@
 - Added definitions to `robot.cpp`
   - Added `constexpr` variables for constants such as ports and robot 
 - Added some functionality to `main.cpp`
-  - Added `vex::competion` instance
+  - Added `vex::competition` instance
   - Added `drivercontrol` function
   - Added `autonomous` function
  
@@ -280,6 +280,46 @@
 ### 12/11/21
 - `11/4/21` incorrectly labeled as `1/4/21` in `Log.md`, fixed
 
+### 12/12/21 (Competition)
+- Added `TEST` macro
+  - Toggles testing mode in `main.cpp`
+- Fixed spelling/typogoraphic errors
+  - `degreees` to `degrees` in `common.h`
+  - `mathamatical` to `mathematical` in `common.h`
+  - `robot.h` to `robot.cpp` (in the file description) in `robot.cpp`
+- Created simple autonomous 
+  - Goes forward, picks up one middle mogo, comes back
+  - Multithreaded claw clamping down
+    - Reasoning: too much waiting if singlethreaded
+- Stopped using namespace `vex` in `config.h`
+  - Reasoning: when using namespace `robot` 
+  - Reverted
+    - Reasoning: Vex headers break
+- Changed lift control to toggle
+  - Changed to two button toggle (L1 up, L2 down)
+- Removed `inteldrive::position()` and `inteldrive::heading()` to use overloaded functions with default parameter
+  - Reasoning: redundant
+#### Testing:
+- `inteldrive::turnTo` not functional after going straight
+  - Negative numbers nonfunctional, must use 0 to 1
+#### Competition:
+- Sudden failure of controller
+  - Had to reset controller
+- Turned off in middle of match
+  - Unknown battery issue
+    - Possibly firmware
+    - Possibly battery charge
+- Auton failure
+  - Distances mismatch, likely want to use ultrasonic sensor for calibration
+- Tied grabbing a middle mogo
+  - Lift motor was not locked and went up, changed to hold motor when starting match
+    - Tug of war test appears to work
+- Detected pnuematic leak
+  - Possibly in solenoid
+- Robot didin't move
+  - Program may not have been uploaded
+- Controller likely causing issues
+
 ## TODO
 - Need to add things to `README.md`
   - Add controls and wiring
@@ -289,4 +329,6 @@
 - Need to test `inteldrive::runLPS`
 - Test autonomous start
 - Fix memory permission error for `inteldrive`
-- Refined PID values (could be faster)
+- Refine PID values (could be faster)
+- Check/fix pnuematic leak
+- Possibly change controllers

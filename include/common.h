@@ -10,12 +10,12 @@
 
 #include <cmath>
 
-constexpr double pi = 3.14159265359; //mathmatical π
-constexpr double tau = pi * 2.0; //mathmatical τ
+constexpr double pi = 3.14159265359; //mathematical π
+constexpr double tau = pi * 2.0; //mathematical τ
 
-// degreees to radians
+// degrees to radians
 constexpr double deg2rad(double a) { return a * pi/180.0; }
-// degreees to revolutions
+// degrees to revolutions
 constexpr double deg2rev(double a) { return a * 1.0/360.0; }
 
 // radians to degrees
@@ -51,10 +51,11 @@ static const double angle_difference_rad(double a, double b) {
 // difference of A and B in degrees
 //returns positive : A is right of B
 static const double angle_difference_rev(double a, double b) {
+  a = a - std::floor(a);
   return std::fmod((a - b + 0.5), 1.0) - 0.5;
 }
 
-// mathmatical 2-dimensional vector
+// mathematical 2-dimensional vector
 struct vec2 {
   double x, y;
   

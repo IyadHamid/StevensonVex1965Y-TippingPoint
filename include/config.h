@@ -18,12 +18,16 @@ using namespace vex;
 typedef std::tuple<int32_t, gearSetting, bool> motor_settings;
 
 // type of debugging [PID/LPS]
-#define DEBUG PID
+#define DEBUG
+//#define TEST
 
 // { forward controller modifier, right controller modifer }
 constexpr vec2 controller_modifiers { 0.4, 0.2 };
 // type of drive [ARCADE/DRONE/TANK] (defaults to TANK)
 #define DRONE
+
+// auton type
+#define AUTON_B
 
 const int32_t inertial_port = PORT10;
 
@@ -44,7 +48,7 @@ constexpr double robot_width = 12.0;
 
 // { proportional constant, integral constant, derivative constant, tolerance }
 constexpr PID::kPID drive_k = { 12.0, 7.0, 0.0, 0.1 };
-constexpr PID::kPID turn_k  = { 130.0, 20.0, 5.0, 0.01 };
+constexpr PID::kPID turn_k  = { 115.0, 15.0, 20.0, 0.005 };
 
 #define CLAW_PORT F
 #define HOOKS_PORT B
@@ -53,5 +57,5 @@ constexpr double back_up = 0.0;
 constexpr double back_down = 1.950;
 constexpr double back_high = 0.0;
 
-constexpr double lift_up = 4.635;
+constexpr double lift_up = 4.570;
 constexpr double lift_down = 0.0;
