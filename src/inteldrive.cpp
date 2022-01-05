@@ -14,9 +14,7 @@
 #include "common.h"
 #include "PID.h"
 
-//#if DEBUG == LPS
 #include "robot.h"
-//#endif
 
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
@@ -43,7 +41,6 @@ inteldrive::inteldrive(vex::inertial i,
   //waits until it is done calibrating
   while (inertialSensor.isCalibrating())
     vex::this_thread::sleep_for(100); //sleeps to save cpu resources
-  //lpsThread = MEMBER_FUNCTION_THREAD( inteldrive, runLPS() );
 }
 
 inteldrive::inteldrive() //initalizes an unusable/empty inteldrive
@@ -95,7 +92,7 @@ void inteldrive::turnTo(double ang, double vel, bool additive) {
   if (!additive) //defaulted to do relative turns
     resetHeading();
   //runs turnPID at angle
-  turnPID.run(ang);
+  turnPID.run(ang, 0, vel);
   stop(vex::brakeType::brake);
 }
 
@@ -108,7 +105,7 @@ void inteldrive::driveTo(double dist, double vel, bool additive) {
   resetHeading();
 
   //runs drivePID at distance
-  drivePID.run(dist);
+  drivePID.run(dist, 0, vel);
 
   inertialSensor.setHeading(prevHeading, vex::rotationUnits::rev); //reset heading back
   stop(vex::brakeType::brake); 
@@ -135,25 +132,11 @@ void inteldrive::tank(double l, double r, double modifer) {
   right.spin(vex::directionType::fwd, r * modifer, vex::percentUnits::pct);
 }
 
-void inteldrive::runLPS() {
-  uint32_t dt = 50; //change in time
-  uint32_t ptime = vex::timer::system(); //previous time
-
-#if DEBUG
-  //prints out debugging header for LPS
-  robot::brain.Screen.printAt(0, 20, "L: "); //Location
-#endif
-
-  while (1) { //should get interrupted elsewhere
-    location += vec2::polar(position() / distanceRatio, heading());
-    
-#if DEBUG
-    //prints actual vector corresponding to label above
-    robot::brain.Screen.printAt(20, 20, "<%4.4f, %4.4f>", location.x, location.y);
-#endif
-
-    vex::this_thread::sleep_until(ptime + dt);
-    ptime = vex::timer::system(); //updates previous time to current time
+void inteldrive::driveInPolygon(double dist, int sides) {
+  const double ang = 1.0/(double)sides;
+  for (double i = 0.0; i < sides; i++) {
+    driveTo(dist);
+    turnTo(ang);
   }
 }
 

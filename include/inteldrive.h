@@ -49,28 +49,25 @@ public:
   // stops motors; brake type (defaulted to braking)
   void stop(vex::brakeType mode = vex::brakeType::brake);
 
-  // turns robot to angle; revolution angle, percent velocity, should not reset gyrometer? (defaulted to false)
-  void turnTo(double ang, double vel, bool additive = false);
-  // drives robot to distance; inches distance, percent velocity, should not reset motor encoders? (defaulted to false)
-  void driveTo(double dist, double vel, bool additive = false);
-  // drives robot to displacement; 2D vector inches displacement, percent velocity, should not reset motor encoders/gyrometer? (defaulted to false)
-  void driveTo(vec2 loc, double vel, bool additive = false);
+  // turns robot to angle; revolution angle, percent velocity (defaulted to 0, 0 is no maximum), should not reset gyrometer? (defaulted to false)
+  void turnTo(double ang, double vel = 0.0, bool additive = false);
+  // drives robot to distance; inches distance, percent velocity (defualted to 0, 0 is no maximum), should not reset motor encoders? (defaulted to false)
+  void driveTo(double dist, double vel = 0.0, bool additive = false);
+  // drives robot to displacement; 2D vector inches displacement, percent velocity (defaulted to 0, 0 is no maximum), should not reset motor encoders/gyrometer? (defaulted to false)
+  void driveTo(vec2 loc, double vel = 0.0, bool additive = false);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
   // tank style drive controls; left percent, right percent, percent modifer (defaulted to 1)
   void tank(double l, double r, double modifer = 1.0);
 
+  // drive in polygon; distance, sides (minimum 3)
+  void driveInPolygon(double dist, int sides);
+
   // gets distance ratio
   double getDistanceRatio();
 
 protected:
-  // local position system
-  void runLPS();
-
-  vex::thread lpsThread; // thread to run the local positioning system
-  vec2 location;
-  
   PID drivePID, turnPID; // PID constants
 
   double robotWidth; // robot width in distance units

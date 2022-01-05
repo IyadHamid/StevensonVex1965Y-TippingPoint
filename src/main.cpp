@@ -33,24 +33,23 @@ void autonomous() {
 
 #elif defined(AUTON_B)
 
-  idrive.driveTo(80, 100);
-  idrive.turnTo(.75, 100);
-  idrive.driveTo(48, 100);
-  idrive.turnTo(.75, 100);
-  idrive.driveTo(80, 100);
+  idrive.driveTo(80);
+  idrive.turnTo(.75);
+  idrive.driveTo(48);
+  idrive.turnTo(.75);
+  idrive.driveTo(80);
 
-  idrive.turnTo(.25, 100);
-  idrive.driveTo(48, 100);
+  idrive.turnTo(.25);
+  idrive.driveTo(48);
 
 #else // defined(C)
   vex::thread t2([]{
     backSet(false);
     hook.open();
   });
-  idrive.driveTo(-45, 100);
+  idrive.driveTo(-45);
   t2.join();
   back.rotateTo(back_high, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
-
 #endif
 }
 
@@ -112,23 +111,20 @@ int main() {
   vex::competition competition;
   
   robot::init();
-
 #ifndef TEST
-    competition.autonomous(autonomous);
-    competition.drivercontrol(drivercontrol);
-#endif
-
-
-#ifdef TEST
+  competition.autonomous(autonomous);
+  competition.drivercontrol(drivercontrol);
+#else
   using namespace robot;
- //test code
   double dist = 40;
-  const double sides = 3.0;
-    const double ang = 1.0/3.0;
-  for (double i = 0.0; i < sides; i++) {
-    idrive.driveTo(dist, 100);
-    idrive.turnTo(ang, 100);
-  }
+  int time = 0;
+  idrive.driveTo(dist);
+  vex::this_thread::sleep_for(time);
+  idrive.driveTo(-dist/2.0);
+  vex::this_thread::sleep_for(time);
+  idrive.driveTo(5);
+  vex::this_thread::sleep_for(time);
+  idrive.driveTo(-dist/2.0 - 5);
 #endif
   vex::this_thread::setPriority(vex::thread::threadPrioritylow);
 

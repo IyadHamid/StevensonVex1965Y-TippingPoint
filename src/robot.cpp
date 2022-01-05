@@ -70,12 +70,7 @@ void robot::init() {
     //  brain.Screen.newLine();
     //}
   }
-  //prints if controllers are not connected
-  if (!primary.installed())
-    brain.Screen.print("Warning: primary controller not connected!");
-  brain.Screen.newLine();
 
-  
   robot::hook.set(false);
   robot::lift.stop(vex::brakeType::hold);
   

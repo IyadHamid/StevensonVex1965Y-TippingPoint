@@ -12,7 +12,7 @@
 
 #include "config.h"
 
-#ifdef DEBUG
+#ifdef DEBUG_PID
 #include "robot.h"
 #endif
 
@@ -24,7 +24,7 @@ void PID::run(double goal, uint32_t timeout, double dmax, uint32_t dt) {
   double pe = e;          //previous error
   uint32_t now;           //current time
 
-#ifdef DEBUG
+#ifdef DEBUG_PID
   robot::brain.Screen.clearScreen();
   //prints out debugging values for PID
   robot::brain.Screen.printAt(0, 20, "P: ");       //proportional component
@@ -46,7 +46,7 @@ void PID::run(double goal, uint32_t timeout, double dmax, uint32_t dt) {
     //PID = Kp*e(t) + Ki*(∫e(t)dt) + Kd*(d/dt*e(t))
     double out = k.p * e + k.i * integral + k.d * derivative;
 
-#ifdef DEBUG
+#ifdef DEBUG_PID
     //prints actual number corresponding to label above
     robot::brain.Screen.printAt(20, 20, "%4.4f", e);
     robot::brain.Screen.printAt(20, 40, "%4.4f", integral);

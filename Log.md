@@ -299,6 +299,7 @@
   - Changed to two button toggle (L1 up, L2 down)
 - Removed `inteldrive::position()` and `inteldrive::heading()` to use overloaded functions with default parameter
   - Reasoning: redundant
+- Possibly fixed `angle_difference_rev` through making value from 0 to 1 using decimal part
 #### Testing:
 - `inteldrive::turnTo` not functional after going straight
   - Negative numbers nonfunctional, must use 0 to 1
@@ -320,15 +321,28 @@
   - Program may not have been uploaded
 - Controller likely causing issues
 
+### 1/5/22
+- Removed primary control disconnected warn
+- Removed `inteldrive::runLPS`
+  - Reasoning: not functional with precision.
+- Implemented max velocity for `inteldrive::driveTo` and `inteldrive::turnTo`
+- Added `inteldrive::driveInPolygon`
+  - Reasoning: used to test PID constants
+
+#### Testing:
+- Refined drive PID values
+
 ## TODO
 - Need to add things to `README.md`
   - Add controls and wiring
     - Create diagrams for each 
 - Need to 'fix' units for `drivePID` and `turnPID` velocities
   - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
-- Need to test `inteldrive::runLPS`
+- Fix memory permission error
 - Test autonomous start
-- Fix memory permission error for `inteldrive`
 - Refine PID values (could be faster)
-- Check/fix pnuematic leak
 - Possibly change controllers
+- Fix "pulsing" when driving
+  - Likely caused through voltage drain
+    - Possible fix includes getting derivative
+- Possibly remove unused functionality in `inteldrive`

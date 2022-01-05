@@ -51,7 +51,7 @@ static const double angle_difference_rad(double a, double b) {
 // difference of A and B in degrees
 //returns positive : A is right of B
 static const double angle_difference_rev(double a, double b) {
-  a = a - std::floor(a);
+  a -= std::floor(a);
   return std::fmod((a - b + 0.5), 1.0) - 0.5;
 }
 
