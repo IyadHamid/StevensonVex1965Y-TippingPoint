@@ -21,19 +21,8 @@ inteldrive::inteldrive(vex::inertial i,
                        PID::kPID drive_k, PID::kPID turn_k,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
-  drivePID{ //initalizes drivePID
-    [=](double goal) { return goal - robot::idrive.position(); },
-    [=](double input) { robot::idrive.drive(input); }, 
-    drive_k
-  },
-  turnPID{ //initalizes turnPID
-    [=](double goal) { return angle_difference_rev(goal, robot::idrive.heading()); }, //turnPID internally uses radians
-    [=](double input) {
-      robot::idrive.left .spin(vex::directionType::fwd, input, vex::velocityUnits::pct);
-      robot::idrive.right.spin(vex::directionType::rev, input, vex::velocityUnits::pct);
-    },
-    turn_k
-  },
+  drivePID(),
+  turnPID(),
   robotWidth{rw}, distanceRatio{ratio}
 {
   //callibrates inertial sensors
@@ -41,6 +30,9 @@ inteldrive::inteldrive(vex::inertial i,
   //waits until it is done calibrating
   while (inertialSensor.isCalibrating())
     vex::this_thread::sleep_for(100); //sleeps to save cpu resources
+
+  drivePID.k = drive_k;
+  turnPID.k = turn_k;
 }
 
 inteldrive::inteldrive() //initalizes an unusable/empty inteldrive
@@ -72,14 +64,14 @@ void inteldrive::resetPosition() {
 
 void inteldrive::drive(double vel, double ratio) {
   //drives left and right motor groups at percent velocity skewed right at ratio
-  left .spin(vex::directionType::fwd, vel / ratio, vex::velocityUnits::pct);
-  right.spin(vex::directionType::fwd, vel * ratio, vex::velocityUnits::pct);
+  left .spin(vex::directionType::fwd, vel / ratio * 150.0, vex::voltageUnits::mV);
+  right.spin(vex::directionType::fwd, vel * ratio * 150.0, vex::voltageUnits::mV);
 }
 
 void inteldrive::drive(double vel) {
   //drives left and right motor groups at percent velocity
-  left .spin(vex::directionType::fwd, vel, vex::velocityUnits::pct);
-  right.spin(vex::directionType::fwd, vel, vex::velocityUnits::pct);
+  left .spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
+  right.spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
 }
 
 void inteldrive::stop(vex::brakeType mode) {
@@ -89,6 +81,9 @@ void inteldrive::stop(vex::brakeType mode) {
 }
 
 void inteldrive::turnTo(double ang, double vel, bool additive) {
+  //calls recapture once
+  __attribute__((unused)) static bool once = [&](){ recapture(); return true; }();
+
   if (!additive) //defaulted to do relative turns
     resetHeading();
   //runs turnPID at angle
@@ -97,6 +92,9 @@ void inteldrive::turnTo(double ang, double vel, bool additive) {
 }
 
 void inteldrive::driveTo(double dist, double vel, bool additive) {
+  //calls recapture once
+  __attribute__((unused)) static bool once = [&](){ recapture(); return true; }();
+
   dist *= distanceRatio; //from inches to rotations
   if (!additive) //defaulted to do relative movements
     resetPosition();
@@ -122,14 +120,15 @@ void inteldrive::arcade(double vertical, double horizontal, double vertModifer, 
   vertical *= vertModifer;
   horizontal *= horiModifer;
   //spins left and right motor with given vertical/horizontal percents
-  left .spin(vex::directionType::fwd, vertical + horizontal, vex::percentUnits::pct);
-  right.spin(vex::directionType::fwd, vertical - horizontal, vex::percentUnits::pct); 
+  
+  left .spin(vex::directionType::fwd, (vertical + horizontal) * 150.0, vex::voltageUnits::mV);
+  right.spin(vex::directionType::fwd, (vertical - horizontal) * 150.0, vex::voltageUnits::mV); 
 }
 
 void inteldrive::tank(double l, double r, double modifer) {
   //spins left and right motors with corresponding inputs multiplied by modifer
-  left .spin(vex::directionType::fwd, l * modifer, vex::percentUnits::pct);
-  right.spin(vex::directionType::fwd, r * modifer, vex::percentUnits::pct);
+  left .spin(vex::directionType::fwd, l * modifer * 150.0, vex::voltageUnits::mV);
+  right.spin(vex::directionType::fwd, r * modifer * 150.0, vex::voltageUnits::mV);
 }
 
 void inteldrive::driveInPolygon(double dist, int sides) {
@@ -142,4 +141,21 @@ void inteldrive::driveInPolygon(double dist, int sides) {
 
 double inteldrive::getDistanceRatio() {
   return distanceRatio;
+}
+
+//used to avoid memory permission error by recapturing this
+void inteldrive::recapture() {
+  drivePID = PID( //initalizes drivePID
+    [&](double goal) { return goal - position(); },
+    [&](double input) { drive(input); }, 
+    drivePID.k
+  );
+  turnPID = PID( //initalizes turnPID
+    [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
+    [&](double input) {
+      left .spin(vex::directionType::fwd, input * 150.0, vex::voltageUnits::mV);
+      right.spin(vex::directionType::rev, input * 150.0, vex::voltageUnits::mV);
+    },
+    turnPID.k
+  );
 }

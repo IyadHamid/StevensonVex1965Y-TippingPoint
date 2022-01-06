@@ -14,11 +14,12 @@
 #include "config.h"
 
 void autonomous() {
-  vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
   using namespace robot;
-#if defined(AUTON_A)
+  vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
   robot::primary.Screen.clearScreen();
   robot::primary.Screen.print("Auton");
+
+#if defined(AUTON_A)
   //robot::hook.open();
   vex::thread t1([]{
     while (idrive.position() < idrive.getDistanceRatio() * 43.5)
@@ -109,7 +110,6 @@ void drivercontrol() {
 
 int main() {
   vex::competition competition;
-  
   robot::init();
 #ifndef TEST
   competition.autonomous(autonomous);

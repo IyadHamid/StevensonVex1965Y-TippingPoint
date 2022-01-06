@@ -21,7 +21,7 @@ typedef std::tuple<int32_t, gearSetting, bool> motor_settings;
 #define DEBUG_PID
 
 // ignore driver control/autonomous for testing
-//#define TEST
+#define TEST
 
 // { forward controller modifier, right controller modifer }
 constexpr vec2 controller_modifiers { 0.4, 0.2 };

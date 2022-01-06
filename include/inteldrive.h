@@ -68,6 +68,9 @@ public:
   double getDistanceRatio();
 
 protected:
+  // recaptures this and sets PIDs
+  void recapture();
+
   PID drivePID, turnPID; // PID constants
 
   double robotWidth; // robot width in distance units

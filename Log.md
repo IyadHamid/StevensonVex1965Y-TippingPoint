@@ -328,9 +328,15 @@
 - Implemented max velocity for `inteldrive::driveTo` and `inteldrive::turnTo`
 - Added `inteldrive::driveInPolygon`
   - Reasoning: used to test PID constants
-
 #### Testing:
 - Refined drive PID values
+
+### 1/6/22
+- Now using voltage control instead of percent for motors in `inteldrive`
+  - Replaced with `vel * 150.0` using `mV` units
+  - Reasoning: percent making weird calculations making robot more difficult to control
+- Fixed memory permission error
+  - Recaptured this in lambdas prior to usage
 
 ## TODO
 - Need to add things to `README.md`
@@ -338,11 +344,6 @@
     - Create diagrams for each 
 - Need to 'fix' units for `drivePID` and `turnPID` velocities
   - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
-- Fix memory permission error
 - Test autonomous start
 - Refine PID values (could be faster)
 - Possibly change controllers
-- Fix "pulsing" when driving
-  - Likely caused through voltage drain
-    - Possible fix includes getting derivative
-- Possibly remove unused functionality in `inteldrive`
