@@ -338,6 +338,25 @@
 - Fixed memory permission error
   - Recaptured this in lambdas prior to usage
 
+
+### 1/12/22
+- Remove `TEST` macro
+  - Reasoning: too cumbersome, easier to comment/uncomment
+- Minor formatting tweaks
+- Main thread contains prototype absolution location tracking
+  - Will break autonomous with current version
+- Updated `Readme.md`
+  - Added `robot.png` depicting robot
+  - Added information on code functionalities
+  - Added robot configuration
+  - Added team name
+- Cleaned up some code
+#### Testing:
+- Tested prototype absolute location tracking
+  - Some innaccuracies while turning
+    - Likely due to slipping
+  - Going straight appears to track well
+
 ## TODO
 - Need to add things to `README.md`
   - Add controls and wiring

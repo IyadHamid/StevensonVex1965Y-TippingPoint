@@ -60,11 +60,11 @@ struct vec2 {
   double x, y;
   
   // creates vector from polar coordinates
-  static vec2 polar(double mag, double ang) { return vec2{cos(ang) * mag, sin(ang) * mag}; };
+  static vec2 polar(double mag, double ang) { return vec2{ cos(ang) * mag, sin(ang) * mag }; };
 
-  vec2 operator+(vec2 other) { return vec2{x+other.x, y+other.y}; }
-  vec2 operator-(vec2 other) { return vec2{x-other.x, y-other.y}; }
-  vec2 operator*(double other) { return vec2{x*other, y*other}; }
+  vec2 operator+(vec2 other) { return vec2{ x+other.x, y+other.y }; }
+  vec2 operator-(vec2 other) { return vec2{ x-other.x, y-other.y }; }
+  vec2 operator*(double other) { return vec2{ x*other, y*other }; }
   
   void operator+=(vec2 other) { *this = *this + other; }
   void operator-=(vec2 other) { *this = *this - other; }

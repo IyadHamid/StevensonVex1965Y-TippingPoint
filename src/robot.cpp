@@ -62,14 +62,6 @@ void robot::init() {
   std::vector<std::pair<vex::triport::port, std::string>> legacy{
     { brain.ThreeWirePort.CLAW_PORT, "claw"} , { brain.ThreeWirePort.HOOKS_PORT, "hook" }
   };
-  
-  for (auto d : legacy) {
-
-    //if (!d.first.installed()) {
-    //  brain.Screen.print("Warning: %s not installed!", d.second.c_str());
-    //  brain.Screen.newLine();
-    //}
-  }
 
   robot::hook.set(false);
   robot::lift.stop(vex::brakeType::hold);

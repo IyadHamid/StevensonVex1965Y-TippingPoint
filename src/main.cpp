@@ -111,23 +111,24 @@ void drivercontrol() {
 int main() {
   vex::competition competition;
   robot::init();
-#ifndef TEST
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
-#else
+  
   using namespace robot;
-  double dist = 40;
-  int time = 0;
-  idrive.driveTo(dist);
-  vex::this_thread::sleep_for(time);
-  idrive.driveTo(-dist/2.0);
-  vex::this_thread::sleep_for(time);
-  idrive.driveTo(5);
-  vex::this_thread::sleep_for(time);
-  idrive.driveTo(-dist/2.0 - 5);
-#endif
-  vex::this_thread::setPriority(vex::thread::threadPrioritylow);
 
-  while (1) 
-    vex::task::sleep(100); //sleeps to save cpu resources
+  vec2 x{0.0, 0.0};
+  auto pt = vex::timer::system();
+  while (1)  {
+    double dt = (vex::timer::system() - pt) / 1000.0;
+    pt = vex::timer::system();
+
+    double dist = idrive.position();
+    //dist /= idrive.getDistanceRatio();
+    idrive.resetPosition();
+
+    x += vec2::polar(dist, idrive.heading());
+    robot::primary.Screen.clearLine();
+    robot::primary.Screen.print("%.4f, %.4f", x.x, x.y);
+    //vex::task::sleep(10); //sleeps to save cpu resources
+  }
 }

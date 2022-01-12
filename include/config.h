@@ -20,11 +20,8 @@ typedef std::tuple<int32_t, gearSetting, bool> motor_settings;
 // type of debugging DEBUG_PID
 #define DEBUG_PID
 
-// ignore driver control/autonomous for testing
-#define TEST
-
 // { forward controller modifier, right controller modifer }
-constexpr vec2 controller_modifiers { 0.4, 0.2 };
+constexpr vec2 controller_modifiers { 0.4, 0.4 };
 // type of drive [ARCADE/DRONE/TANK] (defaults to TANK)
 #define DRONE
 
@@ -35,12 +32,12 @@ const int32_t inertial_port = PORT10;
 
 // { port, gear ratio, is reverse? }
 const motor_settings left_front  { PORT8 , gearSetting::ratio6_1, true  };
-const motor_settings left_top    { PORT9 , gearSetting::ratio6_1, false };
 const motor_settings left_back   { PORT7 , gearSetting::ratio6_1, true  };
+const motor_settings left_top    { PORT9 , gearSetting::ratio6_1, false };
 
 const motor_settings right_front { PORT19, gearSetting::ratio6_1, false };
-const motor_settings right_top   { PORT18, gearSetting::ratio6_1, true  };
 const motor_settings right_back  { PORT5 , gearSetting::ratio6_1, false };
+const motor_settings right_top   { PORT18, gearSetting::ratio6_1, true  };
 
 const motor_settings claw_lift   { PORT13, gearSetting::ratio18_1, false };
 const motor_settings back_lift   { PORT2 , gearSetting::ratio18_1, false };
