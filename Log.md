@@ -357,12 +357,25 @@
     - Likely due to slipping
   - Going straight appears to track well
 
+### 1/13/22
+- Added `deltaTracker`
+  - Reasoning: track anything that changes easier (e.g. time, motor revolutions)
+- Removed `inteldrive::resetPosition` and `inteldrive::resetHeading`
+  - Algorithms instead now uses `deltaTracker` or other equivalent method
+  - Reasoning: force resetting may mess other algorithms
+- Removed `inteldrive::driveTo(vec2...)` (drive to displacement)
+  - Reasoning: unused
+- Renamed parameter `additive` to `relative` in `inteldrive::driveTo` and `inteldrive::turnTo`
+  - `relative` has opposite/inverted meaning `additive`
+  - Reasoning: unclear meaning
+#### Testing
+- Using voltage to control motors causes inconsistent speeds
+  - Want some method to guarentee straightness
+
 ## TODO
-- Need to add things to `README.md`
-  - Add controls and wiring
-    - Create diagrams for each 
+- Need to add controller config to `README.md`
+  - Create diagrams 
 - Need to 'fix' units for `drivePID` and `turnPID` velocities
   - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
 - Test autonomous start
 - Refine PID values (could be faster)
-- Possibly change controllers

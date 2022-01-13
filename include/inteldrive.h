@@ -37,11 +37,6 @@ public:
   // motor encoder's rotational; units for returned rotation (defaulted to revolution)
   double position(vex::rotationUnits unit = vex::rotationUnits::rev);
 
-  // resets inertial sensor's heading to 0 revolutions
-  void resetHeading();
-  // resets motor encoder's to 0 revolutions
-  void resetPosition();
-
   // drives at velocity with turning ratio; percent velocity, ratio for right : left
   void drive(double vel, double ratio);
   // drives at velocity; percent velocity
@@ -50,11 +45,9 @@ public:
   void stop(vex::brakeType mode = vex::brakeType::brake);
 
   // turns robot to angle; revolution angle, percent velocity (defaulted to 0, 0 is no maximum), should not reset gyrometer? (defaulted to false)
-  void turnTo(double ang, double vel = 0.0, bool additive = false);
+  void turnTo(double ang, double vel = 0.0, bool relative = true);
   // drives robot to distance; inches distance, percent velocity (defualted to 0, 0 is no maximum), should not reset motor encoders? (defaulted to false)
-  void driveTo(double dist, double vel = 0.0, bool additive = false);
-  // drives robot to displacement; 2D vector inches displacement, percent velocity (defaulted to 0, 0 is no maximum), should not reset motor encoders/gyrometer? (defaulted to false)
-  void driveTo(vec2 loc, double vel = 0.0, bool additive = false);
+  void driveTo(double dist, double vel = 0.0, bool relative = true);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);

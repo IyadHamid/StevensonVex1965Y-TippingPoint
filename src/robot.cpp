@@ -66,6 +66,8 @@ void robot::init() {
   robot::hook.set(false);
   robot::lift.stop(vex::brakeType::hold);
   
+  isensor.resetHeading();
+
   //initalizes intelligent drivetrain with above sensor, motor groups, and constants from config.h
   idrive = inteldrive(
     isensor, 

@@ -13,8 +13,7 @@
 
 #include "common.h"
 #include "PID.h"
-
-#include "robot.h"
+#include "deltaTracker.h"
 
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
@@ -51,17 +50,6 @@ double inteldrive::position(vex::rotationUnits units) {
   return (left.position(units) + right.position(units)) / 2.0;
 }
 
-void inteldrive::resetHeading() {
-  //resets heading on inertial sensor
-  inertialSensor.resetHeading();
-}
-
-void inteldrive::resetPosition() {
-  //resets positions on both left and right motor groups
-  left .resetPosition();
-  right.resetPosition();
-}
-
 void inteldrive::drive(double vel, double ratio) {
   //drives left and right motor groups at percent velocity skewed right at ratio
   left .spin(vex::directionType::fwd, vel / ratio * 150.0, vex::voltageUnits::mV);
@@ -80,39 +68,29 @@ void inteldrive::stop(vex::brakeType mode) {
   right.stop(mode);
 }
 
-void inteldrive::turnTo(double ang, double vel, bool additive) {
+void inteldrive::turnTo(double ang, double vel, bool relative) {
   //calls recapture once
   __attribute__((unused)) static bool once = [&](){ recapture(); return true; }();
 
-  if (!additive) //defaulted to do relative turns
-    resetHeading();
+  if (relative) //defaulted to do relative turns
+    ang += heading();
   //runs turnPID at angle
   turnPID.run(ang, 0, vel);
   stop(vex::brakeType::brake);
 }
 
-void inteldrive::driveTo(double dist, double vel, bool additive) {
+void inteldrive::driveTo(double dist, double vel, bool relative) {
   //calls recapture once
   __attribute__((unused)) static bool once = [&](){ recapture(); return true; }();
 
   dist *= distanceRatio; //from inches to rotations
-  if (!additive) //defaulted to do relative movements
-    resetPosition();
-
-  double prevHeading = heading(); //uses heading to keep robot straight
-  resetHeading();
+  if (relative) //defaulted to do relative movements
+    dist += position();
 
   //runs drivePID at distance
   drivePID.run(dist, 0, vel);
 
-  inertialSensor.setHeading(prevHeading, vex::rotationUnits::rev); //reset heading back
   stop(vex::brakeType::brake); 
-}
-
-void inteldrive::driveTo(vec2 loc, double vel, bool additive) {
-  //breaks vector into polar components and redirects to turnTo and driveTo
-  turnTo(loc.ang(), vel, additive);
-  driveTo(loc.mag() * distanceRatio, vel, additive);
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {
@@ -121,8 +99,8 @@ void inteldrive::arcade(double vertical, double horizontal, double vertModifer, 
   horizontal *= horiModifer;
   //spins left and right motor with given vertical/horizontal percents
   
-  left .spin(vex::directionType::fwd, (vertical + horizontal) * 150.0, vex::voltageUnits::mV);
-  right.spin(vex::directionType::fwd, (vertical - horizontal) * 150.0, vex::voltageUnits::mV); 
+  left .spin(vex::directionType::fwd, (vertical + horizontal) * 150, vex::voltageUnits::mV);
+  right.spin(vex::directionType::fwd, (vertical - horizontal) * 150, vex::voltageUnits::mV); 
 }
 
 void inteldrive::tank(double l, double r, double modifer) {

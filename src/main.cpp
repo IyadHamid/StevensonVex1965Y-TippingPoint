@@ -12,6 +12,7 @@
 #include "common.h"
 #include "robot.h"
 #include "config.h"
+#include "deltaTracker.h"
 
 void autonomous() {
   using namespace robot;
@@ -117,18 +118,16 @@ int main() {
   using namespace robot;
 
   vec2 x{0.0, 0.0};
-  auto pt = vex::timer::system();
+  deltaTracker<uint32_t> dt(vex::timer::system);
+
+  deltaTracker<double> dist([&](){ return robot::idrive.position(); });
+  deltaTracker<double> dir([&](){ return robot::idrive.heading(); });
   while (1)  {
-    double dt = (vex::timer::system() - pt) / 1000.0;
-    pt = vex::timer::system();
-
-    double dist = idrive.position();
-    //dist /= idrive.getDistanceRatio();
-    idrive.resetPosition();
-
-    x += vec2::polar(dist, idrive.heading());
+    x += vec2::polar(++dist / idrive.getDistanceRatio(), dir++);
+    robot::primary.Screen.setCursor(0, 0);
     robot::primary.Screen.clearLine();
-    robot::primary.Screen.print("%.4f, %.4f", x.x, x.y);
-    //vex::task::sleep(10); //sleeps to save cpu resources
+    robot::primary.Screen.print("%.3f, %.3f", x.x, x.y);
+
+    dt++;
   }
 }
