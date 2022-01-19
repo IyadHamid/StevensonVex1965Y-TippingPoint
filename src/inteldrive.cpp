@@ -24,14 +24,17 @@ inteldrive::inteldrive(vex::inertial i,
   turnPID(),
   robotWidth{rw}, distanceRatio{ratio}
 {
+  drivePID.k = drive_k;
+  turnPID.k = turn_k;
+
   //callibrates inertial sensors
   inertialSensor.calibrate();
   //waits until it is done calibrating
   while (inertialSensor.isCalibrating())
     vex::this_thread::sleep_for(100); //sleeps to save cpu resources
-
-  drivePID.k = drive_k;
-  turnPID.k = turn_k;
+  
+  trackingThread = MEMBER_FUNCTION_THREAD( inteldrive, locationTrack() );
+  trackingThread.setPriority(vex::thread::threadPriorityHigh);
 }
 
 inteldrive::inteldrive() //initalizes an unusable/empty inteldrive
@@ -119,6 +122,20 @@ void inteldrive::driveInPolygon(double dist, int sides) {
 
 double inteldrive::getDistanceRatio() {
   return distanceRatio;
+}
+
+vec2 inteldrive::getLocation() {
+  return location;
+}
+
+void inteldrive::locationTrack() {
+  deltaTracker<double> dist([&](){ return position(); });
+  deltaTracker<double> dir ([&](){ return heading();  });
+
+  while (1)  {
+    location += vec2::polar(++dist / distanceRatio, rev2rad(heading()));
+    vex::this_thread::sleep_for(50); //sleeps to lower cpu usage
+  }
 }
 
 //used to avoid memory permission error by recapturing this

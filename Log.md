@@ -372,6 +372,20 @@
 - Using voltage to control motors causes inconsistent speeds
   - Want some method to guarentee straightness
 
+### 1/13/22
+- Added `trackLocation` function, `location` variable, and `getLocation` function
+  - Moved location tracking here
+  - Tracking is done in a different thread
+#### Testing
+- Tested location tracking
+  - Fixed bugs
+    - `rev2rad` needed for polar vector calculations
+    - Use absolution rotation instead of change in rotation for displacement calculations
+  - Location tracking appears to work in random testing
+    - Displacement ± 2 inches
+- Tested multithreaded location tracking
+  - Variable appears not to replicate between threads
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -379,3 +393,4 @@
   - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
 - Test autonomous start
 - Refine PID values (could be faster)
+- Fix location tracking thread issue

@@ -59,15 +59,21 @@ public:
 
   // gets distance ratio
   double getDistanceRatio();
+  // gets location
+  vec2 getLocation();
 
 protected:
+  // tracks and updates location vector
+  void locationTrack();
+
   // recaptures this and sets PIDs
   void recapture();
+
+  vec2 location; // location (when constructor is called)
+  vex::thread trackingThread; // thread tracking location
 
   PID drivePID, turnPID; // PID constants
 
   double robotWidth; // robot width in distance units
   double distanceRatio; // ratio from distance units to revolutions (revolutions/distance units)
-
-
 };

@@ -73,7 +73,7 @@ void drivercontrol() {
     else {
       robot::claw.open();
       rumbleThread = vex::thread([]{ //rumbles thread until interrupted
-        while (1) {
+        while (1) { 
           robot::primary.rumble("-");
           vex::this_thread::sleep_for(500);
         }
@@ -114,20 +114,17 @@ int main() {
   robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
-  
-  using namespace robot;
 
-  vec2 x{0.0, 0.0};
-  deltaTracker<uint32_t> dt(vex::timer::system);
-
-  deltaTracker<double> dist([&](){ return robot::idrive.position(); });
-  deltaTracker<double> dir([&](){ return robot::idrive.heading(); });
+  vex::this_thread::sleep_for(1000);
+  int hue = 0;
   while (1)  {
-    x += vec2::polar(++dist / idrive.getDistanceRatio(), dir++);
-    robot::primary.Screen.setCursor(0, 0);
-    robot::primary.Screen.clearLine();
-    robot::primary.Screen.print("%.3f, %.3f", x.x, x.y);
-
-    dt++;
+    
+    robot::brain.Screen.clearScreen(++hue %= 360);
+    auto loc = robot::idrive.getLocation();
+    robot::brain.Screen.setCursor(10, 0);
+    robot::brain.Screen.clearLine();
+    robot::brain.Screen.print("%.3f, %.3f", loc.x, loc.y);
+    
+    vex::this_thread::sleep_for(10); //sleeps to minimize cpu usage
   }
 }
