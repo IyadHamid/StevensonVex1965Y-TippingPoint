@@ -38,7 +38,13 @@ namespace robot {
   vex::inertial isensor(inertial_port);
 
   //creates empty inteldrive which gets initalized later in robot::init()
-  inteldrive idrive;
+  inteldrive idrive(
+    isensor, 
+    lgroup, 
+    rgroup,
+    drive_k, turn_k,
+    inches2units_ratio, robot_width
+  );
 
   //initalizes claw with triport from config.h
   vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
@@ -67,15 +73,7 @@ void robot::init() {
   robot::lift.stop(vex::brakeType::hold);
   
   isensor.resetHeading();
-
-  //initalizes intelligent drivetrain with above sensor, motor groups, and constants from config.h
-  idrive = inteldrive(
-    isensor, 
-    lgroup, 
-    rgroup,
-    drive_k, turn_k,
-    inches2units_ratio, robot_width
-  );
+  idrive.start();
 }
 
 bool lift_isUp = false; //lift is initally down

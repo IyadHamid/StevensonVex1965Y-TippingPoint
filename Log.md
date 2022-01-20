@@ -372,7 +372,7 @@
 - Using voltage to control motors causes inconsistent speeds
   - Want some method to guarentee straightness
 
-### 1/13/22
+### 1/19/22
 - Added `trackLocation` function, `location` variable, and `getLocation` function
   - Moved location tracking here
   - Tracking is done in a different thread
@@ -386,6 +386,30 @@
 - Tested multithreaded location tracking
   - Variable appears not to replicate between threads
 
+### 1/20/22
+- Fixed date of `1/19/22` in `Log.md`
+- Calculated drive to absolute location
+  - Requires Testing
+- Renamed `deltaTracker::dv` to `deltaTracker::delta`
+  - Reasoning: better name
+- Created `inteldrive::start`
+  - Reasoning: able to initalize things outside of constructor 
+    - Solves memory errors dealing with the change of `this` memory location for lambdas
+- Removed `inteldrive::recapture`
+  - Removed all callees
+  - Reasoning: `inteldrive::start` takes functionality
+- Removed empty `inteldrive` constructor
+  - Reasoning: Any memory-prone issues now will get initalized in start
+    - Now can use normal constructor globally and call `inteldrive::start` later
+- Renamed `MEMBER_FUNCTION_THREAD` to `CREATE_METHOD_THREAD`
+  - Reasoning: more descriptive name
+- Updated `vec2` to have more cannon operators
+- Started to implement `inteldrive::driveTo`
+  - Uses displacement
+#### Testing
+- Location tracking thread now unable to access correct variables
+  - Initialization of thread in constructor problematic
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -394,3 +418,5 @@
 - Test autonomous start
 - Refine PID values (could be faster)
 - Fix location tracking thread issue
+- Finish implementing `inteldrive::driveTo`
+  - Template PID goal input so it can accept vector

@@ -28,16 +28,18 @@ public:
              PID::kPID drive_k, PID::kPID turn_k, 
              double ratio, double robotWidth);
   // inteldrive constructor (creates empty inteldrive)
-  inteldrive();
+  //inteldrive();
   // inteldrive destructor (does nothing)
   ~inteldrive() {}
-  
+
+  void start();
+
   // gyrometer's heading; units for returned rotation (defaulted to revolution)
   double heading(vex::rotationUnits units = vex::rotationUnits::rev);
   // motor encoder's rotational; units for returned rotation (defaulted to revolution)
   double position(vex::rotationUnits unit = vex::rotationUnits::rev);
 
-  // drives at velocity with turning ratio; percent velocity, ratio for right : left
+  // drives at velocity with turning ratio; percent velocity, ratio for right / left
   void drive(double vel, double ratio);
   // drives at velocity; percent velocity
   void drive(double vel);
@@ -48,6 +50,8 @@ public:
   void turnTo(double ang, double vel = 0.0, bool relative = true);
   // drives robot to distance; inches distance, percent velocity (defualted to 0, 0 is no maximum), should not reset motor encoders? (defaulted to false)
   void driveTo(double dist, double vel = 0.0, bool relative = true);
+  // drives robot to distance; inches distance, percent velocity (defualted to 0, 0 is no maximum), should not reset motor encoders? (defaulted to false)
+  void driveTo(vec2 loc, double vel = 0.0, bool relative = true);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
@@ -61,13 +65,10 @@ public:
   double getDistanceRatio();
   // gets location
   vec2 getLocation();
-
+  
 protected:
   // tracks and updates location vector
   void locationTrack();
-
-  // recaptures this and sets PIDs
-  void recapture();
 
   vec2 location; // location (when constructor is called)
   vex::thread trackingThread; // thread tracking location

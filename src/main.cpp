@@ -115,16 +115,13 @@ int main() {
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
 
-  vex::this_thread::sleep_for(1000);
   int hue = 0;
   while (1)  {
-    
     robot::brain.Screen.clearScreen(++hue %= 360);
     auto loc = robot::idrive.getLocation();
-    robot::brain.Screen.setCursor(10, 0);
-    robot::brain.Screen.clearLine();
-    robot::brain.Screen.print("%.3f, %.3f", loc.x, loc.y);
-    
-    vex::this_thread::sleep_for(10); //sleeps to minimize cpu usage
+    robot::primary.Screen.setCursor(0, 0);
+    robot::primary.Screen.clearLine();
+    robot::primary.Screen.print("%.2f, %.2f", loc.x, loc.y);
+    vex::this_thread::sleep_for(100); //sleeps to minimize cpu usage
   }
 }

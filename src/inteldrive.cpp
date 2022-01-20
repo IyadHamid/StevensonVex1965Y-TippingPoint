@@ -15,33 +15,47 @@
 #include "PID.h"
 #include "deltaTracker.h"
 
+#include "robot.h" //delete me
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
                        PID::kPID drive_k, PID::kPID turn_k,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
-  drivePID(),
-  turnPID(),
+  location{0.0, 0.0},
+  drivePID(), turnPID(),
   robotWidth{rw}, distanceRatio{ratio}
 {
   drivePID.k = drive_k;
   turnPID.k = turn_k;
+  
+}
 
+void inteldrive::start() {
   //callibrates inertial sensors
   inertialSensor.calibrate();
   //waits until it is done calibrating
   while (inertialSensor.isCalibrating())
     vex::this_thread::sleep_for(100); //sleeps to save cpu resources
   
-  trackingThread = MEMBER_FUNCTION_THREAD( inteldrive, locationTrack() );
+  drivePID = PID( //initalizes drivePID
+    [&](double goal) { return goal - position(); },
+    [&](double input) { drive(input); }, 
+    drivePID.k
+  );
+  turnPID = PID( //initalizes turnPID
+    [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
+    [&](double input) {
+      left .spin(vex::directionType::fwd, input * 150.0, vex::voltageUnits::mV);
+      right.spin(vex::directionType::rev, input * 150.0, vex::voltageUnits::mV);
+    },
+    turnPID.k
+  );
+
+  //Starts tracking
+  location = {0.0, 0.0};
+  trackingThread = CREATE_METHOD_THREAD( inteldrive, locationTrack() );
   trackingThread.setPriority(vex::thread::threadPriorityHigh);
 }
-
-inteldrive::inteldrive() //initalizes an unusable/empty inteldrive
-: inertialSensor(-1),
-  drivePID{ nullptr, nullptr, { 0.0, 0.0, 0.0, 0.0 } },
-  turnPID { nullptr, nullptr, { 0.0, 0.0, 0.0, 0.0 } }
-{}
 
 double inteldrive::heading(vex::rotationUnits units) {
   //redirects to inertial sensor
@@ -72,9 +86,6 @@ void inteldrive::stop(vex::brakeType mode) {
 }
 
 void inteldrive::turnTo(double ang, double vel, bool relative) {
-  //calls recapture once
-  __attribute__((unused)) static bool once = [&](){ recapture(); return true; }();
-
   if (relative) //defaulted to do relative turns
     ang += heading();
   //runs turnPID at angle
@@ -83,9 +94,6 @@ void inteldrive::turnTo(double ang, double vel, bool relative) {
 }
 
 void inteldrive::driveTo(double dist, double vel, bool relative) {
-  //calls recapture once
-  __attribute__((unused)) static bool once = [&](){ recapture(); return true; }();
-
   dist *= distanceRatio; //from inches to rotations
   if (relative) //defaulted to do relative movements
     dist += position();
@@ -94,6 +102,21 @@ void inteldrive::driveTo(double dist, double vel, bool relative) {
   drivePID.run(dist, 0, vel);
 
   stop(vex::brakeType::brake); 
+}
+
+void inteldrive::driveTo(vec2 loc, double vel, bool relative) {
+  auto error = [&](double) {
+    return 1.0;
+  };
+  auto a = [&](double input){
+    // displacement between target location and target location
+    auto disp = loc - getLocation();
+    // relative angle towards center of circle (90° from angle between heading at destination)
+    const auto ang = angle_difference_rad(pi / 2.0, disp.ang() - rev2rad(heading()));
+    auto ratio = 0.5 + disp.mag() / (2.0 * robotWidth * cos(ang));
+    drive(input, ratio);
+  };
+  PID dispPID(error, a, drivePID.k);
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {
@@ -131,26 +154,12 @@ vec2 inteldrive::getLocation() {
 void inteldrive::locationTrack() {
   deltaTracker<double> dist([&](){ return position(); });
   deltaTracker<double> dir ([&](){ return heading();  });
-
+  
   while (1)  {
-    location += vec2::polar(++dist / distanceRatio, rev2rad(heading()));
+    auto distance = ++dist / getDistanceRatio();
+    auto angle = rev2rad(heading());
+    location += vec2::polar(distance, angle);
+
     vex::this_thread::sleep_for(50); //sleeps to lower cpu usage
   }
-}
-
-//used to avoid memory permission error by recapturing this
-void inteldrive::recapture() {
-  drivePID = PID( //initalizes drivePID
-    [&](double goal) { return goal - position(); },
-    [&](double input) { drive(input); }, 
-    drivePID.k
-  );
-  turnPID = PID( //initalizes turnPID
-    [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
-    [&](double input) {
-      left .spin(vex::directionType::fwd, input * 150.0, vex::voltageUnits::mV);
-      right.spin(vex::directionType::rev, input * 150.0, vex::voltageUnits::mV);
-    },
-    turnPID.k
-  );
 }

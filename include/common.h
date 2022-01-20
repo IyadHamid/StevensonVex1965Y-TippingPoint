@@ -66,17 +66,17 @@ struct vec2 {
   vec2 operator-(vec2 other) { return vec2{ x-other.x, y-other.y }; }
   vec2 operator*(double other) { return vec2{ x*other, y*other }; }
   
-  void operator+=(vec2 other) { *this = *this + other; }
-  void operator-=(vec2 other) { *this = *this - other; }
+  vec2 operator+=(vec2 other) { return *this = *this + other; }
+  vec2 operator-=(vec2 other) { return *this = *this - other; }
 
   // gets polar angle
-  double ang() { return tan(y / x); }
+  const double ang() { return tan(y / x); }
   // gets magnitude
-  double mag() { return sqrt(x*x + y*y); }
+  const double mag() { return sqrt(x*x + y*y); }
 };
 
 // helper function to create a vex::thread to run a member class function; class name, function with parameters
-#define MEMBER_FUNCTION_THREAD( CLASS, FUNCTION ) vex::thread([](void* self) { static_cast<CLASS*>(self)->FUNCTION; }, this)
+#define CREATE_METHOD_THREAD( CLASS, FUNCTION ) vex::thread([](void* self) { static_cast<CLASS*>(self)->FUNCTION; }, this)
 
 // got from 1,000,000 year simulation
 constexpr int answerToLifeTheUniverseAndEverything = 42;

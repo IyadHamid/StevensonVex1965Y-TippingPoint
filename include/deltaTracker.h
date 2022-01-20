@@ -18,14 +18,14 @@ public:
   deltaTracker(std::function<T(void)> updater) : updater{updater}, value{updater()} {}
 
   T operator()() {
-    return dv;
+    return delta;
   }
 
   // prefix increment update returning new change
   T operator++() {
     const T old = value;
     value = updater();
-    return dv = value - old;
+    return delta = value - old;
   }
   // postfix increment update returning new change
   T operator++(int) {
@@ -34,5 +34,5 @@ public:
 
   std::function<T(void)> updater; //updater function
   T value; //current value
-  T dv;    //change in value
+  T delta; //change in value
 };
