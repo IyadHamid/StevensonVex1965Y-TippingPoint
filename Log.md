@@ -410,7 +410,7 @@
 - Location tracking thread now unable to access correct variables
   - Initialization of thread in constructor problematic
 
-### 1/20/22
+### 1/26/22
 - Rewrote parts of PID
   - PID now templated for goal input
     - Defaulted to use `double`
