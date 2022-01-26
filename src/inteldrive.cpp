@@ -18,7 +18,7 @@
 #include "robot.h" //delete me
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
-                       PID::kPID drive_k, PID::kPID turn_k,
+                       PID<>::kPID drive_k, PID<>::kPID turn_k,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
   location{0.0, 0.0},
@@ -37,12 +37,12 @@ void inteldrive::start() {
   while (inertialSensor.isCalibrating())
     vex::this_thread::sleep_for(100); //sleeps to save cpu resources
   
-  drivePID = PID( //initalizes drivePID
+  drivePID = PID<>( //initalizes drivePID
     [&](double goal) { return goal - position(); },
     [&](double input) { drive(input); }, 
     drivePID.k
   );
-  turnPID = PID( //initalizes turnPID
+  turnPID = PID<>( //initalizes turnPID
     [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
     [&](double input) {
       left .spin(vex::directionType::fwd, input * 150.0, vex::voltageUnits::mV);
@@ -116,7 +116,7 @@ void inteldrive::driveTo(vec2 loc, double vel, bool relative) {
     auto ratio = 0.5 + disp.mag() / (2.0 * robotWidth * cos(ang));
     drive(input, ratio);
   };
-  PID dispPID(error, a, drivePID.k);
+  PID<> dispPID(error, a, drivePID.k);
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {
@@ -152,8 +152,8 @@ vec2 inteldrive::getLocation() {
 }
 
 void inteldrive::locationTrack() {
-  deltaTracker<double> dist([&](){ return position(); });
-  deltaTracker<double> dir ([&](){ return heading();  });
+  deltaTracker<double> dist([&]{ return position(); });
+  deltaTracker<double> dir ([&]{ return heading();  });
   
   while (1)  {
     auto distance = ++dist / getDistanceRatio();

@@ -25,7 +25,7 @@ public:
   //drive PID constants, turn PID constants,
   //ratio revolutions/inches, robot width in inches
   inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, 
-             PID::kPID drive_k, PID::kPID turn_k, 
+             PID<>::kPID drive_k, PID<>::kPID turn_k, 
              double ratio, double robotWidth);
   // inteldrive constructor (creates empty inteldrive)
   //inteldrive();
@@ -73,7 +73,7 @@ protected:
   vec2 location; // location (when constructor is called)
   vex::thread trackingThread; // thread tracking location
 
-  PID drivePID, turnPID; // PID constants
+  PID<> drivePID, turnPID; // PID constants
 
   double robotWidth; // robot width in distance units
   double distanceRatio; // ratio from distance units to revolutions (revolutions/distance units)

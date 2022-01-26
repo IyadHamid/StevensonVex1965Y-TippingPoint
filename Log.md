@@ -1,12 +1,12 @@
 # 2021  - 2022 Vex 1965Y Coding Log
 
-### 09/09/21:
+### 09/09/21
 - Copied `PID.h` and `PID.cpp` from [IyadHamid/StevensonVex1965Y-ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp)
 - Edited `PID.h` and `PID.cpp`
   - Added additional comments/descriptions
   - Accounted for time (`dt`) in equations
 
-### 09/15/21:
+### 09/15/21
 - Created V5 project file
   - Added and edited `main.cpp`, `robot.h`, `robot.cpp`
 - Copied `readme.md` (now `README.md`) and `stevensonlogo.png` (now `stevensonvexlogo.png`) from [IyadHamid/StevensonVex1965Y-ChangeUp](https://github.com/IyadHamid/StevensonVex1965Y-ChangeUp)
@@ -19,7 +19,7 @@
   - Simplified by removing unused data
   - Renamed `leftDrive`/`rightDrive` to `left`/`right`
 
-### 09/22/2021:
+### 09/22/2021
 - Removed all global absolute location tracking in inteldrive
   - Replaced with relative/temporary absolute tracking
 - Overloaded `inteldrive::driveTo`
@@ -32,7 +32,7 @@
 - Must redo `inteldrive::arcTo` to match `inteldrive::driveTo` and `inteldrive::turnTo`
 - Need to recheck/redo math for `inteldrive::arcTo`
 
-### 09/23/2021:
+### 09/23/2021
 - Reordered parameters in `inteldrive` constructor
 - Made `Log.txt` to `Log.md`
   - Reformatted Log to markdown
@@ -43,10 +43,10 @@
   - Added `drivercontrol` function
   - Added `autonomous` function
  
-### 09/29/2021:
+### 09/29/2021
 - Tested pnuematics control (through `vex::pneumatics`) and confirmed that it works
 
-### 09/30/2021:
+### 09/30/2021
 - Removed `dt` from `PID::run` as error is already relative to time
 - Commented `inteldrive::arcTo` function out to build/test curve
 - Added testing code to run `inteldrive::driveTo`
@@ -54,34 +54,34 @@
 - Added support for `inchesRatio` in `inteldrive`
   - Now is ratio for inches : spin
   - `constexpr wheel2inches_ratio` now `constexpr inches2wheel_ratio` in `robot.h` to match
-#### Testing:
+#### Testing
 - Made an attempt to run `inteldrive::driveTo`
   - Does not work, nothing happens
 #### Notes:
 - Need to debug and fix `inteldrive::driveTo`
 
-### 10/04/2021:
+### 10/04/2021
 - Added missing `Log.md` to github repository
 - Updated `README.md` to mention `Log.md`
 
-### 10/06/2021:
+### 10/06/2021
 - Fixed link formating in `Log.md`
 - Added debugging to `PID` enabled by `DEBUG` macro in `PID.h`
 - Added new log category to `Log.md` titled `Testing`specifically to `09/30/2021`
-#### Testing:
+#### Testing
 - Tested `inteldrive::driveTo`
   - Does not work, found program hangs in `PID`
 
 ### 10/07/21
 - Made debugging for `PID::run` viewable/function
 - Replaced `not` with `!` in `inteldrive.cpp`
- #### Testing:
+ #### Testing
 - Isolated problem from above to `vex::motor` constructor
   - Fixed by using `vex::PORT{number}` instead of literals.
   - Found another issue with `PID`/`inteldrive` not updating position error
 
 ### 10/13/21
-#### Testing:
+#### Testing
 - Made PID for `inteldrive::driveTo` to `PID::run` again after 100 ms
 - Found motors do not stop for `inteldrive::driveTo`
   - Changed accordingly
@@ -128,7 +128,7 @@
 #### Notes:
 - May want to remove `velUnits` from `inteldrive` to match with removal of `rotUnits`
 - Should change `integral` in `PID::run` to only be sum of last few iterations
-#### Testing: 
+#### Testing 
 - `inteldrive::driveTo(double,...)` and `inteldrive::turnTo` now functional
   - `inteldrive::driveTo(vec2,...)` and `inteldrive::arcTo` still NOT functional
 
@@ -149,7 +149,7 @@
 - Removed test code from `main`
   - Reasoning: test base got deconstructed, new testing will be done on final base
 - Renamed `[left/right]_middle` to `[left/right]_top` in `config.h`
-#### Testing:
+#### Testing
 - Experimented with accelerometer of inertial sensor
   - Accelerometer is not accurate/local enough to be useful
 
@@ -160,7 +160,7 @@
 #### Notes:
 - Github does not format `Log.md` correctly
   - Likely due to space vs tab
-#### Testing:
+#### Testing
 - Tested physical base
   - Getting memory access error when using `idrive` from `robot.cpp`
     - Duct-tape fix of creating new `inteldrive` and using that works
@@ -175,7 +175,7 @@
   - Initialized with `CLAW_PORT` in `config.h`
 - Replaced single spaces with double spaces in `Log.md` to fix list formating in Github
 - Updated `inches2wheel_ratio` in `config.h`
-#### Testing:
+#### Testing
 - Fixed memory access error
   - Discovered issue was in `left` and `right` due to initialization of `motor_group` inside constructor in `robot.cpp`
   - Solved by constructing `motor_group`s outside of `inteldrive`constructor
@@ -214,7 +214,7 @@
 - Implemented maxmium output to `PID`
 - Created `robot::multitask`
   - Reasoning: using lambdas (anonymous functions) instead of creating new functions for multitasking/multithreading is easier
-#### Testing:
+#### Testing
 - `inteldrive` constructor causing memory error
   - Determined `inertialSensor` to be causing the issue
   - Issue actually is `vex::task::sleep`
@@ -248,7 +248,7 @@
 - Merged left/right pnuematic hooks together
   - Reasoning: physical robot using 1 double-acting solenoid for both piston-controlled hooks 
 - Implemented pneumatic control for `robot::lift` and `robot::hook`
-#### Testing:
+#### Testing
 - Tested pnuematic hooks
   - Mechanical issue, control works as expected
 
@@ -258,7 +258,7 @@
 - Fixed `Log.md` formatting
 - Temporarily disableed `inteldrive::runLPS`
   - Currently unnecessary
-#### Testing:
+#### Testing
 - Tested `inteldrive::driveTo` and `inteldrive::turnTo`
   - Experienced memory permission error for PID control
     - Hotfixed with using `robot::idrive` instead of `this` inside lambda function
@@ -272,7 +272,7 @@
   - Reasoning: `PID` may fail and get stuck in an infinite loop
 - Added analog control with maximums for lift
   - Rumbles controller when at a maximum
-#### Testing:
+#### Testing
 - Tested relative coordinate system
   - Works
 - Refined PID through driving along a square
@@ -300,7 +300,7 @@
 - Removed `inteldrive::position()` and `inteldrive::heading()` to use overloaded functions with default parameter
   - Reasoning: redundant
 - Possibly fixed `angle_difference_rev` through making value from 0 to 1 using decimal part
-#### Testing:
+#### Testing
 - `inteldrive::turnTo` not functional after going straight
   - Negative numbers nonfunctional, must use 0 to 1
 #### Competition:
@@ -328,7 +328,7 @@
 - Implemented max velocity for `inteldrive::driveTo` and `inteldrive::turnTo`
 - Added `inteldrive::driveInPolygon`
   - Reasoning: used to test PID constants
-#### Testing:
+#### Testing
 - Refined drive PID values
 
 ### 1/6/22
@@ -351,7 +351,7 @@
   - Added robot configuration
   - Added team name
 - Cleaned up some code
-#### Testing:
+#### Testing
 - Tested prototype absolute location tracking
   - Some innaccuracies while turning
     - Likely due to slipping
@@ -410,6 +410,25 @@
 - Location tracking thread now unable to access correct variables
   - Initialization of thread in constructor problematic
 
+### 1/20/22
+- Rewrote parts of PID
+  - PID now templated for goal input
+    - Defaulted to use `double`
+    - Updated users to make change
+    - No functionality now in `PID.cpp`
+    - Debugging removed
+      - May need to reimplement
+    - Reasoning: can use `vec2` in input
+  - PID now uses `deltaTracker`
+    - Reasoning: cleans code up
+- Removed `:`s in headers/subheaders in `Log.md`
+  - Reasoning: consistency
+#### Testing
+- Tested PID
+  - Appears to continue to work
+- Tested `inteldrive::driveTo(vec2...)` 
+  - Appears not to do anything
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -417,6 +436,8 @@
   - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
 - Test autonomous start
 - Refine PID values (could be faster)
-- Fix location tracking thread issue
 - Finish implementing `inteldrive::driveTo`
   - Template PID goal input so it can accept vector
+- Add timeout to `inteldrive::driveTo` and `inteldrive::turnTo`
+- Re-add debugging for PID
+  - Possibly through another class utilizing multithreading

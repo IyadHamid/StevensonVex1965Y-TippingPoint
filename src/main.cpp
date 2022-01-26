@@ -114,6 +114,7 @@ int main() {
   robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
+  //robot::idrive.driveTo(vec2{20.0, 20.0});
 
   int hue = 0;
   while (1)  {
