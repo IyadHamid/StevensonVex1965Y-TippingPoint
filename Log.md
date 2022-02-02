@@ -429,6 +429,29 @@
 - Tested `inteldrive::driveTo(vec2...)` 
   - Appears not to do anything
 
+### 1/27/22
+- Work lost
+#### Testing
+- Testing lost
+
+### 2/2/22
+- Added new parameter to `output` in `PID` of type `T` to transfer goal value
+  - Updated users to align with new definition
+  - Reasoning: displacement calculations require goal
+- Worked on `inteldrive::driveTo(vec2...)`
+  - Added some proper error calculation
+- Updated `stevensonvexlogo.png` to new banner
+- Made robot complete stop if no joystick input
+- Made rainbow effect in its own thread instead of main thread
+  - Reasoning: uicker changing rainbow
+### Testing
+- Noticed robot drift if no input is pressed
+  - Preferentially good/bad 
+    - Momentum arguably intuitive however could be imprecise
+- Tested `inteldrive::driveTo(vec2...)` 
+  - Still does not do anything 
+    - Tolerance appears to be too low
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -436,8 +459,7 @@
   - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
 - Test autonomous start
 - Refine PID values (could be faster)
-- Finish implementing `inteldrive::driveTo`
-  - Template PID goal input so it can accept vector
+- Finish implementing `inteldrive::driveTo(vec2...)`
 - Add timeout to `inteldrive::driveTo` and `inteldrive::turnTo`
 - Re-add debugging for PID
   - Possibly through another class utilizing multithreading

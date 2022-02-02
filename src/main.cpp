@@ -17,8 +17,8 @@
 void autonomous() {
   using namespace robot;
   vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
-  robot::primary.Screen.clearScreen();
-  robot::primary.Screen.print("Auton");
+  robot::primary.Screen.setCursor(0, 0);
+  robot::primary.Screen.clearLine();
 
 #if defined(AUTON_A)
   //robot::hook.open();
@@ -57,8 +57,10 @@ void autonomous() {
 
 void drivercontrol() {
   vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
-  robot::primary.Screen.clearScreen();
+  robot::primary.Screen.setCursor(0, 0);
+  robot::primary.Screen.clearLine();
   robot::primary.Screen.print("Driver");
+  
   //adds control function feedbacks
   robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); } );
   robot::primary.ButtonL2.pressed([]{ robot::liftSet(false); } );
@@ -86,13 +88,20 @@ void drivercontrol() {
   while (1) {
     //if turbo button is pressed, use maximum power, else use controller modifers from config.h
     const vec2 modifiers = robot::primary.ButtonR1.pressing() ? vec2{ 1.1, 1.1 } : controller_modifiers;
+    
+    if (robot::primary.Axis1.value() == 0 && robot::primary.Axis2.value() == 0 && 
+        robot::primary.Axis3.value() == 0 && robot::primary.Axis4.value() == 0) {
+      robot::idrive.stop();
+    }
+    else {
 #if defined(ARCADE)
-    robot::idrive.arcade(robot::primary.Axis3.value(), robot::primary.Axis4.value(), modifiers.x, modifiers.y);
+      robot::idrive.arcade(robot::primary.Axis3.value(), robot::primary.Axis4.value(), modifiers.x, modifiers.y);
 #elif defined(DRONE)
-    robot::idrive.arcade(robot::primary.Axis3.value(), robot::primary.Axis1.value(), modifiers.x, modifiers.y);
+      robot::idrive.arcade(robot::primary.Axis3.value(), robot::primary.Axis1.value(), modifiers.x, modifiers.y);
 #else //defined(TANK)
-    robot::idrive.tank(robot::primary.Axis3.value(), robot::primary.Axis2.value(), modifiers.x);
+      robot::idrive.tank(robot::primary.Axis3.value(), robot::primary.Axis2.value(), modifiers.x);
 #endif
+    }
 
 
     if (robot::primary.ButtonUp.pressing()) { //enables manual control
@@ -112,15 +121,24 @@ void drivercontrol() {
 int main() {
   vex::competition competition;
   robot::init();
+
+  //robot::idrive.driveTo(vec2{20.0, 0.0});
+
+  vex::this_thread::sleep_for(200);
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
-  //robot::idrive.driveTo(vec2{20.0, 20.0});
 
-  int hue = 0;
+  vex::thread rainbowThread([]{
+    while (1)  {
+      static int hue = 0;
+      robot::brain.Screen.clearScreen(++hue %= 360);
+    vex::this_thread::sleep_for(20); //sleeps to slow rainbow
+    }
+  });
+
   while (1)  {
-    robot::brain.Screen.clearScreen(++hue %= 360);
     auto loc = robot::idrive.getLocation();
-    robot::primary.Screen.setCursor(0, 0);
+    robot::primary.Screen.setCursor(5, 0);
     robot::primary.Screen.clearLine();
     robot::primary.Screen.print("%.2f, %.2f", loc.x, loc.y);
     vex::this_thread::sleep_for(100); //sleeps to minimize cpu usage

@@ -27,7 +27,6 @@ inteldrive::inteldrive(vex::inertial i,
 {
   drivePID.k = drive_k;
   turnPID.k = turn_k;
-  
 }
 
 void inteldrive::start() {
@@ -39,18 +38,43 @@ void inteldrive::start() {
   
   drivePID = PID<>( //initalizes drivePID
     [&](double goal) { return goal - position(); },
-    [&](double input) { drive(input); }, 
+    [&](double output, double goal) { drive(output); }, 
     drivePID.k
   );
+
   turnPID = PID<>( //initalizes turnPID
     [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
-    [&](double input) {
-      left .spin(vex::directionType::fwd, input * 150.0, vex::voltageUnits::mV);
-      right.spin(vex::directionType::rev, input * 150.0, vex::voltageUnits::mV);
+    [&](double output, double goal) {
+      left .spin(vex::directionType::fwd, output * 150.0, vex::voltageUnits::mV);
+      right.spin(vex::directionType::rev, output * 150.0, vex::voltageUnits::mV);
     },
     turnPID.k
   );
 
+  dispPID = PID<vec2>(
+    [&](vec2 goal){
+      // displacement between target location and target location
+      auto disp = goal - getLocation();
+      // relative angle towards center of circle (90° from angle between heading at destination)
+      const auto ang = angle_difference_rad(pi / 2.0, disp.ang() - rev2rad(heading()));
+      // driving radius
+      const auto r = disp.mag() / (2.0 * cos(ang));
+      // arclength distance
+      const auto dist = r * 2.0 * ang;
+      return dist;
+    },
+    [&](double output, vec2 goal){
+      // displacement between target location and target location
+      auto disp = goal - getLocation();
+      // relative angle towards center of circle (90° from angle between heading at destination)
+      const auto ang = angle_difference_rad(pi / 2.0, disp.ang() - rev2rad(heading()));
+      // ratio between left and right wheels
+      const auto ratio = 0.5 + disp.mag() / (2.0 * robotWidth * cos(ang));
+      drive(output, ratio);
+    },
+    { 1.0, 1.0, 1.0, 1.0 }//drivePID.k
+  );
+  
   //Starts tracking
   location = {0.0, 0.0};
   trackingThread = CREATE_METHOD_THREAD( inteldrive, locationTrack() );
@@ -105,18 +129,7 @@ void inteldrive::driveTo(double dist, double vel, bool relative) {
 }
 
 void inteldrive::driveTo(vec2 loc, double vel, bool relative) {
-  auto error = [&](double) {
-    return 1.0;
-  };
-  auto a = [&](double input){
-    // displacement between target location and target location
-    auto disp = loc - getLocation();
-    // relative angle towards center of circle (90° from angle between heading at destination)
-    const auto ang = angle_difference_rad(pi / 2.0, disp.ang() - rev2rad(heading()));
-    auto ratio = 0.5 + disp.mag() / (2.0 * robotWidth * cos(ang));
-    drive(input, ratio);
-  };
-  PID<> dispPID(error, a, drivePID.k);
+  dispPID.run(loc);
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {

@@ -73,7 +73,8 @@ protected:
   vec2 location; // location (when constructor is called)
   vex::thread trackingThread; // thread tracking location
 
-  PID<> drivePID, turnPID; // PID constants
+  PID<> drivePID, turnPID; // PID controllers using scalar error
+  PID<vec2> dispPID; // PID controller with displacement
 
   double robotWidth; // robot width in distance units
   double distanceRatio; // ratio from distance units to revolutions (revolutions/distance units)

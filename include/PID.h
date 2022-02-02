@@ -25,7 +25,7 @@ public:
 
   PID() {};
   // constructor; error input function, output function, PID constants
-  PID(std::function<double(T)> func_e, std::function<void(double)> func_out, kPID k
+  PID(std::function<double(T)> func_e, std::function<void(double, T)> func_out, kPID k
   ) : k{k}, error{func_e}, output{func_out} {}
 
   // runner; goal to achieve, timeout (0 is no timeout) maximum change for output (defaulted to 0, 0 is no maximum), change in time per cycle in ms (defaulted to 50)
@@ -34,7 +34,7 @@ public:
   //keeps public (instead of private/protected) so it can be changed during runtime
   kPID k; //constants for PID equation
   std::function<double(T)> error; //function to calculate error
-  std::function<void(double)> output;  //function to run output
+  std::function<void(double, T)> output;  //function to run output
 };
 
 template <typename T>
@@ -57,7 +57,7 @@ void PID<T>::run(T goal, uint32_t timeout, double max, uint32_t dt) {
     const auto out = k.p * e.value + k.i * integral + k.d * e.delta;
     
     //send output value back with maximum at max if max > 0.0
-    output(max > 0.0 ? std::min(out, max) : out); 
+    output(max > 0.0 ? std::min(out, max) : out, goal); 
 
     e++; //updates error and derivative
     
