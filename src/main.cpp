@@ -14,52 +14,35 @@
 #include "config.h"
 #include "deltaTracker.h"
 
+const void modePrint(const char* mode) {
+  robot::primary.Screen.setCursor(0, 0);
+  robot::primary.Screen.clearLine(0);
+  robot::primary.Screen.print(mode);
+}
+
 void autonomous() {
   using namespace robot;
-  vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
-  robot::primary.Screen.setCursor(0, 0);
-  robot::primary.Screen.clearLine();
-
-#if defined(AUTON_A)
-  //robot::hook.open();
-  vex::thread t1([]{
-    while (idrive.position() < idrive.getDistanceRatio() * 43.5)
-      vex::this_thread::sleep_for(50);
-    claw.open();
-  });
-  idrive.driveTo(45, 100);
-  vex::this_thread::sleep_for(150);
-  idrive.driveTo(-41, 100);
-  t1.join();
-  claw.close();
-
-#elif defined(AUTON_B)
-
-  idrive.driveTo(80);
-  idrive.turnTo(.75);
-  idrive.driveTo(48);
-  idrive.turnTo(.75);
-  idrive.driveTo(80);
+  modePrint("Auton");
 
   idrive.turnTo(.25);
-  idrive.driveTo(48);
+  return;
+#if defined(AUTON_A)
+  deltaTracker<double> dist([]{ return idrive.position(); });
+  idrive.drive(100);
+  until(dist++ > idrive.getDistanceRatio() * 43.5);
+  claw.open();
+  until(dist++ > idrive.getDistanceRatio() * 45.0);
+  claw.close();
+  idrive.drive(-100);
+  until(dist++ < idrive.getDistanceRatio() * 20.0);
+  idrive.driveTo(0.0, 0, 0.0, false);
 
-#else // defined(C)
-  vex::thread t2([]{
-    backSet(false);
-    hook.open();
-  });
-  idrive.driveTo(-45);
-  t2.join();
-  back.rotateTo(back_high, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
+#elif defined(AUTON_B)
 #endif
 }
 
 void drivercontrol() {
-  vex::this_thread::setPriority(vex::thread::threadPriorityHigh);
-  robot::primary.Screen.setCursor(0, 0);
-  robot::primary.Screen.clearLine();
-  robot::primary.Screen.print("Driver");
+  modePrint("Driver");
   
   //adds control function feedbacks
   robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); } );
@@ -103,16 +86,17 @@ void drivercontrol() {
 #endif
     }
 
-
-    if (robot::primary.ButtonUp.pressing()) { //enables manual control
-      //prints options
-      robot::brain.Screen.printAt(0, 20, "Left : toggle hooks");
-      
-      //toggles hook
-      if (robot::primary.ButtonLeft.pressing()) {
+    if (robot::primary.ButtonUp.pressing()) {
+      if (robot::primary.ButtonDown.pressing()) { //resets location
+        robot::idrive.reset();
+      }
+      else if (robot::primary.ButtonLeft.pressing()) { //toggles hook
         static bool state = true;
         robot::hook.set(!state);
         state = !state;
+      }
+      else if (robot::primary.ButtonRight.pressing()) { //runs auton
+        autonomous();
       }
     }
   }
@@ -122,9 +106,6 @@ int main() {
   vex::competition competition;
   robot::init();
 
-  //robot::idrive.driveTo(vec2{20.0, 0.0});
-
-  vex::this_thread::sleep_for(200);
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
 
@@ -132,15 +113,15 @@ int main() {
     while (1)  {
       static int hue = 0;
       robot::brain.Screen.clearScreen(++hue %= 360);
-    vex::this_thread::sleep_for(20); //sleeps to slow rainbow
+      vex::this_thread::sleep_for(20); //sleeps to slow rainbow
     }
   });
 
   while (1)  {
     auto loc = robot::idrive.getLocation();
     robot::primary.Screen.setCursor(5, 0);
-    robot::primary.Screen.clearLine();
-    robot::primary.Screen.print("%.2f, %.2f", loc.x, loc.y);
-    vex::this_thread::sleep_for(100); //sleeps to minimize cpu usage
+    robot::primary.Screen.clearLine(5);
+    robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
+    vex::this_thread::sleep_for(500); //sleeps to minimize cpu usage and network usage
   }
 }

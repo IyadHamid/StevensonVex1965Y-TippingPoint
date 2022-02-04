@@ -27,9 +27,11 @@ public:
     value = updater();
     return delta = value - old;
   }
-  // postfix increment update returning new change
+  // postfix increment update adding to last change returning total change
   T operator++(int) {
-    return operator++();
+    const T old = value;
+    value = updater();
+    return delta += value - old;
   }
 
   std::function<T(void)> updater; //updater function

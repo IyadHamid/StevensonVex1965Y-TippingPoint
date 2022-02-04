@@ -47,7 +47,7 @@ constexpr double robot_width = 12.0;
 
 // { proportional constant, integral constant, derivative constant, tolerance }
 constexpr PID<>::kPID drive_k = { 15.0, 8.0, 10.0, 0.1 };
-constexpr PID<>::kPID turn_k  = { 115.0, 15.0, 20.0, 0.005 };
+constexpr PID<>::kPID turn_k  = { 200.0, 5.0, 20.0, 0.005 };
 
 #define CLAW_PORT F
 #define HOOKS_PORT B

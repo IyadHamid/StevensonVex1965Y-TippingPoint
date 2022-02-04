@@ -15,7 +15,6 @@
 #include "PID.h"
 #include "deltaTracker.h"
 
-#include "robot.h" //delete me
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
                        PID<>::kPID drive_k, PID<>::kPID turn_k,
@@ -72,8 +71,9 @@ void inteldrive::start() {
       const auto ratio = 0.5 + disp.mag() / (2.0 * robotWidth * cos(ang));
       drive(output, ratio);
     },
-    { 1.0, 1.0, 1.0, 1.0 }//drivePID.k
+    { 1.0, 1.0, 1.0, 1.0 }//dispPID.k
   );
+  
   
   //Starts tracking
   location = {0.0, 0.0};
@@ -92,12 +92,20 @@ double inteldrive::position(vex::rotationUnits units) {
 }
 
 void inteldrive::drive(double vel, double ratio) {
+  if (vel == 0.0) {
+    stop();
+    return;
+  }
   //drives left and right motor groups at percent velocity skewed right at ratio
   left .spin(vex::directionType::fwd, vel / ratio * 150.0, vex::voltageUnits::mV);
   right.spin(vex::directionType::fwd, vel * ratio * 150.0, vex::voltageUnits::mV);
 }
 
 void inteldrive::drive(double vel) {
+  if (vel == 0.0) {
+    stop();
+    return;
+  }
   //drives left and right motor groups at percent velocity
   left .spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
   right.spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
@@ -109,27 +117,33 @@ void inteldrive::stop(vex::brakeType mode) {
   right.stop(mode);
 }
 
-void inteldrive::turnTo(double ang, double vel, bool relative) {
+void inteldrive::turnTo(double ang, uint32_t timeout, double vel, bool relative) {
   if (relative) //defaulted to do relative turns
     ang += heading();
   //runs turnPID at angle
-  turnPID.run(ang, 0, vel);
-  stop(vex::brakeType::brake);
+  turnPID.run(ang, timeout, vel);
+  stop();
 }
 
-void inteldrive::driveTo(double dist, double vel, bool relative) {
+void inteldrive::driveTo(double dist, uint32_t timeout, double vel, bool relative) {
   dist *= distanceRatio; //from inches to rotations
   if (relative) //defaulted to do relative movements
     dist += position();
 
   //runs drivePID at distance
-  drivePID.run(dist, 0, vel);
-
-  stop(vex::brakeType::brake); 
+  drivePID.run(dist, timeout, vel);
+  stop(); 
 }
 
-void inteldrive::driveTo(vec2 loc, double vel, bool relative) {
-  dispPID.run(loc);
+void inteldrive::driveTo(vec2 loc, uint32_t timeout, double vel, bool relative) {
+  //if (relative)
+  //  loc -= location;
+  //
+  //dispPID.run(loc);
+  if (!relative)
+    loc -= location;
+  turnPID.run(loc.ang());
+  drivePID.run(loc.mag());
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {
@@ -160,6 +174,13 @@ double inteldrive::getDistanceRatio() {
   return distanceRatio;
 }
 
+void inteldrive::reset() {
+  location = { 0.0, 0.0 };
+  inertialSensor.resetHeading();
+  left.resetPosition();
+  right.resetPosition();
+}
+
 vec2 inteldrive::getLocation() {
   return location;
 }
@@ -169,8 +190,8 @@ void inteldrive::locationTrack() {
   deltaTracker<double> dir ([&]{ return heading();  });
   
   while (1)  {
-    auto distance = ++dist / getDistanceRatio();
-    auto angle = rev2rad(heading());
+    const auto distance = ++dist / getDistanceRatio();
+    const auto angle = rev2rad(heading());
     location += vec2::polar(distance, angle);
 
     vex::this_thread::sleep_for(50); //sleeps to lower cpu usage

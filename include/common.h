@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cmath>
+#include "vex_thread.h"
 
 constexpr double pi = 3.14159265359; //mathematical π
 constexpr double tau = pi * 2.0; //mathematical τ
@@ -51,7 +52,6 @@ static const double angle_difference_rad(double a, double b) {
 // difference of A and B in degrees
 //returns positive : A is right of B
 static const double angle_difference_rev(double a, double b) {
-  a -= std::floor(a);
   return std::fmod((a - b + 0.5), 1.0) - 0.5;
 }
 
@@ -60,11 +60,11 @@ struct vec2 {
   double x, y;
   
   // creates vector from polar coordinates
-  static vec2 polar(double mag, double ang) { return vec2{ cos(ang) * mag, sin(ang) * mag }; };
+  static const vec2 polar(double mag, double ang) { return vec2{ cos(ang) * mag, sin(ang) * mag }; };
 
-  vec2 operator+(vec2 other) { return vec2{ x+other.x, y+other.y }; }
-  vec2 operator-(vec2 other) { return vec2{ x-other.x, y-other.y }; }
-  vec2 operator*(double other) { return vec2{ x*other, y*other }; }
+  const vec2 operator+(vec2 other) { return vec2{ x+other.x, y+other.y }; }
+  const vec2 operator-(vec2 other) { return vec2{ x-other.x, y-other.y }; }
+  const vec2 operator*(double other) { return vec2{ x*other, y*other }; }
   
   vec2 operator+=(vec2 other) { return *this = *this + other; }
   vec2 operator-=(vec2 other) { return *this = *this - other; }
@@ -75,7 +75,10 @@ struct vec2 {
   const double mag() { return sqrt(x*x + y*y); }
 };
 
-// helper function to create a vex::thread to run a member class function; class name, function with parameters
+// waits until condition; condition
+#define until(condition) { while (!(condition)) vex::this_thread::sleep_for(50); }
+
+// helper macro to create a vex::thread to run a member class function; class name, function with parameters
 #define CREATE_METHOD_THREAD( CLASS, FUNCTION ) vex::thread([](void* self) { static_cast<CLASS*>(self)->FUNCTION; }, this)
 
 // got from 1,000,000 year simulation

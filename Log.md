@@ -444,7 +444,7 @@
 - Made robot complete stop if no joystick input
 - Made rainbow effect in its own thread instead of main thread
   - Reasoning: uicker changing rainbow
-### Testing
+#### Testing
 - Noticed robot drift if no input is pressed
   - Preferentially good/bad 
     - Momentum arguably intuitive however could be imprecise
@@ -452,14 +452,38 @@
   - Still does not do anything 
     - Tolerance appears to be too low
 
+### 2/3/22
+- Added `until` macro in `common.h`
+- Constified parts of `common.h`
+- Added timeout to `inteldrive::driveTo` and `inteldrive::driveTo`
+  - Reasoning: respective PIDs may take too long to converge
+- Changed `deltaTracker::operator++(int)` (postfix increment) to add delta to have total delta
+  - Reasoning: total change from a point can be useful
+- Tweaked turn PID values
+- Removed `a -= std::floor(a)` from `angle_difference_rev`
+- Timeout for `inteldrive::turnTo` now default to 500 ms
+  - Reasoning: prevents from random stopping
+#### Testing
+- Simple straight auton functional
+- Turning non-functional
+  - Possibly due to lack of clean tires and tiles
+  - Turning unoptimized direction
+  - Retuned PID
+- Robot decides to rotate towards incorrect direction
+  - Likely issue with `angle_difference_rev`
+- Timeout does not appear to work
+- Spun around 1/4 rotation relatively
+  - Turning hanged (timeout does not work)
+  - Stopping error to large
+    - Likely due to 'slippery' enviroment
+- Controller sometimes disconnects
+  - Unsure if this is normal
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
-- Need to 'fix' units for `drivePID` and `turnPID` velocities
-  - `dmax` in `inteldrive::run` can be converted to rpm which can be converted to pct through [max rpm](https://www.vexrobotics.com/276-4840.html?q=&locale.name=English)
-- Test autonomous start
-- Refine PID values (could be faster)
-- Finish implementing `inteldrive::driveTo(vec2...)`
-- Add timeout to `inteldrive::driveTo` and `inteldrive::turnTo`
+- Refine PID values
+- Finish (re)implementing `inteldrive::driveTo(vec2...)`
 - Re-add debugging for PID
-  - Possibly through another class utilizing multithreading
+  - Possibly multithreaded
+- Clean tires

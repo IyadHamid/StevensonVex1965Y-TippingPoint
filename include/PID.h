@@ -46,7 +46,7 @@ void PID<T>::run(T goal, uint32_t timeout, double max, uint32_t dt) {
   uint32_t now;                                            // current time
 
   now = vex::timer::system();
-  while (std::abs(e.value) > k.t || (timeout != 0 && now - start > timeout )) {
+  while (std::abs(e.value) > k.t) {
 
     //smooths integral to 'forget' past used to not overcompensate
     integral /= 2.0;
@@ -59,9 +59,12 @@ void PID<T>::run(T goal, uint32_t timeout, double max, uint32_t dt) {
     //send output value back with maximum at max if max > 0.0
     output(max > 0.0 ? std::min(out, max) : out, goal); 
 
-    e++; //updates error and derivative
+    ++e; //updates error and derivative
     
     vex::this_thread::sleep_until(now + dt);
     now = vex::timer::system(); //updates previous time to current time
+
+    if (timeout != 0 && ((now - start) > timeout))
+      break;
   }
 }

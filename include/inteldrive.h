@@ -46,12 +46,15 @@ public:
   // stops motors; brake type (defaulted to braking)
   void stop(vex::brakeType mode = vex::brakeType::brake);
 
-  // turns robot to angle; revolution angle, percent velocity (defaulted to 0, 0 is no maximum), should not reset gyrometer? (defaulted to false)
-  void turnTo(double ang, double vel = 0.0, bool relative = true);
-  // drives robot to distance; inches distance, percent velocity (defualted to 0, 0 is no maximum), should not reset motor encoders? (defaulted to false)
-  void driveTo(double dist, double vel = 0.0, bool relative = true);
-  // drives robot to distance; inches distance, percent velocity (defualted to 0, 0 is no maximum), should not reset motor encoders? (defaulted to false)
-  void driveTo(vec2 loc, double vel = 0.0, bool relative = true);
+  // turns robot to angle; revolution angle, timeout (defaulted to 0, 0 is no timeout), 
+  //   percent velocity (defaulted to 0, 0 is no max), is relative? (defaulted to true)
+  void turnTo(double ang, uint32_t timeout = 500, double vel = 0.0, bool relative = true);
+  // drives robot to distance; inches distance, timeout (defaulted to 0, 0 is no timeout), 
+  //   percent velocity (defaulted to 0, 0 is no max), is relative? (defaulted to true)
+  void driveTo(double dist, uint32_t timeout = 0, double vel = 0.0, bool relative = true);
+  // drives robot to distance; inches distance, timeout (defaulted to 0, 0 is no timeout), 
+  //   percent velocity (defaulted to 0, 0 is no max), is relative? (defaulted to true)
+  void driveTo(vec2 loc, uint32_t timeout = 0, double vel = 0.0, bool relative = true);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
@@ -65,6 +68,9 @@ public:
   double getDistanceRatio();
   // gets location
   vec2 getLocation();
+  
+  // resets location, position, and heading (use sparingly)
+  void reset();
   
 protected:
   // tracks and updates location vector
