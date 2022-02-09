@@ -22,31 +22,26 @@ const void modePrint(const char* mode) {
 
 void autonomous() {
   using namespace robot;
-  modePrint("Auton");
-  idrive.reset();
 
 #if defined(AUTON_A)
+  modePrint("Auton A");
   claw.close();
   deltaTracker<double> dist([]{ return idrive.position(); });
   vex::thread clawThread([]{
     until(idrive.position() >= idrive.getDistanceRatio() * 44.5);
     claw.open();
   });
-  //idrive.drive(50);
-  //until(dist++ >= idrive.getDistanceRatio() * 43.5);
-  idrive.driveTo(45.5, 0, 0.0, false);
-  
+  idrive.driveTo(45.5, false, false);
   backToggle();
-  claw.open();
-  vex::this_thread::sleep_for(100);
-  //idrive.drive(-50);
-  //until(dist++ <= idrive.getDistanceRatio() * 20.0);
-  idrive.driveTo(18.0, 0, 0.0, false);
+  //claw.open();
+  vex::this_thread::sleep_for(50);
+  idrive.driveTo(18.0, true, false);
   idrive.turnTo(.75);
   idrive.driveTo(-15.0);
   backToggle();
   clawThread.join();
 #elif defined(AUTON_B)
+  modePrint("Auton B");
   claw.open();
   lift.rotateFor(1.8, vex::rotationUnits::rev, 100, vex::velocityUnits::pct);
   idrive.driveTo(5);
@@ -54,7 +49,8 @@ void autonomous() {
   idrive.driveTo(5);
   idrive.driveTo(-10);
 #elif defined(AUTON_C)
-  idrive.driveTo(120);
+  modePrint("Auton C");
+  idrive.driveTo({0,0}, false, false);
 #endif
 }
 
@@ -148,9 +144,9 @@ int main() {
   });
 
   while (1)  {
-    auto loc = robot::idrive.getLocation();
     robot::primary.Screen.setCursor(5, 0);
     robot::primary.Screen.clearLine(5);
+    const auto loc = robot::idrive.getLocation();
     robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
     vex::this_thread::sleep_for(500); //sleeps to minimize cpu usage and network usage
   }

@@ -45,8 +45,8 @@ void PID<T>::run(T goal, uint32_t timeout, double max, uint32_t dt) {
   deltaTracker<double> e([&, goal]{ return error(goal);}); // tracks error and derivative of error
   uint32_t now;                                            // current time
 
-  now = vex::timer::system();
   while (std::abs(e.value) > k.t) {
+    now = vex::timer::system();
 
     //smooths integral to 'forget' past used to not overcompensate
     integral /= 2.0;

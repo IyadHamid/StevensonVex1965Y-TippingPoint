@@ -25,7 +25,8 @@ public:
   //drive PID constants, turn PID constants,
   //ratio revolutions/inches, robot width in inches
   inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, 
-             PID<>::kPID drive_k, PID<>::kPID turn_k, 
+             PID<>::kPID drive_k, PID<>::kPID turn_k,
+             PID<>::kPID fast_drive_k, PID<>::kPID fast_turn_k, 
              double ratio, double robotWidth);
   // inteldrive constructor (creates empty inteldrive)
   //inteldrive();
@@ -37,7 +38,7 @@ public:
   // gyrometer's heading; units for returned rotation (defaulted to revolution)
   double heading(vex::rotationUnits units = vex::rotationUnits::rev);
   // motor encoder's rotational; units for returned rotation (defaulted to revolution)
-  double position(vex::rotationUnits unit = vex::rotationUnits::rev);
+  double position(vex::rotationUnits units = vex::rotationUnits::rev);
 
   // drives at velocity with turning ratio; percent velocity, ratio for right / left
   void drive(double vel, double ratio);
@@ -47,15 +48,14 @@ public:
   // stops motors; brake type (defaulted to braking)
   void stop(vex::brakeType mode = vex::brakeType::brake);
 
-  // turns robot to angle; revolution angle, timeout (defaulted to 0, 0 is no timeout), 
-  //   percent velocity (defaulted to 0, 0 is no max), is relative? (defaulted to true)
-  void turnTo(double ang, uint32_t timeout = 500, double vel = 0.0, bool relative = true);
-  // drives robot to distance; inches distance, timeout (defaulted to 0, 0 is no timeout), 
-  //   percent velocity (defaulted to 0, 0 is no max), is relative? (defaulted to true)
-  void driveTo(double dist, uint32_t timeout = 0, double vel = 0.0, bool relative = true);
-  // drives robot to distance; inches distance, timeout (defaulted to 0, 0 is no timeout), 
-  //   percent velocity (defaulted to 0, 0 is no max), is relative? (defaulted to true)
-  void driveTo(vec2 loc, uint32_t timeout = 0, double vel = 0.0, bool relative = true);
+  // turns robot to angle; revolution angle, use fast PID? (defaulted to true),
+  //   is relative? (defaulted to true), timeout in ms (defaulted to 1000, 0 is no timeout)
+  void turnTo(double ang, bool fast = true, bool relative = true, uint32_t timeout = 1000);
+  // drives robot to distance; inches distance, use fast PID? (defaulted to true),
+  //   is relative? (defaulted to true), timeout in ms (defaulted to 0, 0 is no timeout)
+  void driveTo(double dist, bool fast = true, bool relative = true, uint32_t timeout = 0);
+  // drives robot to position; displacement, use fast PIDs? (defaulted to true), is relative? (defaulted to true)
+  void driveTo(vec2 loc, bool fast = true, bool relative = true);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
@@ -81,7 +81,8 @@ protected:
   vex::thread trackingThread; // thread tracking location
 
   PID<> drivePID, turnPID; // PID controllers using scalar error
-  PID<vec2> dispPID; // PID controller with displacement
+  PID<>::kPID drive_k, fast_drive_k, turn_k, fast_turn_k; // PID constants
+  //PID<vec2> dispPID; // PID controller with displacement
 
   double robotWidth; // robot width in distance units
   double distanceRatio; // ratio from distance units to revolutions (revolutions/distance units)

@@ -18,10 +18,13 @@
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
                        PID<>::kPID drive_k, PID<>::kPID turn_k,
+                       PID<>::kPID fast_drive_k, PID<>::kPID fast_turn_k,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
   location{0.0, 0.0},
-  drivePID(), turnPID(),
+  drivePID{}, turnPID{},
+  drive_k{ drive_k }, fast_drive_k{ fast_drive_k },
+  turn_k{ turn_k }, fast_turn_k{ fast_turn_k },
   robotWidth{rw}, distanceRatio{ratio}
 {
   drivePID.k = drive_k;
@@ -44,12 +47,13 @@ void inteldrive::start() {
   turnPID = PID<>( //initalizes turnPID
     [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
     [&](double output, double goal) {
-      left .spin(vex::directionType::fwd, output * 150.0, vex::voltageUnits::mV);
-      right.spin(vex::directionType::rev, output * 150.0, vex::voltageUnits::mV);
+      left .spin(vex::directionType::fwd, output, vex::percentUnits::pct);
+      right.spin(vex::directionType::rev, output, vex::percentUnits::pct);
     },
     turnPID.k
   );
 
+  /*
   dispPID = PID<vec2>(
     [&](vec2 goal){
       // displacement between target location and target location
@@ -72,8 +76,9 @@ void inteldrive::start() {
       drive(output, ratio);
     },
     { 1.0, 1.0, 1.0, 1.0 }//dispPID.k
+    
   );
-  
+  */
   
   //Starts tracking
   location = {0.0, 0.0};
@@ -127,33 +132,43 @@ void inteldrive::stop(vex::brakeType mode) {
   right.stop(mode);
 }
 
-void inteldrive::turnTo(double ang, uint32_t timeout, double vel, bool relative) {
+void inteldrive::turnTo(double ang, bool fast, bool relative, uint32_t timeout) {
   if (relative) //defaulted to do relative turns
     ang += heading();
+  turnPID.k = fast ? fast_turn_k : turn_k; //use fast PID constants?
   //runs turnPID at angle
-  turnPID.run(ang, timeout, vel);
+  turnPID.run(ang, timeout, 0.0);
   stop();
 }
 
-void inteldrive::driveTo(double dist, uint32_t timeout, double vel, bool relative) {
+void inteldrive::driveTo(double dist, bool fast, bool relative, uint32_t timeout) {
   dist *= distanceRatio; //from inches to rotations
   if (relative) //defaulted to do relative movements
     dist += position();
+  drivePID.k = fast ? fast_drive_k : drive_k; //use fast PID constants?
 
   //runs drivePID at distance
-  drivePID.run(dist, timeout, vel);
+  drivePID.run(dist, timeout, 0.0);
   stop(); 
 }
 
-void inteldrive::driveTo(vec2 loc, uint32_t timeout, double vel, bool relative) {
-  //if (relative)
-  //  loc -= location;
+
+void inteldrive::driveTo(vec2 loc, bool fast, bool relative) {
+  vec2 disp = loc - (!relative ? location : vec2{}); //need values relatively
+
+  turnTo(disp.ang(), fast, true);
+
+  disp = loc - (!relative ? location : vec2{}); //recalculates displacement
+  driveTo(disp.mag(), fast, true);
+  
+/*
   //
   //dispPID.run(loc);
   if (!relative)
     loc -= location;
   turnPID.run(loc.ang());
   drivePID.run(loc.mag());
+*/
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {

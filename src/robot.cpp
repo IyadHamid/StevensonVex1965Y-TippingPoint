@@ -43,6 +43,7 @@ namespace robot {
     lgroup, 
     rgroup,
     drive_k, turn_k,
+    fast_drive_k, fast_turn_k,
     inches2units_ratio, robot_width
   );
 
