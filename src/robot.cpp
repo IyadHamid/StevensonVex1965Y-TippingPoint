@@ -79,9 +79,9 @@ void robot::init() {
 bool lift_isUp = false; //lift is initally down
 bool back_isUp = true; //back is initally up
 
-void robot::liftSet(bool goUp) { 
+void robot::liftSet(bool goUp, bool waitForCompletion) { 
   //set lift to up if going up
-  lift.rotateTo(goUp ? lift_up : lift_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
+  lift.rotateTo(goUp ? lift_up : lift_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, waitForCompletion);
   lift_isUp = goUp;
 }
 

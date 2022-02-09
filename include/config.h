@@ -25,6 +25,9 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 // type of drive [ARCADE/DRONE/TANK] (defaults to TANK)
 #define DRONE
 
+// admin testing controls
+//#define ADMIN
+
 // auton type
 #define AUTON_A
 
@@ -46,7 +49,8 @@ constexpr double inches2units_ratio = 1.0/(pi * 3.25) * 60.0/36.0; // 1/πd * [r
 constexpr double robot_width = 12.0;
 
 // { proportional constant, integral constant, derivative constant, tolerance }
-constexpr PID<>::kPID drive_k = { 15.0, 8.0, 10.0, 0.1 };
+//constexpr PID<>::kPID drive_k = { 15.0, 8.0, 10.0, 0.1 };
+constexpr PID<>::kPID drive_k = { 13.0, 5.0, 6.0, 0.1 };
 constexpr PID<>::kPID turn_k  = { 200.0, 5.0, 20.0, 0.005 };
 
 #define CLAW_PORT F

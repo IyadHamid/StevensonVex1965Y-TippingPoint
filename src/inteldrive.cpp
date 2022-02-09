@@ -37,7 +37,7 @@ void inteldrive::start() {
   
   drivePID = PID<>( //initalizes drivePID
     [&](double goal) { return goal - position(); },
-    [&](double output, double goal) { drive(output); }, 
+    [&](double output, double goal) { drive_percentage(output); }, 
     drivePID.k
   );
 
@@ -109,6 +109,16 @@ void inteldrive::drive(double vel) {
   //drives left and right motor groups at percent velocity
   left .spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
   right.spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
+}
+
+void inteldrive::drive_percentage(double vel) {
+  if (vel == 0.0) {
+    stop();
+    return;
+  }
+  //drives left and right motor groups at percent velocity
+  left .spin(vex::directionType::fwd, vel, vex::percentUnits::pct);
+  right.spin(vex::directionType::fwd, vel, vex::percentUnits::pct);
 }
 
 void inteldrive::stop(vex::brakeType mode) {

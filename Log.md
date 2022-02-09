@@ -479,6 +479,25 @@
 - Controller sometimes disconnects
   - Unsure if this is normal
 
+### 2/6/22 (Competition)
+- Changed lift contorls to analog
+  - Rumbles if at max
+- Added new auton for WP
+- Tuned pressure regulators
+- Added `inteldrive::drive_straight`
+  - Uses percent isntead of mV
+  - Reasoning: drivePID auton expects straightness
+- Slowed down `inteldrive::driveTo`
+  - Done by lower PID values
+- Made auton running on right side more comprenhensive
+#### Competition
+- Auton not clamping too late
+  - Clamp later
+  - Was not threaded
+- Auton very inconsistent 
+- Auton functions not doing expected things
+  - Maybe running wrong programs
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -486,4 +505,3 @@
 - Finish (re)implementing `inteldrive::driveTo(vec2...)`
 - Re-add debugging for PID
   - Possibly multithreaded
-- Clean tires

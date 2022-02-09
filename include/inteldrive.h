@@ -43,6 +43,7 @@ public:
   void drive(double vel, double ratio);
   // drives at velocity; percent velocity
   void drive(double vel);
+  void drive_percentage(double vel);
   // stops motors; brake type (defaulted to braking)
   void stop(vex::brakeType mode = vex::brakeType::brake);
 

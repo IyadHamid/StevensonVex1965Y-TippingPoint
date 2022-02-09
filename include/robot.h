@@ -44,11 +44,11 @@ namespace robot {
   //init function
   void init();
 
-  //sets lift up/down; boolean go up?
-  void liftSet(bool newState);
+  //sets lift up/down; boolean go up?, wait for completion? (defualted to false)
+  void liftSet(bool newState, bool waitForCompletion = false);
   //toggles lift from being up/down
   void liftToggle();
-  //moves lift up/down with limits; boolean go up?, return at a maximum
+  //moves lift up/down with limits and returns when at a limit; boolean go up?
   bool liftAnalog(bool goUp);
 
   //sets lift up/down; boolean go up?

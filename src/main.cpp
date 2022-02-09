@@ -23,21 +23,38 @@ const void modePrint(const char* mode) {
 void autonomous() {
   using namespace robot;
   modePrint("Auton");
+  idrive.reset();
 
-  idrive.turnTo(.25);
-  return;
 #if defined(AUTON_A)
-  deltaTracker<double> dist([]{ return idrive.position(); });
-  idrive.drive(100);
-  until(dist++ > idrive.getDistanceRatio() * 43.5);
-  claw.open();
-  until(dist++ > idrive.getDistanceRatio() * 45.0);
   claw.close();
-  idrive.drive(-100);
-  until(dist++ < idrive.getDistanceRatio() * 20.0);
-  idrive.driveTo(0.0, 0, 0.0, false);
-
+  deltaTracker<double> dist([]{ return idrive.position(); });
+  vex::thread clawThread([]{
+    until(idrive.position() >= idrive.getDistanceRatio() * 44.5);
+    claw.open();
+  });
+  //idrive.drive(50);
+  //until(dist++ >= idrive.getDistanceRatio() * 43.5);
+  idrive.driveTo(45.5, 0, 0.0, false);
+  
+  backToggle();
+  claw.open();
+  vex::this_thread::sleep_for(100);
+  //idrive.drive(-50);
+  //until(dist++ <= idrive.getDistanceRatio() * 20.0);
+  idrive.driveTo(18.0, 0, 0.0, false);
+  idrive.turnTo(.75);
+  idrive.driveTo(-15.0);
+  backToggle();
+  clawThread.join();
 #elif defined(AUTON_B)
+  claw.open();
+  lift.rotateFor(1.8, vex::rotationUnits::rev, 100, vex::velocityUnits::pct);
+  idrive.driveTo(5);
+  claw.close();
+  idrive.driveTo(5);
+  idrive.driveTo(-10);
+#elif defined(AUTON_C)
+  idrive.driveTo(120);
 #endif
 }
 
@@ -45,8 +62,9 @@ void drivercontrol() {
   modePrint("Driver");
   
   //adds control function feedbacks
-  robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); } );
-  robot::primary.ButtonL2.pressed([]{ robot::liftSet(false); } );
+  //robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); });
+  //robot::primary.ButtonL2.pressed([]{ robot::liftSet(false); });
+  
   robot::primary.ButtonA.pressed(robot::backToggle);
   robot::primary.ButtonR2.pressed([]{ //toggle claw
     static bool isOpen = false; //piston starts out closed
@@ -71,7 +89,7 @@ void drivercontrol() {
   while (1) {
     //if turbo button is pressed, use maximum power, else use controller modifers from config.h
     const vec2 modifiers = robot::primary.ButtonR1.pressing() ? vec2{ 1.1, 1.1 } : controller_modifiers;
-    
+
     if (robot::primary.Axis1.value() == 0 && robot::primary.Axis2.value() == 0 && 
         robot::primary.Axis3.value() == 0 && robot::primary.Axis4.value() == 0) {
       robot::idrive.stop();
@@ -86,6 +104,7 @@ void drivercontrol() {
 #endif
     }
 
+#ifdef ADMIN
     if (robot::primary.ButtonUp.pressing()) {
       if (robot::primary.ButtonDown.pressing()) { //resets location
         robot::idrive.reset();
@@ -99,13 +118,24 @@ void drivercontrol() {
         autonomous();
       }
     }
+#endif 
+    if (robot::primary.ButtonL1.pressing()) {
+      if (robot::liftAnalog(true)) 
+        robot::primary.rumble("."); 
+    }
+    else if (robot::primary.ButtonL2.pressing()) {
+      if (robot::liftAnalog(false)) 
+        robot::primary.rumble("."); 
+    }
+    else 
+      robot::lift.stop(vex::brakeType::hold);
   }
 }
 
 int main() {
   vex::competition competition;
+  robot::claw.open();
   robot::init();
-
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
 
