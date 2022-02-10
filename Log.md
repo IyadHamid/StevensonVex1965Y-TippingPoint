@@ -498,12 +498,12 @@
 - Auton functions not doing expected things
   - Maybe running wrong programs
 
-### 4/9/22
+### 2/9/22
 - Reimplemented `inteldrive::driveTo(vec2...)` back to turn and drive
   - Reasoning: other algorithm complex and untested
 - Changed `inteldrive` to have fast variants of PID constants
   - Changed parameter footprint of `inteldrive::driveTo` and `inteldrive::turnTo`
-#### Testing:
+#### Testing
 - Timeout was not working
   - Bug in code (fixed)
 - Tuned some PIDs
@@ -514,11 +514,32 @@
     - Succeeded (does not move)
   - Possibly angle-location discrepancy 
 
+### 2/10/22
+- Fixed `2/9/22`'s log
+  - Wrong date
+  - Has colon after `Testing`
+- Fixed `vex::ang`
+  - Angle was being calculated incorrect
+    - Used `tan` when `atan2` should have been used
+- 
+#### Testing
+- Point and drive `inteldrive::driveTo` not functional
+  - Found error was with angle calculation
+    - Angle was being miscalculated by `vec2`
+- Point and drive now functional
+  - Going 'home' (`{0, 0}`) absolute functional
+  - Going 10in forward from home (`{10, 0}` absolute) functional
+  - Going 10in side from home (`{0, 10}` absolute) functional
+  - Going a distance from home (`{20, 10}` absolute) functional
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
 - Refine PID values
-- Finish (re)implementing `inteldrive::driveTo(vec2...)`
+- Finish reimplement `inteldrive::driveTo(vec2...)`
+  - Maybe with curvature
+  - Implement real-time autocorrecting `inteldrive::driveTo` 
 - Re-add debugging for PID
   - Possibly multithreaded
 - Clean-up code
+- Relative turn point should not work (fix)

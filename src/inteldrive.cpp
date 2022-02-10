@@ -152,11 +152,13 @@ void inteldrive::driveTo(double dist, bool fast, bool relative, uint32_t timeout
   stop(); 
 }
 
-
+#include "robot.h"
 void inteldrive::driveTo(vec2 loc, bool fast, bool relative) {
   vec2 disp = loc - (!relative ? location : vec2{}); //need values relatively
+  //vec2 disp = vec2{0,0} - location;
+  double angle = common_mod(rad2rev(disp.ang()), 1.0);
 
-  turnTo(disp.ang(), fast, true);
+  turnTo(angle, fast, false);
 
   disp = loc - (!relative ? location : vec2{}); //recalculates displacement
   driveTo(disp.mag(), fast, true);

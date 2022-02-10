@@ -57,10 +57,6 @@ void autonomous() {
 void drivercontrol() {
   modePrint("Driver");
   
-  //adds control function feedbacks
-  //robot::primary.ButtonL1.pressed([]{ robot::liftSet(true); });
-  //robot::primary.ButtonL2.pressed([]{ robot::liftSet(false); });
-  
   robot::primary.ButtonA.pressed(robot::backToggle);
   robot::primary.ButtonR2.pressed([]{ //toggle claw
     static bool isOpen = false; //piston starts out closed
@@ -144,9 +140,9 @@ int main() {
   });
 
   while (1)  {
-    robot::primary.Screen.setCursor(5, 0);
-    robot::primary.Screen.clearLine(5);
-    const auto loc = robot::idrive.getLocation();
+    robot::primary.Screen.setCursor(3, 0);
+    robot::primary.Screen.clearLine(3);
+    const vec2 loc = robot::idrive.getLocation();
     robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
     vex::this_thread::sleep_for(500); //sleeps to minimize cpu usage and network usage
   }

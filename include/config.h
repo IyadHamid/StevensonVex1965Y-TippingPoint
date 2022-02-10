@@ -52,7 +52,7 @@ constexpr double robot_width = 12.0;
 constexpr PID<>::kPID drive_k      = { 13.0, 6.0, 6.0, 0.1 };
 constexpr PID<>::kPID fast_drive_k = { 15.0, 8.0, 10.0, 0.1 };
 
-constexpr PID<>::kPID turn_k       = { 100.0, 3.0, 4.0, 0.001 };
+constexpr PID<>::kPID turn_k       = { 150.0, 3.0, 8.0, 0.001 };
 constexpr PID<>::kPID fast_turn_k  = { 200.0, 5.0, 20.0, 0.005 };
 
 #define CLAW_PORT F

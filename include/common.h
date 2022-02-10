@@ -39,22 +39,27 @@ constexpr bool within_angle_range(double a, double x, double y) {
          (a < y && y < x) ||
          (y < x && x < a);
 }
+// computes mod without first parameter sign bias
+static const double common_mod(double a, double b) {
+  return a - std::floor(a / b) * b;
+}
+
 // difference of A and B in degrees
 //returns positive : A is right of B
 static const double angle_difference_deg(double a, double b) {
-  return std::fmod((a - b + 180.0), 360.0) - 180.0;
+  return common_mod(a - b + 180.0, 360.0) - 180.0;
 }
 // difference of A and B in degrees
 //returns positive : A is right of B
 static const double angle_difference_rad(double a, double b) {
-  return std::fmod((a - b + pi), tau) - pi;
+  return common_mod(a - b + pi, tau) - pi;
 }
 // difference of A and B in degrees
 //returns positive : A is right of B
 static const double angle_difference_rev(double a, double b) {
-  return std::fmod((a - b + 0.5), 1.0) - 0.5;
+  return common_mod(a - b + 0.5, 1.0) - 0.5;
 }
-
+#include <complex>
 // mathematical 2-dimensional vector
 struct vec2 {
   double x, y;
@@ -70,7 +75,7 @@ struct vec2 {
   vec2 operator-=(vec2 other) { return *this = *this - other; }
 
   // gets polar angle
-  const double ang() { return tan(y / x); }
+  const double ang() { return atan2(y, x); }
   // gets magnitude
   const double mag() { return sqrt(x*x + y*y); }
 };
