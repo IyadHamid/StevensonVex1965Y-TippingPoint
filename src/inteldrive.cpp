@@ -47,8 +47,8 @@ void inteldrive::start() {
   turnPID = PID<>( //initalizes turnPID
     [&](double goal) { return angle_difference_rev(goal, heading()); }, //turnPID internally uses radians
     [&](double output, double goal) {
-      left .spin(vex::directionType::fwd, output, vex::percentUnits::pct);
-      right.spin(vex::directionType::rev, output, vex::percentUnits::pct);
+      left .spin(vex::directionType::fwd, output, vex::voltageUnits::volt);
+      right.spin(vex::directionType::rev, output, vex::voltageUnits::volt);
     },
     turnPID.k
   );
@@ -152,10 +152,10 @@ void inteldrive::driveTo(double dist, bool fast, bool relative, uint32_t timeout
   stop(); 
 }
 
-#include "robot.h"
 void inteldrive::driveTo(vec2 loc, bool fast, bool relative) {
-  vec2 disp = loc - (!relative ? location : vec2{}); //need values relatively
-  //vec2 disp = vec2{0,0} - location;
+  vec2 disp = loc - (relative ? vec2{0.0, 0.0} : location); 
+  if (!relative) //need values relatively
+    disp -= location; 
   double angle = common_mod(rad2rev(disp.ang()), 1.0);
 
   turnTo(angle, fast, false);
@@ -163,14 +163,6 @@ void inteldrive::driveTo(vec2 loc, bool fast, bool relative) {
   disp = loc - (!relative ? location : vec2{}); //recalculates displacement
   driveTo(disp.mag(), fast, true);
   
-/*
-  //
-  //dispPID.run(loc);
-  if (!relative)
-    loc -= location;
-  turnPID.run(loc.ang());
-  drivePID.run(loc.mag());
-*/
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {

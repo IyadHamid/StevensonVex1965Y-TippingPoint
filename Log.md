@@ -521,7 +521,6 @@
 - Fixed `vex::ang`
   - Angle was being calculated incorrect
     - Used `tan` when `atan2` should have been used
-- 
 #### Testing
 - Point and drive `inteldrive::driveTo` not functional
   - Found error was with angle calculation
@@ -531,6 +530,20 @@
   - Going 10in forward from home (`{10, 0}` absolute) functional
   - Going 10in side from home (`{0, 10}` absolute) functional
   - Going a distance from home (`{20, 10}` absolute) functional
+
+### 2/16/22
+- Made `inteldrive::driveTo(vec2...)` to default to absolute
+  - Reasoning: generally used for absolute
+- Changed `inteldrive::turnPID` to use `vex::voltageUnits::volt`
+  - Retuned turn PID to match with new units
+  - Reasoning: to get as much power out of the motor as possible
+
+#### Testing
+- Tuned turning PID
+  - Did by turning .15 revolutions then .35 revolutions
+  - Completely redid PID from scratch for volts
+  - Accurate to `±.01` revolutions
+  - kp = 105.0, ki = -32.0, kd = -25.0s
 
 ## TODO
 - Need to add controller config to `README.md`
@@ -542,4 +555,4 @@
 - Re-add debugging for PID
   - Possibly multithreaded
 - Clean-up code
-- Relative turn point should not work (fix)
+- Relative turn point does not work (fix)

@@ -28,8 +28,6 @@ public:
              PID<>::kPID drive_k, PID<>::kPID turn_k,
              PID<>::kPID fast_drive_k, PID<>::kPID fast_turn_k, 
              double ratio, double robotWidth);
-  // inteldrive constructor (creates empty inteldrive)
-  //inteldrive();
   // inteldrive destructor (does nothing)
   ~inteldrive() {}
 
@@ -54,8 +52,8 @@ public:
   // drives robot to distance; inches distance, use fast PID? (defaulted to true),
   //   is relative? (defaulted to true), timeout in ms (defaulted to 0, 0 is no timeout)
   void driveTo(double dist, bool fast = true, bool relative = true, uint32_t timeout = 0);
-  // drives robot to position; displacement, use fast PIDs? (defaulted to true), is relative? (defaulted to true)
-  void driveTo(vec2 loc, bool fast = true, bool relative = true);
+  // drives robot to position; displacement, use fast PIDs? (defaulted to true), is relative? (defaulted to false)
+  void driveTo(vec2 loc, bool fast = true, bool relative = false);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);

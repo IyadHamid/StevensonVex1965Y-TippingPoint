@@ -50,7 +50,16 @@ void autonomous() {
   idrive.driveTo(-10);
 #elif defined(AUTON_C)
   modePrint("Auton C");
-  idrive.driveTo({0,0}, false, false);
+  //idrive.drive(100.0);
+  //until (idrive.getLocation().x > 48.0);
+  //idrive.driveTo({0,0}, false);
+  idrive.driveTo(50);
+  idrive.driveTo(-40);
+  idrive.driveTo(-10);
+  //idrive.turnTo(0.15, true);
+  //vex::this_thread::sleep_for(500);
+  //idrive.turnTo(0.35, true, true, 3000);
+
 #endif
 }
 
