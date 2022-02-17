@@ -56,7 +56,7 @@ constexpr PID<>::kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
 constexpr PID<>::kPID fast_turn_k  = { 105.0, -32.0, -25.0, 0.005 };
 
 #define CLAW_PORT F
-#define HOOKS_PORT B
+#define BACK_PORT B
 
 constexpr double back_up = 0.0;
 constexpr double back_down = 1.950;

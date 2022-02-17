@@ -50,7 +50,7 @@ namespace robot {
   //initalizes claw with triport from config.h
   vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
   //initalizes left/right hook with triport from config.h
-  vex::pneumatics hook(brain.ThreeWirePort.HOOKS_PORT);
+  vex::pneumatics backClaw(brain.ThreeWirePort.BACK_PORT);
 }
 
 void robot::init() {
@@ -67,10 +67,10 @@ void robot::init() {
     }
   }
   std::vector<std::pair<vex::triport::port, std::string>> legacy{
-    { brain.ThreeWirePort.CLAW_PORT, "claw"} , { brain.ThreeWirePort.HOOKS_PORT, "hook" }
+    { brain.ThreeWirePort.CLAW_PORT, "claw"} , { brain.ThreeWirePort.BACK_PORT, "hook" }
   };
 
-  robot::hook.set(false);
+  robot::backClaw.set(false);
   robot::lift.stop(vex::brakeType::hold);
   
   isensor.resetHeading();
@@ -105,13 +105,18 @@ bool robot::liftAnalog(bool goUp) {
 }
 
 void robot::backSet(bool goUp) { 
+  static vex::thread backThread;
+  backThread.interrupt();
   //set lift to up if going up
   back.rotateTo(goUp ? back_up : back_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   back_isUp = goUp;
+  backThread = vex::thread([](){
+    until (back.isDone());
+    backClaw.set(back_isUp);
+  });
 }
 
 void robot::backToggle() {
   //set lift to lift_down if is up
-  back.rotateTo(back_isUp ? back_down : back_up, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
-  back_isUp = !back_isUp;
+  backSet(!back_isUp);
 }

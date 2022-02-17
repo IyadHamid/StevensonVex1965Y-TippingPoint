@@ -545,6 +545,10 @@
   - Accurate to `±.01` revolutions
   - kp = 105.0, ki = -32.0, kd = -25.0s
 
+### 2/16/22
+- Added back claw pnuematics
+  - Toggles with back lift
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 

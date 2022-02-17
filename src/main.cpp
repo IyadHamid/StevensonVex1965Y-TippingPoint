@@ -110,11 +110,6 @@ void drivercontrol() {
       if (robot::primary.ButtonDown.pressing()) { //resets location
         robot::idrive.reset();
       }
-      else if (robot::primary.ButtonLeft.pressing()) { //toggles hook
-        static bool state = true;
-        robot::hook.set(!state);
-        state = !state;
-      }
       else if (robot::primary.ButtonRight.pressing()) { //runs auton
         autonomous();
       }

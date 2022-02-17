@@ -38,8 +38,8 @@ namespace robot {
   extern vex::pneumatics claw;
   extern bool clawOpen;
   //double-acting solenoid attached to the pistons controlling the each hook
-  extern vex::pneumatics hook;
-  extern bool hookOpens;
+  extern vex::pneumatics backClaw;
+  extern bool backClawOpen;
   
   //init function
   void init();
