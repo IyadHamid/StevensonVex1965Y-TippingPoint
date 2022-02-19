@@ -40,7 +40,10 @@ void inteldrive::start() {
   
   drivePID = PID<>( //initalizes drivePID
     [&](double goal) { return goal - position(); },
-    [&](double output, double goal) { drive_percentage(output); }, 
+    [&](double output, double goal) { 
+      left .spin(vex::directionType::fwd, output, vex::percentUnits::pct);
+      right.spin(vex::directionType::fwd, output, vex::percentUnits::pct);
+      }, 
     drivePID.k
   );
 

@@ -24,7 +24,27 @@ void autonomous() {
   using namespace robot;
 
 #if defined(AUTON_A)
+
   modePrint("Auton A");
+
+  vex::thread backThread([]{
+    until(idrive.position() <= idrive.getDistanceRatio() * -46.0);
+    robot::primary.Screen.print("!!!");
+    backClaw.set(false);
+  });
+
+  backSet(false);
+  idrive.drive_percentage(-20);
+  vex::this_thread::sleep_for(100);
+  idrive.driveTo(-50.0, true, true, 0);
+  
+  backSet(true);
+  
+  //vex::this_thread::sleep_for(10);
+  idrive.driveTo({0, 0});
+  backThread.interrupt();
+#elif defined(AUTON_B)
+  modePrint("Auton B");
   claw.close();
   deltaTracker<double> dist([]{ return idrive.position(); });
   vex::thread clawThread([]{
@@ -40,25 +60,26 @@ void autonomous() {
   idrive.driveTo(-15.0);
   backToggle();
   clawThread.join();
-#elif defined(AUTON_B)
-  modePrint("Auton B");
-  claw.open();
-  lift.rotateFor(1.8, vex::rotationUnits::rev, 100, vex::velocityUnits::pct);
-  idrive.driveTo(5);
-  claw.close();
-  idrive.driveTo(5);
-  idrive.driveTo(-10);
 #elif defined(AUTON_C)
   modePrint("Auton C");
-  //idrive.drive(100.0);
-  //until (idrive.getLocation().x > 48.0);
-  //idrive.driveTo({0,0}, false);
-  idrive.driveTo(50);
-  idrive.driveTo(-40);
-  idrive.driveTo(-10);
-  //idrive.turnTo(0.15, true);
-  //vex::this_thread::sleep_for(500);
-  //idrive.turnTo(0.35, true, true, 3000);
+  
+  claw.close();
+  backSet(false);
+  idrive.driveTo(-48.0);
+  backSet(true);
+  vex::this_thread::sleep_for(10);
+
+  
+  idrive.driveTo({-35.0, 0.0}, false);
+  idrive.turnTo(.36, false);
+  idrive.driveTo(40.0, false);
+
+  claw.open();
+  vex::this_thread::sleep_for(100);
+  idrive.turnTo(.45, true, false);
+  idrive.driveTo(-50);
+
+  //idrive.driveTo({-48.0, 25.0});
 
 #endif
 }
@@ -66,7 +87,7 @@ void autonomous() {
 void drivercontrol() {
   modePrint("Driver");
   
-  robot::primary.ButtonA.pressed(robot::backToggle);
+  robot::primary.ButtonRight.pressed(robot::backToggle);
   robot::primary.ButtonR2.pressed([]{ //toggle claw
     static bool isOpen = false; //piston starts out closed
     static vex::thread rumbleThread; //thread to rumble controller

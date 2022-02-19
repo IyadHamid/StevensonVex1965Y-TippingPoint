@@ -26,7 +26,7 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 #define DRONE
 
 // admin testing controls
-#define ADMIN
+//#define ADMIN
 
 // auton type
 #define AUTON_C
@@ -43,23 +43,23 @@ const motor_settings right_back  { PORT5 , gearSetting::ratio6_1, false };
 const motor_settings right_top   { PORT18, gearSetting::ratio6_1, true  };
 
 const motor_settings claw_lift   { PORT13, gearSetting::ratio18_1, false };
-const motor_settings back_lift   { PORT2 , gearSetting::ratio18_1, false };
+const motor_settings back_lift   { PORT3 , gearSetting::ratio18_1, false };
 
 constexpr double inches2units_ratio = 1.0/(pi * 3.25) * 60.0/36.0; // 1/πd * [ratio] (revolutions/inches), ~6.1 inches per rev
 constexpr double robot_width = 12.0;
 
 // { proportional constant, integral constant, derivative constant, tolerance }
-constexpr PID<>::kPID drive_k      = { 13.0, 6.0, 6.0, 0.1 };
+constexpr PID<>::kPID drive_k      = { 10.0, 5.0, 5.0, 0.1 };
 constexpr PID<>::kPID fast_drive_k = { 15.0, 8.0, 10.0, 0.1 };
 
 constexpr PID<>::kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
-constexpr PID<>::kPID fast_turn_k  = { 105.0, -32.0, -25.0, 0.005 };
+constexpr PID<>::kPID fast_turn_k  = { 105.0, -32.0, -30.0, 0.005 };
 
 #define CLAW_PORT F
-#define BACK_PORT B
+#define BACK_PORT H
 
 constexpr double back_up = 0.0;
-constexpr double back_down = 1.950;
+constexpr double back_down = 1.850;
 constexpr double back_high = 0.0;
 
 constexpr double lift_up = 4.570;

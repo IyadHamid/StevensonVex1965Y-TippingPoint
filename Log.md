@@ -545,9 +545,20 @@
   - Accurate to `±.01` revolutions
   - kp = 105.0, ki = -32.0, kd = -25.0s
 
-### 2/16/22
+### 2/17/22
 - Added back claw pnuematics
   - Toggles with back lift
+- Flipped back pnuematic to invert method 
+  - Reasoning: doesn't expell as much air
+
+### 2/19/22 (Competition)
+- Added new auton to use back claw (back claw rush)
+- Port 2 maybe burned out
+  - Port 3 working
+
+#### Competition
+- Back pnuematics leaking too much
+  - Flip pnuematic tubes on the dual acting cylinder to lose less air
 
 ## TODO
 - Need to add controller config to `README.md`

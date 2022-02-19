@@ -104,16 +104,11 @@ bool robot::liftAnalog(bool goUp) {
   return false;
 }
 
-void robot::backSet(bool goUp) { 
-  static vex::thread backThread;
-  backThread.interrupt();
+void robot::backSet(bool goUp) {
   //set lift to up if going up
+  backClaw.set(!goUp);
   back.rotateTo(goUp ? back_up : back_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
   back_isUp = goUp;
-  backThread = vex::thread([](){
-    until (back.isDone());
-    backClaw.set(back_isUp);
-  });
 }
 
 void robot::backToggle() {
