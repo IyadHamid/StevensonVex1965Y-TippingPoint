@@ -553,12 +553,27 @@
 
 ### 2/19/22 (Competition)
 - Added new auton to use back claw (back claw rush)
-- Port 2 maybe burned out
-  - Port 3 working
-
 #### Competition
 - Back pnuematics leaking too much
   - Flip pnuematic tubes on the dual acting cylinder to lose less air
+- Port 2 maybe burned out
+  - Port 3 working
+
+### 2/20/22
+- Replaced `relative` bool with `reverse` parameter in `inteldrive::driveTo(vec2...)`
+  - Reasoning: going backwards to specific location is required 
+- Attempted self-correcting `driveTo`
+  - Rewrote `inteldrive::driveTo(double...)` to use vectors
+    - Used `PID<vec2>`
+- Moved `kPID` outside `PID`
+  - Reasoning: be consistent between templated versions of `PID`
+- Reverted changes for self-correcting `driveTo`
+#### Testing
+- Backwards `driveTo` functional
+- Self-correcting drive not functional
+  - Jerks back and forth
+  - Using vector instead of linear distance broken
+- Self-correction may not be necessary with good wheels
 
 ## TODO
 - Need to add controller config to `README.md`

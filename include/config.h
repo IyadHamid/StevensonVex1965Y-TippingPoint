@@ -26,10 +26,10 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 #define DRONE
 
 // admin testing controls
-//#define ADMIN
+#define ADMIN
 
 // auton type
-#define AUTON_C
+#define AUTON_D
 
 const int32_t inertial_port = PORT10;
 
@@ -49,11 +49,11 @@ constexpr double inches2units_ratio = 1.0/(pi * 3.25) * 60.0/36.0; // 1/πd * [r
 constexpr double robot_width = 12.0;
 
 // { proportional constant, integral constant, derivative constant, tolerance }
-constexpr PID<>::kPID drive_k      = { 10.0, 5.0, 5.0, 0.1 };
-constexpr PID<>::kPID fast_drive_k = { 15.0, 8.0, 10.0, 0.1 };
+constexpr kPID drive_k      = { 10.0, 5.0, 5.0, 0.1 };
+constexpr kPID fast_drive_k = { 15.0, 8.0, 10.0, 0.1 };
 
-constexpr PID<>::kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
-constexpr PID<>::kPID fast_turn_k  = { 105.0, -32.0, -30.0, 0.005 };
+constexpr kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
+constexpr kPID fast_turn_k  = { 105.0, -32.0, -30.0, 0.005 };
 
 #define CLAW_PORT F
 #define BACK_PORT H

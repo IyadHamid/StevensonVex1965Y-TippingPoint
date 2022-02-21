@@ -25,8 +25,8 @@ public:
   //drive PID constants, turn PID constants,
   //ratio revolutions/inches, robot width in inches
   inteldrive(vex::inertial i, vex::motor_group l, vex::motor_group r, 
-             PID<>::kPID drive_k, PID<>::kPID turn_k,
-             PID<>::kPID fast_drive_k, PID<>::kPID fast_turn_k, 
+             kPID drive_k     , kPID turn_k,
+             kPID fast_drive_k, kPID fast_turn_k, 
              double ratio, double robotWidth);
   // inteldrive destructor (does nothing)
   ~inteldrive() {}
@@ -42,6 +42,7 @@ public:
   void drive(double vel, double ratio);
   // drives at velocity; percent velocity
   void drive(double vel);
+  // drives at velocity internally using percent; percent velocity
   void drive_percentage(double vel);
   // stops motors; brake type (defaulted to braking)
   void stop(vex::brakeType mode = vex::brakeType::brake);
@@ -52,8 +53,8 @@ public:
   // drives robot to distance; inches distance, use fast PID? (defaulted to true),
   //   is relative? (defaulted to true), timeout in ms (defaulted to 0, 0 is no timeout)
   void driveTo(double dist, bool fast = true, bool relative = true, uint32_t timeout = 0);
-  // drives robot to position; displacement, use fast PIDs? (defaulted to true), is relative? (defaulted to false)
-  void driveTo(vec2 loc, bool fast = true, bool relative = false);
+  // drives robot to position; displacement, use fast PIDs? (defaulted to true), drive reverse? (defaulted to false)
+  void driveTo(vec2 loc, bool fast = true, bool reverse = false);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
@@ -79,7 +80,7 @@ protected:
   vex::thread trackingThread; // thread tracking location
 
   PID<> drivePID, turnPID; // PID controllers using scalar error
-  PID<>::kPID drive_k, fast_drive_k, turn_k, fast_turn_k; // PID constants
+  kPID drive_k, fast_drive_k, turn_k, fast_turn_k; // PID constants
   //PID<vec2> dispPID; // PID controller with displacement
 
   double robotWidth; // robot width in distance units

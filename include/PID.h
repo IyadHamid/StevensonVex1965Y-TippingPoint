@@ -13,15 +13,16 @@
 
 #include "deltaTracker.h"
 
+//structure containing the 3 PID constants (kp, ki, kd) and tolerance
+struct kPID {
+  double p, i, d, t;
+};
+
 //PID controller class
 template<typename T = double>
 class PID {
 public:
   
-  //structure containing the 3 PID constants (kp, ki, kd) and tolerance
-  struct kPID {
-    double p, i, d, t;
-  };
 
   PID() {};
   // constructor; error input function, output function, PID constants

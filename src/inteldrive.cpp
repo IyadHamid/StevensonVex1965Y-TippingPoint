@@ -17,15 +17,15 @@
 
 inteldrive::inteldrive(vex::inertial i, 
                        vex::motor_group l, vex::motor_group r,
-                       PID<>::kPID drive_k, PID<>::kPID turn_k,
-                       PID<>::kPID fast_drive_k, PID<>::kPID fast_turn_k,
+                       kPID drive_k     , kPID turn_k,
+                       kPID fast_drive_k, kPID fast_turn_k,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
   location{0.0, 0.0},
   drivePID{}, turnPID{},
   drive_k{ drive_k }, fast_drive_k{ fast_drive_k },
   turn_k{ turn_k }, fast_turn_k{ fast_turn_k },
-  robotWidth{rw}, distanceRatio{ratio}
+  robotWidth{ rw }, distanceRatio{ ratio }
 {
   drivePID.k = drive_k;
   turnPID.k = turn_k;
@@ -40,10 +40,7 @@ void inteldrive::start() {
   
   drivePID = PID<>( //initalizes drivePID
     [&](double goal) { return goal - position(); },
-    [&](double output, double goal) { 
-      left .spin(vex::directionType::fwd, output, vex::percentUnits::pct);
-      right.spin(vex::directionType::fwd, output, vex::percentUnits::pct);
-      }, 
+    [&](double output, double goal) { drive_percentage(output); }, 
     drivePID.k
   );
 
@@ -56,33 +53,6 @@ void inteldrive::start() {
     turnPID.k
   );
 
-  /*
-  dispPID = PID<vec2>(
-    [&](vec2 goal){
-      // displacement between target location and target location
-      auto disp = goal - getLocation();
-      // relative angle towards center of circle (90° from angle between heading at destination)
-      const auto ang = angle_difference_rad(pi / 2.0, disp.ang() - rev2rad(heading()));
-      // driving radius
-      const auto r = disp.mag() / (2.0 * cos(ang));
-      // arclength distance
-      const auto dist = r * 2.0 * ang;
-      return dist;
-    },
-    [&](double output, vec2 goal){
-      // displacement between target location and target location
-      auto disp = goal - getLocation();
-      // relative angle towards center of circle (90° from angle between heading at destination)
-      const auto ang = angle_difference_rad(pi / 2.0, disp.ang() - rev2rad(heading()));
-      // ratio between left and right wheels
-      const auto ratio = 0.5 + disp.mag() / (2.0 * robotWidth * cos(ang));
-      drive(output, ratio);
-    },
-    { 1.0, 1.0, 1.0, 1.0 }//dispPID.k
-    
-  );
-  */
-  
   //Starts tracking
   location = {0.0, 0.0};
   trackingThread = CREATE_METHOD_THREAD( inteldrive, locationTrack() );
@@ -155,16 +125,14 @@ void inteldrive::driveTo(double dist, bool fast, bool relative, uint32_t timeout
   stop(); 
 }
 
-void inteldrive::driveTo(vec2 loc, bool fast, bool relative) {
-  vec2 disp = loc - (relative ? vec2{0.0, 0.0} : location); 
-  if (!relative) //need values relatively
-    disp -= location; 
-  double angle = common_mod(rad2rev(disp.ang()), 1.0);
+void inteldrive::driveTo(vec2 loc, bool fast, bool reverse) {
+  vec2 disp = loc - location;
+  double angle = common_mod(rad2rev(disp.ang()) + (reverse ? 0.5 : 0.0), 1.0);
 
   turnTo(angle, fast, false);
 
-  disp = loc - (!relative ? location : vec2{}); //recalculates displacement
-  driveTo(disp.mag(), fast, true);
+  disp = loc - location; //recalculates displacement
+  driveTo(disp.mag() * (reverse ? -1.0 : 1.0), fast, true);
   
 }
 

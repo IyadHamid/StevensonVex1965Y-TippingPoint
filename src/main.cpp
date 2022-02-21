@@ -29,7 +29,6 @@ void autonomous() {
 
   vex::thread backThread([]{
     until(idrive.position() <= idrive.getDistanceRatio() * -46.0);
-    robot::primary.Screen.print("!!!");
     backClaw.set(false);
   });
 
@@ -40,7 +39,6 @@ void autonomous() {
   
   backSet(true);
   
-  //vex::this_thread::sleep_for(10);
   idrive.driveTo({0, 0});
   backThread.interrupt();
 #elif defined(AUTON_B)
@@ -81,6 +79,8 @@ void autonomous() {
 
   //idrive.driveTo({-48.0, 25.0});
 
+#elif defined(AUTON_D)
+  idrive.driveTo({0.0, 0.0}, true, true);
 #endif
 }
 
@@ -131,11 +131,12 @@ void drivercontrol() {
       if (robot::primary.ButtonDown.pressing()) { //resets location
         robot::idrive.reset();
       }
-      else if (robot::primary.ButtonRight.pressing()) { //runs auton
+      else if (robot::primary.ButtonLeft.pressing()) { //runs auton
         autonomous();
       }
     }
 #endif 
+
     if (robot::primary.ButtonL1.pressing()) {
       if (robot::liftAnalog(true)) 
         robot::primary.rumble("."); 

@@ -65,7 +65,7 @@ struct vec2 {
   double x, y;
   
   // creates vector from polar coordinates
-  static const vec2 polar(double mag, double ang) { return vec2{ cos(ang) * mag, sin(ang) * mag }; };
+  static vec2 polar(double mag, double ang) { return vec2{ cos(ang) * mag, sin(ang) * mag }; };
 
   const vec2 operator+(vec2 other) { return vec2{ x+other.x, y+other.y }; }
   const vec2 operator-(vec2 other) { return vec2{ x-other.x, y-other.y }; }
@@ -79,6 +79,8 @@ struct vec2 {
   // gets magnitude
   const double mag() { return sqrt(x*x + y*y); }
 };
+
+static double dot(vec2 a, vec2 b) { return a.x * b.x + a.y * b.y; }
 
 // waits until condition; condition
 #define until(condition) { while (!(condition)) vex::this_thread::sleep_for(50); }
