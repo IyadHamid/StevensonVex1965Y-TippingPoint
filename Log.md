@@ -575,6 +575,20 @@
   - Using vector instead of linear distance broken
 - Self-correction may not be necessary with good wheels
 
+### 2/21/22
+- Rewrote code for new robot
+  - Now one lift motor
+    - Contains 3 states represented by an `enum`
+  - Now two claws
+  - Now intakes
+- Updated controls
+  - Button Y controls back claw
+  - Lift analog function (`robot::liftAnalog`) removed
+    - Controls functionally equivalent
+    - Reasoning: to add 'hesitate' at center to lock there
+- Added/updated some comments
+- Updated ports
+  - Updated `README.md`
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -584,5 +598,4 @@
   - Implement real-time autocorrecting `inteldrive::driveTo` 
 - Re-add debugging for PID
   - Possibly multithreaded
-- Clean-up code
-- Relative turn point does not work (fix)
+- Test new controls

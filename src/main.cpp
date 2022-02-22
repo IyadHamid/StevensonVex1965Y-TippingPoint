@@ -26,6 +26,7 @@ void autonomous() {
 #if defined(AUTON_A)
 
   modePrint("Auton A");
+  robot::idrive.reset();
 
   vex::thread backThread([]{
     until(idrive.position() <= idrive.getDistanceRatio() * -46.0);
@@ -43,6 +44,8 @@ void autonomous() {
   backThread.interrupt();
 #elif defined(AUTON_B)
   modePrint("Auton B");
+  robot::idrive.reset();
+  
   claw.close();
   deltaTracker<double> dist([]{ return idrive.position(); });
   vex::thread clawThread([]{
@@ -51,7 +54,7 @@ void autonomous() {
   });
   idrive.driveTo(45.5, false, false);
   backToggle();
-  //claw.open();
+  
   vex::this_thread::sleep_for(50);
   idrive.driveTo(18.0, true, false);
   idrive.turnTo(.75);
@@ -60,6 +63,7 @@ void autonomous() {
   clawThread.join();
 #elif defined(AUTON_C)
   modePrint("Auton C");
+  robot::idrive.reset();
   
   claw.close();
   backSet(false);
@@ -87,27 +91,30 @@ void autonomous() {
 void drivercontrol() {
   modePrint("Driver");
   
-  robot::primary.ButtonRight.pressed(robot::backToggle);
-  robot::primary.ButtonR2.pressed([]{ //toggle claw
-    static bool isOpen = false; //piston starts out closed
+  robot::primary.ButtonR2.pressed([]{ //toggle front claw
+    static bool isOpen = false; //cylinder starts out closed
     static vex::thread rumbleThread; //thread to rumble controller
-    if (isOpen) {
-      robot::claw.close();
-      rumbleThread.interrupt();
-    }
-    else {
-      robot::claw.open();
-      rumbleThread = vex::thread([]{ //rumbles thread until interrupted
+    static auto rumbleFunc{[]{ //rumbles thread until interrupted
         while (1) { 
           robot::primary.rumble("-");
           vex::this_thread::sleep_for(500);
         }
-      });
+    }};
+
+    if (isOpen)
+      rumbleThread.interrupt();
+    else {
+      rumbleThread = vex::thread(rumbleFunc);
       rumbleThread.setPriority(vex::thread::threadPrioritylow);
     }
-    isOpen = !isOpen;
+    robot::frontClaw.set(isOpen = !isOpen);
+  });
+  robot::primary.ButtonY.pressed([]{ //toggle back claw
+    static bool isOpen = false; //cylinder starts out closed
+    robot::backClaw.set(isOpen = !isOpen);
   });
   
+
   while (1) {
     //if turbo button is pressed, use maximum power, else use controller modifers from config.h
     const vec2 modifiers = robot::primary.ButtonR1.pressing() ? vec2{ 1.1, 1.1 } : controller_modifiers;
@@ -136,23 +143,38 @@ void drivercontrol() {
       }
     }
 #endif 
-
-    if (robot::primary.ButtonL1.pressing()) {
-      if (robot::liftAnalog(true)) 
-        robot::primary.rumble("."); 
+    //analog lift controls which stop at the center
+    {
+      static bool held = false; // was L1 or L2 held (as of last tick)?
+      static bool onFront = true; // using front limits?
+      // limits (x being positive-sided limit)
+      vec2 limits = onFront ? vec2{ lift_front, lift_center } : vec2{ lift_center, lift_back };
+      if (robot::primary.ButtonL1.pressing()) { //go forward
+        if (robot::lift.position(vex::rotationUnits::rev) < limits.x)
+          robot::lift.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+        else if (!held && !onFront)
+          onFront = true;
+        held = true;
+      }
+      else if (robot::primary.ButtonL2.pressing()) { //go backward
+        if (robot::lift.position(vex::rotationUnits::rev) > limits.y)
+          robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+        else if (!held && onFront)
+          onFront = false;
+        held = true;
+      }
+      else { //stop
+        robot::lift.stop(vex::brakeType::hold);
+        held = false;
+      }
     }
-    else if (robot::primary.ButtonL2.pressing()) {
-      if (robot::liftAnalog(false)) 
-        robot::primary.rumble("."); 
-    }
-    else 
-      robot::lift.stop(vex::brakeType::hold);
   }
 }
 
 int main() {
   vex::competition competition;
-  robot::claw.open();
+  robot::frontClaw.open();
+  robot::backClaw.open();
   robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
@@ -160,12 +182,14 @@ int main() {
   vex::thread rainbowThread([]{
     while (1)  {
       static int hue = 0;
-      robot::brain.Screen.clearScreen(++hue %= 360);
-      vex::this_thread::sleep_for(20); //sleeps to slow rainbow
+      //cycles through hues and clears screen with color
+      robot::brain.Screen.clearScreen(++hue %= 360); 
+      vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a nice rate
     }
   });
 
   while (1)  {
+    //prints location and heading
     robot::primary.Screen.setCursor(3, 0);
     robot::primary.Screen.clearLine(3);
     const vec2 loc = robot::idrive.getLocation();

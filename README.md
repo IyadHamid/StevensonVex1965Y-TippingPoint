@@ -31,17 +31,17 @@ Configured in [config.h](./include/config.h).
 
 | Name               | Type     | Port(s) |
 |:-------------------|:---------|:--------|
-|`front left drive  `| motor    | 8       |
-|`back left drive   `| motor    | 7       |
-|`top left drive    `| motor    | 9       |
-|`front right drive `| motor    | 19      |
-|`back right drive  `| motor    | 5       |
-|`top right drive   `| motor    | 18      |
-|`claw lift         `| motor    | 13      |
-|`back lift         `| motor    | 2       |
-|`inertial sensor   `| sensor   | 10      |
-|`claw              `| solenoid | F       |
-|`hooks             `| solenoid | B       |
+|`front left drive  `| motor    | 13      |
+|`back left drive   `| motor    | 16      |
+|`top left drive    `| motor    | 17      |
+|`front right drive `| motor    | 10      |
+|`back right drive  `| motor    | 9       |
+|`top right drive   `| motor    | 8       |
+|`lifts             `| motor    | 5       |
+|`intakes           `| motor    | 6       |
+|`inertial sensor   `| sensor   | 2       |
+|`front claw        `| solenoid | F       |
+|`back claw         `| solenoid | H       |
 
 ![](./media/robot.png "Stevenson Robotics 2021-2022")
 

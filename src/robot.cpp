@@ -26,8 +26,8 @@ namespace robot {
   vex::motor rfront(std::get<0>(right_front), std::get<1>(right_front), std::get<2>(right_front));
   vex::motor rtop  (std::get<0>(right_top  ), std::get<1>(right_top  ), std::get<2>(right_top  ));
   vex::motor rback (std::get<0>(right_back ), std::get<1>(right_back ), std::get<2>(right_back ));
-  vex::motor lift  (std::get<0>(claw_lift  ), std::get<1>(claw_lift  ), std::get<2>(claw_lift  ));
-  vex::motor back  (std::get<0>(back_lift  ), std::get<1>(back_lift  ), std::get<2>(claw_lift  ));
+  vex::motor lift  (std::get<0>(lifts      ), std::get<1>(lifts      ), std::get<2>(lifts      ));
+  vex::motor intake(std::get<0>(intakes    ), std::get<1>(intakes    ), std::get<2>(intakes    ));
 
   //initalizes left motor group with left motors
   vex::motor_group lgroup (lfront, ltop, lback);
@@ -47,10 +47,12 @@ namespace robot {
     inches2units_ratio, robot_width
   );
 
-  //initalizes claw with triport from config.h
-  vex::pneumatics claw(brain.ThreeWirePort.CLAW_PORT);
-  //initalizes left/right hook with triport from config.h
+  //initalizes front claw with triport from config.h
+  vex::pneumatics frontClaw(brain.ThreeWirePort.FRONT_PORT);
+  //initalizes back claw with triport from config.h
   vex::pneumatics backClaw(brain.ThreeWirePort.BACK_PORT);
+
+  liftStateEnum liftState = center;
 }
 
 void robot::init() {
@@ -67,7 +69,7 @@ void robot::init() {
     }
   }
   std::vector<std::pair<vex::triport::port, std::string>> legacy{
-    { brain.ThreeWirePort.CLAW_PORT, "claw"} , { brain.ThreeWirePort.BACK_PORT, "hook" }
+    { brain.ThreeWirePort.FRONT_PORT, "front"} , { brain.ThreeWirePort.BACK_PORT, "back" }
   };
 
   robot::backClaw.set(false);
@@ -77,41 +79,21 @@ void robot::init() {
   idrive.start();
 }
 
-bool lift_isUp = false; //lift is initally down
-bool back_isUp = true; //back is initally up
-
-void robot::liftSet(bool goUp, bool waitForCompletion) { 
+void robot::liftSet(liftStateEnum newState, bool waitForCompletion) { 
   //set lift to up if going up
-  lift.rotateTo(goUp ? lift_up : lift_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, waitForCompletion);
-  lift_isUp = goUp;
-}
-
-void robot::liftToggle() {
-  //set lift to lift_down if is up
-  lift.rotateTo(lift_isUp ? lift_down : lift_up, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
-  lift_isUp = !lift_isUp;
-}
-
-bool robot::liftAnalog(bool goUp) {
-  if (goUp && lift.rotation(rotationUnits::rev) < lift_up)
-    lift.spin(directionType::fwd, 100, vex::velocityUnits::pct);
-  else if (!goUp && lift.rotation(rotationUnits::rev) > lift_down)
-    lift.spin(directionType::rev, 100, vex::velocityUnits::pct);
-  else {
-    lift.stop(vex::brakeType::hold);
-    return true;
+  double position;
+  switch (newState) {
+    case front:
+      position = lift_front;
+      break;
+    case back:
+      position = lift_back;
+    case center:
+      position = lift_center;
+    default:
+      break;
   }
-  return false;
-}
 
-void robot::backSet(bool goUp) {
-  //set lift to up if going up
-  backClaw.set(!goUp);
-  back.rotateTo(goUp ? back_up : back_down, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, false);
-  back_isUp = goUp;
-}
-
-void robot::backToggle() {
-  //set lift to lift_down if is up
-  backSet(!back_isUp);
+  lift.rotateTo(position, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, waitForCompletion);
+  liftState = newState;
 }

@@ -28,32 +28,31 @@ namespace robot {
   
   //lift motor
   extern vex::motor lift;
-  //back motor
-  extern vex::motor back;
+  //intake motor
+  extern vex::motor intake;
 
   //intelligent drive train
   extern inteldrive idrive;
 
-  //single-acting solenoid attached to a piston controlling the claw
-  extern vex::pneumatics claw;
-  extern bool clawOpen;
-  //double-acting solenoid attached to the pistons controlling the each hook
+  //single-acting solenoid attached to a piston controlling the front claw
+  extern vex::pneumatics frontClaw;
+  extern bool frontClawOpen;
+  //double-acting solenoid attached to the pistons controlling the back claw
   extern vex::pneumatics backClaw;
   extern bool backClawOpen;
   
   //init function
   void init();
 
+  //enum state of the lift
+  enum liftStateEnum {
+    front,
+    center,
+    back
+  };
+  //current state of the lift
+  extern liftStateEnum liftState;
+
   //sets lift up/down; boolean go up?, wait for completion? (defualted to false)
-  void liftSet(bool newState, bool waitForCompletion = false);
-  //toggles lift from being up/down
-  void liftToggle();
-  //moves lift up/down with limits and returns when at a limit; boolean go up?
-  bool liftAnalog(bool goUp);
-
-  //sets lift up/down; boolean go up?
-  void backSet(bool newState);
-  //toggles back from being up/down
-  void backToggle();
-
+  void liftSet(liftStateEnum newState, bool waitForCompletion = false);
 }
