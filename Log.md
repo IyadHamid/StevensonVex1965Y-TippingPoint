@@ -589,6 +589,23 @@
 - Added/updated some comments
 - Updated ports
   - Updated `README.md`
+
+### 2/24/22
+- Separated `drivercontrol()` in `main.cpp` into several functions
+  - Reasoning: cleans up function
+- Added automatic intake controls
+- Deleted limits on lift
+- Deleted `PID.cpp`
+  - Reasoning: not used
+#### Testing
+- Tested controls
+  - Written controls working
+    - Limits on lift not functional
+- Tested drive PID
+  - Refined speed version
+- Tested pnuematic claws
+- Tested lift
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 

@@ -14,17 +14,24 @@
 #include "config.h"
 #include "deltaTracker.h"
 
+//prints mode as given; string of mode
 const void modePrint(const char* mode) {
   robot::primary.Screen.setCursor(0, 0);
   robot::primary.Screen.clearLine(0);
   robot::primary.Screen.print(mode);
 }
 
+// prints location and heading
+const void locPrint() {
+  robot::primary.Screen.setCursor(3, 0);
+  robot::primary.Screen.clearLine(3);
+  const vec2 loc = robot::idrive.getLocation();
+  robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
+}
+
 void autonomous() {
   using namespace robot;
-
 #if defined(AUTON_A)
-
   modePrint("Auton A");
   robot::idrive.reset();
 
@@ -84,31 +91,59 @@ void autonomous() {
   //idrive.driveTo({-48.0, 25.0});
 
 #elif defined(AUTON_D)
-  idrive.driveTo({0.0, 0.0}, true, true);
+  //idrive.driveTo({0.0, 0.0}, true, true);
+  idrive.driveTo(48);
 #endif
+}
+
+// toggles front claw and rumbles controller accordingly
+void toggleclawcontrol() {
+  //toggle front claw
+  static bool isOpen = false; //cylinder starts out closed
+  static vex::thread rumbleThread; //thread to rumble controller
+  static auto rumbleFunc{[]{ //rumbles thread until interrupted
+      while (1) { 
+        robot::primary.rumble("-");
+        vex::this_thread::sleep_for(500);
+      }
+  }};
+
+  if (isOpen)
+    rumbleThread.interrupt();
+  else {
+    rumbleThread = vex::thread(rumbleFunc);
+    rumbleThread.setPriority(vex::thread::threadPrioritylow);
+  }
+  robot::frontClaw.set(isOpen = !isOpen);
+}
+
+// admin/testing controls
+void admincontrol() {
+  if (robot::primary.ButtonDown.pressing()) //resets location
+    robot::idrive.reset();
+  else if (robot::primary.ButtonLeft.pressing())  //runs auton
+    autonomous();
+}
+
+// controls lift
+void liftcontrol() {
+  
+  if (robot::primary.ButtonL1.pressing()) { //go forward
+    robot::lift.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+  }
+  else if (robot::primary.ButtonL2.pressing()) { //go backward
+    robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+  }
+  else {
+    robot::lift.stop(vex::brakeType::hold);
+  }
 }
 
 void drivercontrol() {
   modePrint("Driver");
   
-  robot::primary.ButtonR2.pressed([]{ //toggle front claw
-    static bool isOpen = false; //cylinder starts out closed
-    static vex::thread rumbleThread; //thread to rumble controller
-    static auto rumbleFunc{[]{ //rumbles thread until interrupted
-        while (1) { 
-          robot::primary.rumble("-");
-          vex::this_thread::sleep_for(500);
-        }
-    }};
-
-    if (isOpen)
-      rumbleThread.interrupt();
-    else {
-      rumbleThread = vex::thread(rumbleFunc);
-      rumbleThread.setPriority(vex::thread::threadPrioritylow);
-    }
-    robot::frontClaw.set(isOpen = !isOpen);
-  });
+  robot::primary.ButtonR2.pressed(toggleclawcontrol);
+  
   robot::primary.ButtonY.pressed([]{ //toggle back claw
     static bool isOpen = false; //cylinder starts out closed
     robot::backClaw.set(isOpen = !isOpen);
@@ -134,40 +169,16 @@ void drivercontrol() {
     }
 
 #ifdef ADMIN
-    if (robot::primary.ButtonUp.pressing()) {
-      if (robot::primary.ButtonDown.pressing()) { //resets location
-        robot::idrive.reset();
-      }
-      else if (robot::primary.ButtonLeft.pressing()) { //runs auton
-        autonomous();
-      }
-    }
+    if (robot::primary.ButtonUp.pressing())
+      admincontrol();
 #endif 
-    //analog lift controls which stop at the center
-    {
-      static bool held = false; // was L1 or L2 held (as of last tick)?
-      static bool onFront = true; // using front limits?
-      // limits (x being positive-sided limit)
-      vec2 limits = onFront ? vec2{ lift_front, lift_center } : vec2{ lift_center, lift_back };
-      if (robot::primary.ButtonL1.pressing()) { //go forward
-        if (robot::lift.position(vex::rotationUnits::rev) < limits.x)
-          robot::lift.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
-        else if (!held && !onFront)
-          onFront = true;
-        held = true;
-      }
-      else if (robot::primary.ButtonL2.pressing()) { //go backward
-        if (robot::lift.position(vex::rotationUnits::rev) > limits.y)
-          robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
-        else if (!held && onFront)
-          onFront = false;
-        held = true;
-      }
-      else { //stop
-        robot::lift.stop(vex::brakeType::hold);
-        held = false;
-      }
-    }
+    liftcontrol();
+    
+    if (robot::lift.position(vex::rotationUnits::rev) > lift_ring_thresh)
+      robot::intake.spin(directionType::fwd);
+    else
+      robot::intake.stop(vex::brakeType::hold);
+
   }
 }
 
@@ -184,16 +195,12 @@ int main() {
       static int hue = 0;
       //cycles through hues and clears screen with color
       robot::brain.Screen.clearScreen(++hue %= 360); 
-      vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a nice rate
+      vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a non-epileptic rate
     }
   });
 
   while (1)  {
-    //prints location and heading
-    robot::primary.Screen.setCursor(3, 0);
-    robot::primary.Screen.clearLine(3);
-    const vec2 loc = robot::idrive.getLocation();
-    robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
+    locPrint();
     vex::this_thread::sleep_for(500); //sleeps to minimize cpu usage and network usage
   }
 }

@@ -34,12 +34,12 @@ Configured in [config.h](./include/config.h).
 |`front left drive  `| motor    | 13      |
 |`back left drive   `| motor    | 16      |
 |`top left drive    `| motor    | 17      |
-|`front right drive `| motor    | 10      |
-|`back right drive  `| motor    | 9       |
-|`top right drive   `| motor    | 8       |
-|`lifts             `| motor    | 5       |
+|`front right drive `| motor    | 7       |
+|`back right drive  `| motor    | 8       |
+|`top right drive   `| motor    | 9       |
+|`lifts             `| motor    | 14      |
 |`intakes           `| motor    | 6       |
-|`inertial sensor   `| sensor   | 2       |
+|`inertial sensor   `| sensor   | 10      |
 |`front claw        `| solenoid | F       |
 |`back claw         `| solenoid | H       |
 
