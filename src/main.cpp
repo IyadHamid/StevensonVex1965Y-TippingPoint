@@ -30,25 +30,28 @@ const void locPrint() {
 }
 
 void autonomous() {
+
   using namespace robot;
 #if defined(AUTON_A)
   modePrint("Auton A");
   robot::idrive.reset();
 
-  vex::thread backThread([]{
-    until(idrive.position() <= idrive.getDistanceRatio() * -46.0);
-    backClaw.set(false);
+  vex::thread clawThread([]{
+    until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
+    frontClaw.set(true);
   });
 
-  backSet(false);
-  idrive.drive_percentage(-20);
+  frontClaw.set(false);
+
+  idrive.driveTo(48.0);
+  
+  //frontClaw.set(true);
+  
+  idrive.drive_percentage(-100);
   vex::this_thread::sleep_for(100);
-  idrive.driveTo(-50.0, true, true, 0);
-  
-  backSet(true);
-  
-  idrive.driveTo({0, 0});
-  backThread.interrupt();
+  idrive.driveTo({0, 0}, true, true);
+  //idrive.driveTo(0, true, false)
+  clawThread.interrupt();
 #elif defined(AUTON_B)
   modePrint("Auton B");
   robot::idrive.reset();

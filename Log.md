@@ -606,6 +606,11 @@
 - Tested pnuematic claws
 - Tested lift
 
+### 2/25/22 (Competition)
+- Reverted Auton A to be forward
+#### Testing
+- Auton A appears to be consistents
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 

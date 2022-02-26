@@ -29,7 +29,7 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 #define ADMIN
 
 // auton type
-#define AUTON_D
+#define AUTON_A
 
 const int32_t inertial_port = PORT10;
 
