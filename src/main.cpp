@@ -50,27 +50,23 @@ void autonomous() {
   idrive.drive_percentage(-100);
   vex::this_thread::sleep_for(100);
   idrive.driveTo({0, 0}, true, true);
-  //idrive.driveTo(0, true, false)
   clawThread.interrupt();
 #elif defined(AUTON_B)
   modePrint("Auton B");
-  robot::idrive.reset();
-  
-  claw.close();
-  deltaTracker<double> dist([]{ return idrive.position(); });
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 44.5);
-    claw.open();
+    until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
+    frontClaw.set(true);
   });
-  idrive.driveTo(45.5, false, false);
-  backToggle();
+
+  frontClaw.set(false);
+
+  idrive.driveTo(48.0);
   
-  vex::this_thread::sleep_for(50);
-  idrive.driveTo(18.0, true, false);
-  idrive.turnTo(.75);
-  idrive.driveTo(-15.0);
-  backToggle();
-  clawThread.join();
+  idrive.drive_percentage(-100);
+  idrive.driveTo(-5.0);
+  idrive.turnTo(.25);
+  clawThread.interrupt();
+
 #elif defined(AUTON_C)
   modePrint("Auton C");
   robot::idrive.reset();
@@ -131,10 +127,10 @@ void admincontrol() {
 // controls lift
 void liftcontrol() {
   
-  if (robot::primary.ButtonL1.pressing()) { //go forward
+  if (robot::primary.ButtonL1.pressing() && robot::lift.position(vex::rotationUnits::rev) < lift_front) { //go forward
     robot::lift.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
   }
-  else if (robot::primary.ButtonL2.pressing()) { //go backward
+  else if (robot::primary.ButtonL2.pressing() && robot::lift.position(vex::rotationUnits::rev) > lift_center) { //go backward
     robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
   }
   else {
@@ -147,11 +143,20 @@ void drivercontrol() {
   
   robot::primary.ButtonR2.pressed(toggleclawcontrol);
   
-  robot::primary.ButtonY.pressed([]{ //toggle back claw
+  robot::primary.ButtonRight.pressed([]{ //toggle back claw
     static bool isOpen = false; //cylinder starts out closed
     robot::backClaw.set(isOpen = !isOpen);
   });
+  robot::primary.ButtonY.pressed([]{ //toggle back claw
+    static bool isRunning = false; //cylinder starts out closed
+    isRunning = !isRunning;
+    if (isRunning)
+      robot::intake.spin(directionType::fwd, 100, vex::percentUnits::pct);
+    else 
+      robot::intake.stop();
+  });
   
+
 
   while (1) {
     //if turbo button is pressed, use maximum power, else use controller modifers from config.h
@@ -176,11 +181,10 @@ void drivercontrol() {
       admincontrol();
 #endif 
     liftcontrol();
-    
-    if (robot::lift.position(vex::rotationUnits::rev) > lift_ring_thresh)
-      robot::intake.spin(directionType::fwd);
-    else
-      robot::intake.stop(vex::brakeType::hold);
+    //if (robot::lift.position(vex::rotationUnits::rev) > lift_ring_thresh)
+    //  robot::intake.spin(directionType::fwd);
+    //else
+    //  robot::intake.stop(vex::brakeType::hold);
 
   }
 }

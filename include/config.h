@@ -26,7 +26,7 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 #define DRONE
 
 // admin testing controls
-#define ADMIN
+//#define ADMIN
 
 // auton type
 #define AUTON_A
@@ -42,8 +42,8 @@ const motor_settings right_front { PORT7 , gearSetting::ratio6_1, true  };
 const motor_settings right_back  { PORT8 , gearSetting::ratio6_1, true  };
 const motor_settings right_top   { PORT9 , gearSetting::ratio6_1, true  };
 
-const motor_settings lifts   { PORT14, gearSetting::ratio36_1, true  };
-const motor_settings intakes { PORT6 , gearSetting::ratio6_1 , false };
+const motor_settings lifts   { PORT19, gearSetting::ratio36_1, true  };
+const motor_settings intakes { PORT2 , gearSetting::ratio6_1 , true };
 
 constexpr double inches2units_ratio = 1.0/(pi * 3.25) * 36.0/24.0; // 1/πd * [ratio] (revolutions/inches), ~6.1 inches per rev
 constexpr double robot_width = 12.0;
@@ -60,6 +60,6 @@ constexpr kPID fast_turn_k  = { 105.0, -32.0, -30.0, 0.005 };
 
 constexpr double lift_back   = -1.2;
 constexpr double lift_center =  0.0;
-constexpr double lift_front  =  1.75;
+constexpr double lift_front  =  1.5;
 
 constexpr double lift_ring_thresh = 0.25;

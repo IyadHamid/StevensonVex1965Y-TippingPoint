@@ -611,6 +611,17 @@
 #### Testing
 - Auton A appears to be consistents
 
+
+### 2/26/22 (Competition)
+- Switched lifts and intakes port
+- Made intakes toggle mode with right button
+- Changed Auton B to goal rush but not go all the way back
+  - Allows for a solo win point auton bot to have room 
+#### Competition
+- Auton A appears to still be consistent
+- Lift motor not working
+  - Switched ports to 19
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
