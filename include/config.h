@@ -55,6 +55,8 @@ constexpr kPID fast_drive_k = { 14.0, 6.5, 6.0, 0.1 };
 constexpr kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
 constexpr kPID fast_turn_k  = { 105.0, -32.0, -30.0, 0.005 };
 
+constexpr kPID disp_k       = { 4.0, 5.0, 0.1, 0.1 };
+
 #define FRONT_PORT F
 #define BACK_PORT  H
 

@@ -19,6 +19,7 @@ inteldrive::inteldrive(vex::inertial i,
                        vex::motor_group l, vex::motor_group r,
                        kPID drive_k     , kPID turn_k,
                        kPID fast_drive_k, kPID fast_turn_k,
+                       kPID disp_k,
                        double ratio, double rw)
 : inertialSensor{i}, left{l}, right{r},
   location{0.0, 0.0},
@@ -29,7 +30,7 @@ inteldrive::inteldrive(vex::inertial i,
 {
   drivePID.k = drive_k;
   turnPID.k = turn_k;
-  dispPID.k = drive_k;
+  dispPID.k = disp_k;
 }
 
 void inteldrive::start() {
@@ -64,7 +65,8 @@ void inteldrive::start() {
     [&](double output, vec2 goal) {
       vec2 disp = goal - location;
       auto ratio = 2.0 * angle_difference_rev(rad2rev(disp.ang()), heading());
-      output /= 2.0;
+      if (fabs(ratio) > 0.5)
+        ratio = 2.0 * (angle_difference_rev(heading(), rad2rev(disp.ang())) - .5);
 
       left .spin(vex::directionType::fwd, output * (.5 + ratio), vex::percentUnits::pct);
       right.spin(vex::directionType::fwd, output * (.5 - ratio), vex::percentUnits::pct);
@@ -144,15 +146,18 @@ void inteldrive::driveTo(double dist, bool fast, bool relative, uint32_t timeout
   stop(); 
 }
 
-void inteldrive::driveTo(vec2 loc, bool fast, bool reverse) {
-  //vec2 disp = loc - location;
-  //double angle = common_mod(rad2rev(disp.ang()) + (reverse ? 0.5 : 0.0), 1.0);
-//
-  //turnTo(angle, fast, false);
-//
-  //disp = loc - location; //recalculates displacement
-  //driveTo(disp.mag() * (reverse ? -1.0 : 1.0), fast, true);
-  dispPID.run(loc);
+void inteldrive::driveTo(vec2 loc, bool fast, bool reverse, bool turnAndDrive) {
+  if (turnAndDrive) {
+    vec2 disp = loc - location;
+    double angle = common_mod(rad2rev(disp.ang()) + (reverse ? 0.5 : 0.0), 1.0);
+ 
+    turnTo(angle, fast, false);
+
+    disp = loc - location; //recalculates displacement
+    driveTo(disp.mag() * (reverse ? -1.0 : 1.0), fast, true);
+  }
+  else
+    dispPID.run(loc);
   stop();
 }
 

@@ -72,7 +72,12 @@ void autonomous() {
   robot::idrive.reset();
 
 #elif defined(AUTON_D) //debug
-  idrive.driveTo({0.0, 0.0});
+  static bool a = true;
+  if (a)
+    idrive.driveTo({0.0, 0.0});
+  else 
+    idrive.driveTo({20.0, 0.0 });
+  a = !a;
 #endif
 }
 

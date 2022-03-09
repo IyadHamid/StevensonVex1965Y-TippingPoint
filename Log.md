@@ -633,6 +633,15 @@
   - Excessively turns although gets to correct position
   - Probably something with negatives
 
+### 3/9/22
+- Fixed going backwards problem
+  - Gets angle need to turn when going backwards
+#### Testing
+- Tested `driveTo(vec2...)` implementation
+  - Turning is still very excessive
+  - Path of getting to position is inconsistent and highly volatile
+    - Possibly fixed with PID tuning
+  - Possibly want to turn and drive forward at low distance errors
 
 ## TODO
 - Need to add controller config to `README.md`
@@ -642,3 +651,4 @@
   - Maybe with curvature
   - Implement real-time autocorrecting `inteldrive::driveTo` 
 - Switch brain
+- Project distance for `inteldrive::driveTo(double...)`
