@@ -29,14 +29,14 @@ inteldrive::inteldrive(vex::inertial i,
 {
   drivePID.k = drive_k;
   turnPID.k = turn_k;
+  dispPID.k = drive_k;
 }
 
 void inteldrive::start() {
   //callibrates inertial sensors
   inertialSensor.calibrate();
   //waits until it is done calibrating
-  while (inertialSensor.isCalibrating())
-    vex::this_thread::sleep_for(100); //sleeps to save cpu resources
+  until(!inertialSensor.isCalibrating());
   
   drivePID = PID<>( //initalizes drivePID
     [&](double goal) { return goal - position(); },
@@ -51,6 +51,25 @@ void inteldrive::start() {
       right.spin(vex::directionType::rev, output, vex::voltageUnits::volt);
     },
     turnPID.k
+  );
+
+  dispPID = PID<vec2>( //initalizes drivePID
+    [&](vec2 goal) { 
+      vec2 disp = goal - location;
+      vec2 dir  = vec2::polar(1.0, rev2rad(heading()));
+      //project displacement onto heading
+      auto dist = dot(disp, dir);
+      return dist; 
+    },
+    [&](double output, vec2 goal) {
+      vec2 disp = goal - location;
+      auto ratio = 2.0 * angle_difference_rev(rad2rev(disp.ang()), heading());
+      output /= 2.0;
+
+      left .spin(vex::directionType::fwd, output * (.5 + ratio), vex::percentUnits::pct);
+      right.spin(vex::directionType::fwd, output * (.5 - ratio), vex::percentUnits::pct);
+    }, 
+    drivePID.k
   );
 
   //Starts tracking
@@ -126,14 +145,15 @@ void inteldrive::driveTo(double dist, bool fast, bool relative, uint32_t timeout
 }
 
 void inteldrive::driveTo(vec2 loc, bool fast, bool reverse) {
-  vec2 disp = loc - location;
-  double angle = common_mod(rad2rev(disp.ang()) + (reverse ? 0.5 : 0.0), 1.0);
-
-  turnTo(angle, fast, false);
-
-  disp = loc - location; //recalculates displacement
-  driveTo(disp.mag() * (reverse ? -1.0 : 1.0), fast, true);
-  
+  //vec2 disp = loc - location;
+  //double angle = common_mod(rad2rev(disp.ang()) + (reverse ? 0.5 : 0.0), 1.0);
+//
+  //turnTo(angle, fast, false);
+//
+  //disp = loc - location; //recalculates displacement
+  //driveTo(disp.mag() * (reverse ? -1.0 : 1.0), fast, true);
+  dispPID.run(loc);
+  stop();
 }
 
 void inteldrive::arcade(double vertical, double horizontal, double vertModifer, double horiModifer) {

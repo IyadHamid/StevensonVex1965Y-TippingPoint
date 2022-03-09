@@ -611,7 +611,6 @@
 #### Testing
 - Auton A appears to be consistents
 
-
 ### 2/26/22 (Competition)
 - Switched lifts and intakes port
 - Made intakes toggle mode with right button
@@ -622,6 +621,19 @@
 - Lift motor not working
   - Switched ports to 19
 
+### 3/6/22
+- Started to add displacement-based PID in `driveTo(vec2...)`
+  - Using vector projection to find distance
+  - Turning based on angle difference
+    - Currently has issues
+#### Testing
+- Inertial sensor wire gets disconnected
+  - Port 10 is loose
+- Going backwards is problematic with `driveTo(vec2...)`
+  - Excessively turns although gets to correct position
+  - Probably something with negatives
+
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -629,6 +641,4 @@
 - Finish reimplement `inteldrive::driveTo(vec2...)`
   - Maybe with curvature
   - Implement real-time autocorrecting `inteldrive::driveTo` 
-- Re-add debugging for PID
-  - Possibly multithreaded
-- Test new controls
+- Switch brain

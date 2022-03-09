@@ -26,12 +26,12 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 #define DRONE
 
 // admin testing controls
-//#define ADMIN
+#define ADMIN
 
 // auton type
-#define AUTON_A
+#define AUTON_D
 
-const int32_t inertial_port = PORT10;
+const int32_t inertial_port = PORT6;
 
 // { port, gear ratio, is reverse? }
 const motor_settings left_front  { PORT13, gearSetting::ratio6_1, false };

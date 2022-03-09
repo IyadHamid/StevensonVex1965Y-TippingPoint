@@ -32,7 +32,7 @@ const void locPrint() {
 void autonomous() {
 
   using namespace robot;
-#if defined(AUTON_A)
+#if defined(AUTON_A) //goal rush
   modePrint("Auton A");
   robot::idrive.reset();
 
@@ -51,7 +51,7 @@ void autonomous() {
   vex::this_thread::sleep_for(100);
   idrive.driveTo({0, 0}, true, true);
   clawThread.interrupt();
-#elif defined(AUTON_B)
+#elif defined(AUTON_B) //goal rush, leave room
   modePrint("Auton B");
   vex::thread clawThread([]{
     until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
@@ -67,31 +67,12 @@ void autonomous() {
   idrive.turnTo(.25);
   clawThread.interrupt();
 
-#elif defined(AUTON_C)
+#elif defined(AUTON_C) //nothing
   modePrint("Auton C");
   robot::idrive.reset();
-  
-  claw.close();
-  backSet(false);
-  idrive.driveTo(-48.0);
-  backSet(true);
-  vex::this_thread::sleep_for(10);
 
-  
-  idrive.driveTo({-35.0, 0.0}, false);
-  idrive.turnTo(.36, false);
-  idrive.driveTo(40.0, false);
-
-  claw.open();
-  vex::this_thread::sleep_for(100);
-  idrive.turnTo(.45, true, false);
-  idrive.driveTo(-50);
-
-  //idrive.driveTo({-48.0, 25.0});
-
-#elif defined(AUTON_D)
-  //idrive.driveTo({0.0, 0.0}, true, true);
-  idrive.driveTo(48);
+#elif defined(AUTON_D) //debug
+  idrive.driveTo({0.0, 0.0});
 #endif
 }
 
@@ -196,12 +177,12 @@ int main() {
   robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
-
+  
   vex::thread rainbowThread([]{
     while (1)  {
       static int hue = 0;
       //cycles through hues and clears screen with color
-      robot::brain.Screen.clearScreen(++hue %= 360); 
+      robot::brain.Screen.clearScreen(10);//++hue %= 360); 
       vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a non-epileptic rate
     }
   });

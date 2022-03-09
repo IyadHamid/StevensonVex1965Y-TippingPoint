@@ -80,7 +80,7 @@ struct vec2 {
   const double mag() { return sqrt(x*x + y*y); }
 };
 
-static double dot(vec2 a, vec2 b) { return a.x * b.x + a.y * b.y; }
+constexpr double dot(vec2 a, vec2 b) { return a.x * b.x + a.y * b.y; }
 
 // waits until condition; condition
 #define until(condition) { while (!(condition)) vex::this_thread::sleep_for(50); }

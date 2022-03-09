@@ -80,6 +80,7 @@ protected:
   vex::thread trackingThread; // thread tracking location
 
   PID<> drivePID, turnPID; // PID controllers using scalar error
+  PID<vec2> dispPID; 
   kPID drive_k, fast_drive_k, turn_k, fast_turn_k; // PID constants
   //PID<vec2> dispPID; // PID controller with displacement
 
