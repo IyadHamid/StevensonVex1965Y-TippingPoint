@@ -60,8 +60,6 @@ constexpr kPID disp_k       = { 4.0, 5.0, 0.1, 0.1 };
 #define FRONT_PORT F
 #define BACK_PORT  H
 
-constexpr double lift_back   = -1.2;
-constexpr double lift_center =  0.0;
-constexpr double lift_front  =  1.5;
-
-constexpr double lift_ring_thresh = 0.25;
+constexpr double lift_up            = 1.5;
+constexpr double lift_down          = 0.0;
+constexpr double lift_intake_thresh = 0.25;

@@ -112,16 +112,18 @@ void admincontrol() {
 
 // controls lift
 void liftcontrol() {
-  
-  if (robot::primary.ButtonL1.pressing() && robot::lift.position(vex::rotationUnits::rev) < lift_front) { //go forward
+  double pos = robot::lift.position(vex::rotationUnits::rev);
+  if (robot::primary.ButtonL1.pressing() && pos < lift_up) //go up
     robot::lift.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
-  }
-  else if (robot::primary.ButtonL2.pressing() && robot::lift.position(vex::rotationUnits::rev) > lift_center) { //go backward
+  else if (robot::primary.ButtonL2.pressing() && pos > lift_down) //go down
     robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
-  }
-  else {
+  else 
     robot::lift.stop(vex::brakeType::hold);
-  }
+
+  if (pos > lift_intake_thresh)
+    robot::intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+  else
+    robot::intake.stop(vex::brakeType::hold);
 }
 
 void drivercontrol() {
@@ -133,7 +135,7 @@ void drivercontrol() {
     static bool isOpen = false; //cylinder starts out closed
     robot::backClaw.set(isOpen = !isOpen);
   });
-  robot::primary.ButtonY.pressed([]{ //toggle back claw
+  robot::primary.ButtonY.pressed([]{ //toggle intake claw
     static bool isRunning = false; //cylinder starts out closed
     isRunning = !isRunning;
     if (isRunning)
@@ -167,10 +169,6 @@ void drivercontrol() {
       admincontrol();
 #endif 
     liftcontrol();
-    //if (robot::lift.position(vex::rotationUnits::rev) > lift_ring_thresh)
-    //  robot::intake.spin(directionType::fwd);
-    //else
-    //  robot::intake.stop(vex::brakeType::hold);
 
   }
 }
@@ -187,7 +185,7 @@ int main() {
     while (1)  {
       static int hue = 0;
       //cycles through hues and clears screen with color
-      robot::brain.Screen.clearScreen(10);//++hue %= 360); 
+      robot::brain.Screen.clearScreen(++hue %= 360); 
       vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a non-epileptic rate
     }
   });

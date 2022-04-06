@@ -643,6 +643,9 @@
     - Possibly fixed with PID tuning
   - Possibly want to turn and drive forward at low distance errors
 
+### 4/6/22
+- Adapted code to new robot/controls
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 

@@ -52,8 +52,6 @@ namespace robot {
   vex::pneumatics frontClaw(brain.ThreeWirePort.FRONT_PORT);
   //initalizes back claw with triport from config.h
   vex::pneumatics backClaw(brain.ThreeWirePort.BACK_PORT);
-
-  liftStateEnum liftState = center;
 }
 
 void robot::init() {
@@ -78,23 +76,4 @@ void robot::init() {
   
   isensor.resetHeading();
   idrive.start();
-}
-
-void robot::liftSet(liftStateEnum newState, bool waitForCompletion) { 
-  //set lift to up if going up
-  double position;
-  switch (newState) {
-    case front:
-      position = lift_front;
-      break;
-    case back:
-      position = lift_back;
-    case center:
-      position = lift_center;
-    default:
-      break;
-  }
-
-  lift.rotateTo(position, vex::rotationUnits::rev, 110, vex::velocityUnits::pct, waitForCompletion);
-  liftState = newState;
 }

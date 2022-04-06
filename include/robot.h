@@ -43,16 +43,4 @@ namespace robot {
   
   //init function
   void init();
-
-  //enum state of the lift
-  enum liftStateEnum {
-    front,
-    center,
-    back
-  };
-  //current state of the lift
-  extern liftStateEnum liftState;
-
-  //sets lift up/down; boolean go up?, wait for completion? (defualted to false)
-  void liftSet(liftStateEnum newState, bool waitForCompletion = false);
 }
