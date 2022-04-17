@@ -31,19 +31,19 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 // auton type
 #define AUTON_D
 
-const int32_t inertial_port = PORT6;
+const int32_t inertial_port = PORT4;
 
 // { port, gear ratio, is reverse? }
-const motor_settings left_front  { PORT13, gearSetting::ratio6_1, false };
-const motor_settings left_back   { PORT16, gearSetting::ratio6_1, false };
-const motor_settings left_top    { PORT17, gearSetting::ratio6_1, false };
+const motor_settings left_front  { PORT3 , gearSetting::ratio6_1, false };
+const motor_settings left_back   { PORT1 , gearSetting::ratio6_1, false };
+const motor_settings left_top    { PORT2 , gearSetting::ratio6_1, false };
 
-const motor_settings right_front { PORT7 , gearSetting::ratio6_1, true  };
-const motor_settings right_back  { PORT8 , gearSetting::ratio6_1, true  };
-const motor_settings right_top   { PORT9 , gearSetting::ratio6_1, true  };
+const motor_settings right_front { PORT13, gearSetting::ratio6_1, true  };
+const motor_settings right_back  { PORT11, gearSetting::ratio6_1, true  };
+const motor_settings right_top   { PORT12, gearSetting::ratio6_1, true  };
 
-const motor_settings lifts   { PORT19, gearSetting::ratio36_1, true  };
-const motor_settings intakes { PORT2 , gearSetting::ratio6_1 , true };
+const motor_settings lifts   { PORT10, gearSetting::ratio36_1, true  };
+const motor_settings intakes { PORT20, gearSetting::ratio6_1 , true };
 
 constexpr double inches2units_ratio = 1.0/(pi * 3.25) * 36.0/24.0; // 1/πd * [ratio] (revolutions/inches), ~6.1 inches per rev
 constexpr double robot_width = 12.0;

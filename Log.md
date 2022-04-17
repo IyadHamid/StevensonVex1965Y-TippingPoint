@@ -646,6 +646,9 @@
 ### 4/6/22
 - Adapted code to new robot/controls
 
+### 4/17/22
+- Updated ports
+
 ## TODO
 - Need to add controller config to `README.md`
   - Create diagrams 
