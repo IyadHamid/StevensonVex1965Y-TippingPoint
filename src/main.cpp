@@ -30,26 +30,28 @@ const void locPrint() {
 }
 
 void autonomous() {
-
   using namespace robot;
 #if defined(AUTON_A) //goal rush
   modePrint("Auton A");
   robot::idrive.reset();
 
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
+    until(idrive.position() >= idrive.getDistanceRatio() * 35.0);
     frontClaw.set(true);
   });
 
   frontClaw.set(false);
 
-  idrive.driveTo(48.0);
-  
+  //idrive.driveTo(48.0);
+  idrive.drive(100);
+  until(idrive.position() >= idrive.getDistanceRatio() * 37.0);
+  vex::this_thread::sleep_for(100);
   //frontClaw.set(true);
   
-  idrive.drive_percentage(-100);
-  vex::this_thread::sleep_for(100);
-  idrive.driveTo({0, 0}, true, true);
+  idrive.drive(-100);
+  vex::this_thread::sleep_for(500);
+  //idrive.driveTo({0, 0}, true, true);
+  idrive.stop();
   clawThread.interrupt();
 #elif defined(AUTON_B) //goal rush, leave room
   modePrint("Auton B");
@@ -72,12 +74,7 @@ void autonomous() {
   robot::idrive.reset();
 
 #elif defined(AUTON_D) //debug
-  static bool a = true;
-  if (a)
-    idrive.driveTo({0.0, 0.0});
-  else 
-    idrive.driveTo({20.0, 0.0 });
-  a = !a;
+  idrive.driveTo({0, 0});
 #endif
 }
 
@@ -119,11 +116,6 @@ void liftcontrol() {
     robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
   else 
     robot::lift.stop(vex::brakeType::hold);
-
-  if (pos > lift_intake_thresh)
-    robot::intake.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
-  else
-    robot::intake.stop(vex::brakeType::hold);
 }
 
 void drivercontrol() {

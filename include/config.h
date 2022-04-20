@@ -29,7 +29,7 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 #define ADMIN
 
 // auton type
-#define AUTON_D
+#define AUTON_A
 
 const int32_t inertial_port = PORT4;
 
@@ -43,23 +43,23 @@ const motor_settings right_back  { PORT11, gearSetting::ratio6_1, true  };
 const motor_settings right_top   { PORT12, gearSetting::ratio6_1, true  };
 
 const motor_settings lifts   { PORT10, gearSetting::ratio36_1, true  };
-const motor_settings intakes { PORT20, gearSetting::ratio6_1 , true };
+const motor_settings intakes { PORT20, gearSetting::ratio6_1 , false };
 
 constexpr double inches2units_ratio = 1.0/(pi * 3.25) * 36.0/24.0; // 1/πd * [ratio] (revolutions/inches), ~6.1 inches per rev
 constexpr double robot_width = 12.0;
 
 // { proportional constant, integral constant, derivative constant, tolerance }
-constexpr kPID drive_k      = { 10.0, 5.0, 5.0, 0.1 };
-constexpr kPID fast_drive_k = { 14.0, 6.5, 6.0, 0.1 };
+constexpr kPID drive_k      = { 10.0, 1.0, 0.0, 0.1 };
+constexpr kPID fast_drive_k = { 17.5, 4.0, 6.5, 0.1 };
 
 constexpr kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
-constexpr kPID fast_turn_k  = { 105.0, -32.0, -30.0, 0.005 };
+constexpr kPID fast_turn_k  = { 27.5, 0.0, 35.0, 0.001 };
 
 constexpr kPID disp_k       = { 4.0, 5.0, 0.1, 0.1 };
 
-#define FRONT_PORT F
-#define BACK_PORT  H
+#define FRONT_PORT H
+#define BACK_PORT  F
 
-constexpr double lift_up            = 1.5;
+constexpr double lift_up            = 2.1;
 constexpr double lift_down          = 0.0;
 constexpr double lift_intake_thresh = 0.25;

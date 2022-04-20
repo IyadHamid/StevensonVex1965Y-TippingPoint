@@ -645,16 +645,36 @@
 
 ### 4/6/22
 - Adapted code to new robot/controls
+#### Testing
+- Intakes are annoying/uncontrollable when automatic
+  - Reverted back to toggle on button
 
 ### 4/17/22
 - Updated ports
 
+### 4/20/22
+- Updated pnuematics birthday
+- Updated lift limits
+- Added maximum speed to `driveTo`
+- Made `max` in `PID::run` work as a` magnitude
+- Recalibrated Auton A
+#### Testing
+- Tested `driveTo` and refined PID
+  - 24", 96", and -24" accurate to 0.5"
+- Tested `turnTo` and refined PID
+  - .25, -.25, and .5 revs accurate to .02 revs
+- `driveTo(vec2...)` not functional
+  - Turning does not seem to be accurate
+- Auton A grabs sucessfully with correct alignment
+
+
 ## TODO
+- Brain selector for auton types
+- Remove 2 PID system 
 - Need to add controller config to `README.md`
   - Create diagrams 
-- Refine PID values
-- Finish reimplement `inteldrive::driveTo(vec2...)`
+- Refine turn PID values
+- Finish reimplementing `inteldrive::driveTo(vec2...)`
   - Maybe with curvature
   - Implement real-time autocorrecting `inteldrive::driveTo` 
-- Switch brain
 - Project distance for `inteldrive::driveTo(double...)`

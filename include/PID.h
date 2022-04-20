@@ -58,7 +58,7 @@ void PID<T>::run(T goal, uint32_t timeout, double max, uint32_t dt) {
     const auto out = k.p * e.value + k.i * integral + k.d * e.delta;
     
     //send output value back with maximum at max if max > 0.0
-    output(max > 0.0 ? std::min(out, max) : out, goal); 
+    output(std::copysign(max != 0.0 ? std::min(std::abs(out), max) : out, out), goal); 
 
     ++e; //updates error and derivative
     
