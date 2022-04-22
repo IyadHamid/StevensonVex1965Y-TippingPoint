@@ -53,7 +53,7 @@ constexpr kPID drive_k      = { 10.0, 1.0, 0.0, 0.1 };
 constexpr kPID fast_drive_k = { 17.5, 4.0, 6.5, 0.1 };
 
 constexpr kPID turn_k       = { 50.0, -10.0, -10.0, 0.001 };
-constexpr kPID fast_turn_k  = { 27.5, 0.0, 35.0, 0.001 };
+constexpr kPID fast_turn_k  = { 28.0, 0.0, 35.0, 0.001 };
 
 constexpr kPID disp_k       = { 4.0, 5.0, 0.1, 0.1 };
 

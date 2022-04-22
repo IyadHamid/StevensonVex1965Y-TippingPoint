@@ -126,38 +126,39 @@ void inteldrive::stop(vex::brakeType mode) {
   right.stop(mode);
 }
 
-void inteldrive::turnTo(double ang, bool fast, double maxSpeed, bool relative, uint32_t timeout) {
+void inteldrive::turnTo(double ang, double maxSpeed, bool relative, uint32_t timeout) {
   if (relative) //defaulted to do relative turns
     ang += heading();
-  turnPID.k = fast ? fast_turn_k : turn_k; //use fast PID constants?
+  turnPID.k = fast_turn_k;
   //runs turnPID at angle
   turnPID.run(ang, timeout, maxSpeed);
   stop();
 }
 
-void inteldrive::driveTo(double dist, bool fast, double maxSpeed, bool relative, uint32_t timeout) {
+void inteldrive::driveTo(double dist, double maxSpeed, bool relative, uint32_t timeout) {
   dist *= distanceRatio; //from inches to rotations
   if (relative) //defaulted to do relative movements
     dist += position();
-  drivePID.k = fast ? fast_drive_k : drive_k; //use fast PID constants?
+  drivePID.k = fast_drive_k;
 
   //runs drivePID at distance
   drivePID.run(dist, timeout, maxSpeed);
   stop(); 
 }
 
-void inteldrive::driveTo(vec2 loc, bool fast, double maxSpeed, bool reverse, bool turnAndDrive) {
+void inteldrive::driveTo(vec2 loc, bool reverse, double maxDriveSpeed, double maxTurnSpeed, bool turnAndDrive) {
   if (turnAndDrive) {
     vec2 disp = loc - location;
     double angle = common_mod(rad2rev(disp.ang()) + (reverse ? 0.5 : 0.0), 1.0);
  
-    turnTo(angle, fast, false);
-
+    turnTo(angle, maxTurnSpeed, false); //turn absolutely
+    
     disp = loc - location; //recalculates displacement
-    driveTo(disp.mag() * (reverse ? -1.0 : 1.0), fast, maxSpeed);
+    vex::this_thread::sleep_for(50); //fixes a turn jerk
+    driveTo(disp.mag() * (reverse ? -1.0 : 1.0), maxDriveSpeed); //drive relatively
   }
-  else
-    dispPID.run(loc);
+  //else
+  //  dispPID.run(loc);
   stop();
 }
 

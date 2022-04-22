@@ -667,6 +667,17 @@
   - Turning does not seem to be accurate
 - Auton A grabs sucessfully with correct alignment
 
+### 4/22/22
+- Removed option to use normal pids from `inteldrive::driveTo` and `inteldrive::turnTo`
+  - Reasoning: `maxSpeed` parameter fufills duty
+- Added more to Auton A
+#### Testing
+- `inteldrive::driveTo(vec2...)` jerks after turning
+  - Added delay to fix
+- Turning delays if angle too small
+- Reversing `inteldrive::driveTo(vec2...)`
+  - Parameters wrong, reordered them
+- Auton A working consistently (to an extent)
 
 ## TODO
 - Brain selector for auton types

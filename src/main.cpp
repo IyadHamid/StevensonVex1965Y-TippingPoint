@@ -36,22 +36,33 @@ void autonomous() {
   robot::idrive.reset();
 
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 35.0);
+    until(idrive.position() >= idrive.getDistanceRatio() * 34.25);
     frontClaw.set(true);
   });
 
   frontClaw.set(false);
 
   //idrive.driveTo(48.0);
-  idrive.drive(100);
-  until(idrive.position() >= idrive.getDistanceRatio() * 37.0);
-  vex::this_thread::sleep_for(100);
-  //frontClaw.set(true);
-  
+  idrive.drive(110);
+  until(idrive.position() >= idrive.getDistanceRatio() * 34.5);
+  idrive.stop(vex::brakeType::coast);
+  vex::this_thread::sleep_for(10);
   idrive.drive(-100);
-  vex::this_thread::sleep_for(500);
-  //idrive.driveTo({0, 0}, true, true);
-  idrive.stop();
+  vex::this_thread::sleep_for(100);
+  idrive.driveTo({14.0, 0.0}, true);
+  backClaw.set(true);
+  //idrive.turnTo(-0.25, 0.0, false);
+  idrive.driveTo({14.0, 20.0}, true, 30.0);
+
+  backClaw.set(false);
+
+  
+
+  lift.spinTo(.25, vex::rotationUnits::rev, false);
+  idrive.driveTo({14.0, 15.0}, true);
+  
+  idrive.driveTo({40.0, 0.0}, true);
+
   clawThread.interrupt();
 #elif defined(AUTON_B) //goal rush, leave room
   modePrint("Auton B");
@@ -63,10 +74,11 @@ void autonomous() {
   frontClaw.set(false);
 
   idrive.driveTo(48.0);
-  
   idrive.drive_percentage(-100);
   idrive.driveTo(-5.0);
   idrive.turnTo(.25);
+
+
   clawThread.interrupt();
 
 #elif defined(AUTON_C) //nothing
@@ -74,7 +86,7 @@ void autonomous() {
   robot::idrive.reset();
 
 #elif defined(AUTON_D) //debug
-  idrive.driveTo({0, 0});
+  idrive.driveTo({0, 0}, true);
 #endif
 }
 

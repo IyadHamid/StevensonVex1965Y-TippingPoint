@@ -48,14 +48,14 @@ public:
   // stops motors; brake type (defaulted to braking)
   void stop(vex::brakeType mode = vex::brakeType::brake);
 
-  // turns robot to angle; revolution angle, use fast PID? (defaulted to true),
-  //   max speed (defaulted to 0, 0 is no max), is relative? (defaulted to true), timeout in ms (defaulted to 1000, 0 is no timeout)
-  void turnTo(double ang, bool fast = true, double maxSpeed = 0.0, bool relative = true, uint32_t timeout = 1000);
-  // drives robot to distance; inches distance, use fast PID? (defaulted to true),
-  //   max speed (defaulted to 0, 0 is no max), is relative? (defaulted to true), timeout in ms (defaulted to 0, 0 is no timeout)
-  void driveTo(double dist, bool fast = true, double maxSpeed = 0.0, bool relative = true, uint32_t timeout = 0);
-  // drives robot to position; displacement, use fast PIDs? (defaulted to true), max speed (defaulted to 0, 0 is no max), drive reverse? (defaulted to false), turn and drive (defaulted to true)
-  void driveTo(vec2 loc, bool fast = true, double maxSpeed = 0.0, bool reverse = false, bool turnAndDrive = true);
+  // turns robot to angle; revolution angle,max speed (defaulted to 0, 0 is no max),
+  //   is relative? (defaulted to true), timeout in ms (defaulted to 1000, 0 is no timeout)
+  void turnTo(double ang, double maxSpeed = 0.0, bool relative = true, uint32_t timeout = 1000);
+  // drives robot to distance; inches distance, max speed (defaulted to 0, 0 is no max), 
+  //   is relative? (defaulted to true), timeout in ms (defaulted to 0, 0 is no timeout)
+  void driveTo(double dist, double maxSpeed = 0.0, bool relative = true, uint32_t timeout = 0);
+  // drives robot to position; displacement, max drive speed (defaulted to 0, 0 is no max), max turn speed (defaulted to 0, 0 is no max), drive reverse? (defaulted to false), turn and drive (defaulted to true)
+  void driveTo(vec2 loc, bool reverse = false, double maxDriveSpeed = 0.0, double maxTurnSpeed = 0.0, bool turnAndDrive = true);
 
   // arcade style drive controls; vertical percent, horizontal percent, percent vertical modifer (defaulted to 1), percent horizontal modifer (defaulted to 1)
   void arcade(double vertical, double horizontal, double vertModifier = 1.0, double horiModifer = 1.0);
