@@ -30,6 +30,7 @@ namespace robot {
   extern vex::motor lift;
   //intake motor
   extern vex::motor intake;
+  extern bool intakeRunning;
 
   //intelligent drive train
   extern inteldrive idrive;

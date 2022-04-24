@@ -14,7 +14,10 @@
 #include "config.h"
 #include "deltaTracker.h"
 
-//prints mode as given; string of mode
+// type of auton, fallback is auton red
+int autonType = 0;
+
+// prints mode as given; string of mode
 const void modePrint(const char* mode) {
   robot::primary.Screen.setCursor(0, 0);
   robot::primary.Screen.clearLine(0);
@@ -29,14 +32,12 @@ const void locPrint() {
   robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
 }
 
-void autonomous() {
+// rush auton
+void autonred() {
   using namespace robot;
-#if defined(AUTON_A) //goal rush
-  modePrint("Auton A");
-  robot::idrive.reset();
 
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 34.25);
+    until(idrive.position() >= idrive.getDistanceRatio() * 34.5);
     frontClaw.set(true);
   });
 
@@ -44,50 +45,91 @@ void autonomous() {
 
   //idrive.driveTo(48.0);
   idrive.drive(110);
-  until(idrive.position() >= idrive.getDistanceRatio() * 34.5);
-  idrive.stop(vex::brakeType::coast);
-  vex::this_thread::sleep_for(10);
+  until(idrive.position() >= idrive.getDistanceRatio() * 37.0);
+  //idrive.stop(vex::brakeType::coast);
+  //vex::this_thread::sleep_for(50);
   idrive.drive(-100);
-  vex::this_thread::sleep_for(100);
-  idrive.driveTo({14.0, 0.0}, true);
+  until(idrive.position() <= idrive.getDistanceRatio() * 30.0);
+  idrive.driveTo({15.0, 0.0}, true);
   backClaw.set(true);
-  //idrive.turnTo(-0.25, 0.0, false);
-  idrive.driveTo({14.0, 20.0}, true, 30.0);
+  vex::this_thread::sleep_for(100);
+  idrive.turnTo(-0.25, 0.0, false);
+  idrive.driveTo({15.0, 20.0}, true, 30.0);
+
 
   backClaw.set(false);
 
+  lift.spinTo(.5, vex::rotationUnits::rev, false);
+  idrive.driveTo({15.0, 15.0}, true);
   
-
-  lift.spinTo(.25, vex::rotationUnits::rev, false);
-  idrive.driveTo({14.0, 15.0}, true);
-  
-  idrive.driveTo({40.0, 0.0}, true);
+  idrive.driveTo({40.0, 15.0});
 
   clawThread.interrupt();
-#elif defined(AUTON_B) //goal rush, leave room
-  modePrint("Auton B");
-  vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
-    frontClaw.set(true);
-  });
+}
 
-  frontClaw.set(false);
+void autonorange() {
+  using namespace robot;
+  
+}
 
-  idrive.driveTo(48.0);
-  idrive.drive_percentage(-100);
-  idrive.driveTo(-5.0);
+void autonyellow() {
+  using namespace robot;
+  
+}
+
+void autongreen() {
+  using namespace robot;
+  
+}
+
+void autonblue() {
+  using namespace robot;
+  
+}
+
+// debug auton
+void autonpurple() {
+  using namespace robot;
+  //idrive.driveTo({0, 0}, true);
+  //while (1) {
+  //  until(robot::primary.ButtonX.pressing());
+  //  vec2 a{robot::primary.Axis3.value()/100.0, robot::primary.Axis4.value()/100.0};
+  //  idrive.turnTo(rad2rev(a.ang()), 0.0, false);
+  //}
   idrive.turnTo(.25);
+  vex::this_thread::sleep_for(500);
+  idrive.turnTo(.125);
+  vex::this_thread::sleep_for(500);
+  idrive.turnTo(.5);
+  vex::this_thread::sleep_for(500);
+  idrive.turnTo(0, 0.0, false);
+  
+}
 
-
-  clawThread.interrupt();
-
-#elif defined(AUTON_C) //nothing
-  modePrint("Auton C");
-  robot::idrive.reset();
-
-#elif defined(AUTON_D) //debug
-  idrive.driveTo({0, 0}, true);
-#endif
+void autonomous() {
+  switch (autonType) {
+    case 0:
+      autonred();
+      break;
+    case 1:
+      autonorange();
+      break;
+    case 2:
+      autonyellow();
+      break;
+    case 3:
+      autongreen();
+      break;
+    case 4:
+      autonblue();
+      break;
+    case 5:
+      autonpurple();
+      break;
+    default: //use auton red as a fallback
+      autonred();
+      break;
+  }
 }
 
 // toggles front claw and rumbles controller accordingly
@@ -128,6 +170,12 @@ void liftcontrol() {
     robot::lift.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
   else 
     robot::lift.stop(vex::brakeType::hold);
+  
+  if (pos < lift_intake_thresh && robot::intakeRunning) { //stop intake running if too low
+    robot::intakeRunning = false;
+    robot::intake.stop();
+  }
+    
 }
 
 void drivercontrol() {
@@ -139,10 +187,12 @@ void drivercontrol() {
     static bool isOpen = false; //cylinder starts out closed
     robot::backClaw.set(isOpen = !isOpen);
   });
-  robot::primary.ButtonY.pressed([]{ //toggle intake claw
-    static bool isRunning = false; //cylinder starts out closed
-    isRunning = !isRunning;
-    if (isRunning)
+  robot::primary.ButtonY.pressed([]{ //toggle intakes
+    //prevent intakes from running into lift
+    if (robot::lift.position(vex::rotationUnits::rev) < lift_intake_thresh)
+      return;
+    robot::intakeRunning = !robot::intakeRunning;
+    if (robot::intakeRunning)
       robot::intake.spin(directionType::fwd, 100, vex::percentUnits::pct);
     else 
       robot::intake.stop();
@@ -179,12 +229,31 @@ void drivercontrol() {
 
 int main() {
   vex::competition competition;
-  robot::frontClaw.open();
-  robot::backClaw.open();
+
   robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
-  
+
+  //renders tiles and sets correct auton
+  std::array<vex::color, 6> autonColors{ vex::color::red  , vex::color::orange, vex::color::yellow, 
+                                         vex::color::green, vex::color::blue  , vex::color::purple  };
+  int screenWidth = 480, screenHeight = 272;
+  int tileWidth = screenWidth / 3, tileHeight = screenHeight / 2;
+  for (int i = 0; i < autonColors.size(); i++) {
+    const auto color = autonColors[i];
+    robot::brain.Screen.drawRectangle((i % 3) * tileWidth, (i / 3) * tileHeight, tileWidth, tileHeight, color);
+  }
+  //robot::brain.Screen.render();
+  until(robot::brain.Screen.pressing());
+  int tileX = robot::brain.Screen.xPosition() / tileWidth;
+  int tileY = robot::brain.Screen.yPosition() / tileHeight;
+  autonType = tileX + tileY * 3;
+
+  //callibrates inertial sensors again
+  robot::idrive.inertialSensor.calibrate();
+  //waits until it is done calibrating
+  until(!robot::idrive.inertialSensor.isCalibrating());
+
   vex::thread rainbowThread([]{
     while (1)  {
       static int hue = 0;

@@ -37,6 +37,8 @@ namespace robot {
   //initalizes inertial sensor with port from config.h
   vex::inertial isensor(inertial_port);
 
+  bool intakeRunning = false;
+
   //creates empty inteldrive which gets initalized later in robot::init()
   inteldrive idrive(
     isensor, 
@@ -73,7 +75,9 @@ void robot::init() {
 
   robot::backClaw.set(false);
   robot::lift.stop(vex::brakeType::hold);
-  
+  robot::frontClaw.open();
+  robot::backClaw.open();
+
   isensor.resetHeading();
   idrive.start();
 }

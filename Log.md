@@ -679,6 +679,18 @@
   - Parameters wrong, reordered them
 - Auton A working consistently (to an extent)
 
+### 4/23/22
+- Stopped intakes if lift is below threshold
+  - Reasoning: prevents jamming
+- Added auton selector during start of program
+  - Fallback is auton red
+  - Removed `AUTON_[A-D]`
+  - Reasoning: easier to select correct auton
+#### Testing
+- Tuned Auton A
+- Rings sometimes jams
+  - Moving apparently fixes jamming
+
 ## TODO
 - Brain selector for auton types
 - Remove 2 PID system 

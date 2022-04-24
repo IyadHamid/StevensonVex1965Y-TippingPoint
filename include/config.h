@@ -28,9 +28,6 @@ constexpr vec2 controller_modifiers { 0.4, 0.4 };
 // admin testing controls
 #define ADMIN
 
-// auton type
-#define AUTON_A
-
 const int32_t inertial_port = PORT4;
 
 // { port, gear ratio, is reverse? }
