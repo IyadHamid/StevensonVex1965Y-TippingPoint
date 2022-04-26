@@ -32,12 +32,12 @@ const void locPrint() {
   robot::primary.Screen.print("%.2f, %.2f, %.2f", loc.x, loc.y, robot::idrive.heading());
 }
 
-// rush auton
-void autonred() {
+// rush goal
+void goalRush() {
   using namespace robot;
-
+  idrive.reset();
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 34.5);
+    until(idrive.position() >= idrive.getDistanceRatio() * 35.0);
     frontClaw.set(true);
   });
 
@@ -45,36 +45,68 @@ void autonred() {
 
   //idrive.driveTo(48.0);
   idrive.drive(110);
-  until(idrive.position() >= idrive.getDistanceRatio() * 37.0);
-  //idrive.stop(vex::brakeType::coast);
-  //vex::this_thread::sleep_for(50);
+  until(idrive.position() >= idrive.getDistanceRatio() * 38.0);
+  frontClaw.set(true);
   idrive.drive(-100);
-  until(idrive.position() <= idrive.getDistanceRatio() * 30.0);
-  idrive.driveTo({15.0, 0.0}, true);
-  backClaw.set(true);
-  vex::this_thread::sleep_for(100);
-  idrive.turnTo(-0.25, 0.0, false);
-  idrive.driveTo({15.0, 20.0}, true, 30.0);
-
-
-  backClaw.set(false);
-
-  lift.spinTo(.5, vex::rotationUnits::rev, false);
-  idrive.driveTo({15.0, 15.0}, true);
-  
-  idrive.driveTo({40.0, 15.0});
-
   clawThread.interrupt();
+  until(idrive.position() <= idrive.getDistanceRatio() * 28.0);
+}
+
+// rush auton
+void autonred() {
+  using namespace robot;
+  goalRush();
+  idrive.driveTo({0.0, 0.0}, true);
+  idrive.stop();
 }
 
 void autonorange() {
   using namespace robot;
   
+  goalRush();
+  idrive.driveTo({15.0, 0.0}, true);
+  backClaw.set(true);
+  vex::this_thread::sleep_for(100);
+  idrive.turnTo(-0.25, 0.0, false);
+  //idrive.driveTo({15.0, 20.0}, true, 30.0);
+  idrive.drive(-35);
+  vex::this_thread::sleep_for(1000);
+  backClaw.set(false);
+
+  lift.spinTo(.5, vex::rotationUnits::rev, false);
+  double ringYPos = 10.0;
+  idrive.driveTo({15.0, ringYPos});
+  
+  intake.spin(vex::directionType::fwd);
+  idrive.turnTo(0.01, 0.0, false);
+  idrive.driveTo({50.0, ringYPos}, false, 30.0);
+  idrive.driveTo({0.0, ringYPos}, true);
+
+  intake.stop();
+  backClaw.set(true);
 }
 
 void autonyellow() {
   using namespace robot;
-  
+  //starts tilted
+  idrive.inertialSensor.setRotation(-20.0, vex::rotationUnits::deg);
+  idrive.reset();
+  vex::thread clawThread([]{
+    until(idrive.position() >= idrive.getDistanceRatio() * 41.0);
+    frontClaw.set(true);
+  });
+
+  frontClaw.set(false);
+
+  //idrive.driveTo(48.0);
+  idrive.drive(110);
+  until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
+  clawThread.interrupt();
+  idrive.drive(-100);
+  until(idrive.position() <= idrive.getDistanceRatio() * 35.0);
+  //idrive.driveTo({0.0, 16.0}, true);
+  idrive.turnTo(0.0, 0.0, false);
+  idrive.stop();
 }
 
 void autongreen() {
@@ -197,6 +229,15 @@ void drivercontrol() {
     else 
       robot::intake.stop();
   });
+  //Runs intake backwards when B is held
+  robot::primary.ButtonB.pressed([]{ 
+    if (robot::lift.position(vex::rotationUnits::rev) > lift_intake_thresh) {
+      robot::intakeRunning = true;
+      robot::intake.spin(vex::directionType::rev); 
+    }
+  });
+  robot::primary.ButtonB.released([]{ robot::intake.stop(); });
+      
   
 
 
@@ -223,7 +264,6 @@ void drivercontrol() {
       admincontrol();
 #endif 
     liftcontrol();
-
   }
 }
 
@@ -248,7 +288,9 @@ int main() {
   int tileX = robot::brain.Screen.xPosition() / tileWidth;
   int tileY = robot::brain.Screen.yPosition() / tileHeight;
   autonType = tileX + tileY * 3;
+  robot::brain.Screen.clearScreen(autonColors[autonType]);
 
+  vex::this_thread::sleep_for(500);
   //callibrates inertial sensors again
   robot::idrive.inertialSensor.calibrate();
   //waits until it is done calibrating

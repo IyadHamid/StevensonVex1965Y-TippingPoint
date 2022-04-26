@@ -691,6 +691,21 @@
 - Rings sometimes jams
   - Moving apparently fixes jamming
 
+  
+### 4/24/22 (Skirmish)
+- Added `goalRush` function for autonomous
+- Moved Auton Red (previously A) to Auton Orange
+- Set Auton Red to just goal rush
+- Used Button B to invert intakes
+  - Reasoning: could fix jams
+#### Testing
+- Tuned Auton Orange
+  - Turn PID struggling with added weights
+    - Is manually corrected
+#### Skirmish
+- Auton Orange breaks by trying to go further back when reaching alliance goal
+  - Now uses time based to pick up goal
+
 ## TODO
 - Brain selector for auton types
 - Remove 2 PID system 
@@ -701,3 +716,4 @@
   - Maybe with curvature
   - Implement real-time autocorrecting `inteldrive::driveTo` 
 - Project distance for `inteldrive::driveTo(double...)`
+- Test new competition firmware/software
