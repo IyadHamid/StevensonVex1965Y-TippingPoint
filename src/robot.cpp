@@ -75,7 +75,7 @@ void robot::init() {
 
   robot::backClaw.set(false);
   robot::lift.stop(vex::brakeType::hold);
-  robot::frontClaw.open();
+  robot::frontClaw.close();
   robot::backClaw.close();
 
   robot::intake.setVelocity(100, vex::percentUnits::pct);

@@ -706,6 +706,13 @@
 - Auton Orange breaks by trying to go further back when reaching alliance goal
   - Now uses time based to pick up goal
 
+### 4/26/22
+#### Testing
+- Tuned turning PID with weights
+- Tuned Auton Orange
+  - Goal rush is consistent
+  - Alliance mogo is inconsistent
+  - Rings are consistent
 ## TODO
 - Brain selector for auton types
 - Remove 2 PID system 

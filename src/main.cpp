@@ -15,13 +15,13 @@
 #include "deltaTracker.h"
 
 // type of auton, fallback is auton red
-int autonType = 0;
+int autonType = 1;
 
 // prints mode as given; string of mode
 const void modePrint(const char* mode) {
-  robot::primary.Screen.setCursor(0, 0);
-  robot::primary.Screen.clearLine(0);
-  robot::primary.Screen.print(mode);
+  //robot::primary.Screen.setCursor(0, 0);
+  //robot::primary.Screen.clearLine(0);
+  //robot::primary.Screen.print(mode);
 }
 
 // prints location and heading
@@ -37,19 +37,19 @@ void goalRush() {
   using namespace robot;
   idrive.reset();
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 35.0);
-    frontClaw.set(true);
+    until(idrive.position() >= idrive.getDistanceRatio() * 38.0);
+    frontClaw.set(false);
   });
 
-  frontClaw.set(false);
+  frontClaw.set(true);
 
   //idrive.driveTo(48.0);
   idrive.drive(110);
-  until(idrive.position() >= idrive.getDistanceRatio() * 38.0);
-  frontClaw.set(true);
+  until(idrive.position() >= idrive.getDistanceRatio() * 40.0);
+  frontClaw.set(false);
   idrive.drive(-100);
   clawThread.interrupt();
-  until(idrive.position() <= idrive.getDistanceRatio() * 28.0);
+  until(idrive.position() <= idrive.getDistanceRatio() * 20.0);
 }
 
 // rush auton
@@ -60,32 +60,35 @@ void autonred() {
   idrive.stop();
 }
 
+// rush and pick up alliance mogo auton
 void autonorange() {
   using namespace robot;
   
   goalRush();
-  idrive.driveTo({15.0, 0.0}, true);
+
+  //grab alliance mogo
+  double goalXPos = 14.5;
+  idrive.driveTo({goalXPos, -1.0}, true);
+  lift.spinTo(.5, vex::rotationUnits::rev, false);
   backClaw.set(true);
   vex::this_thread::sleep_for(100);
   idrive.turnTo(-0.25, 0.0, false);
-  //idrive.driveTo({15.0, 20.0}, true, 30.0);
   idrive.drive(-35);
-  vex::this_thread::sleep_for(1000);
+  vex::this_thread::sleep_for(1000); //time based as using wall to align
   backClaw.set(false);
-
-  lift.spinTo(.5, vex::rotationUnits::rev, false);
-  double ringYPos = 10.0;
-  idrive.driveTo({15.0, ringYPos});
   
+  //pick up rings
+  double ringYPos = 11.0;
+  idrive.driveTo({goalXPos, ringYPos});
   intake.spin(vex::directionType::fwd);
-  idrive.turnTo(0.01, 0.0, false);
-  idrive.driveTo({50.0, ringYPos}, false, 30.0);
+  idrive.driveTo({60.0, ringYPos}, false, 30.0);
   idrive.driveTo({0.0, ringYPos}, true);
 
   intake.stop();
   backClaw.set(true);
 }
 
+// center rush auton
 void autonyellow() {
   using namespace robot;
   //starts tilted
@@ -129,12 +132,6 @@ void autonpurple() {
   //  idrive.turnTo(rad2rev(a.ang()), 0.0, false);
   //}
   idrive.turnTo(.25);
-  vex::this_thread::sleep_for(500);
-  idrive.turnTo(.125);
-  vex::this_thread::sleep_for(500);
-  idrive.turnTo(.5);
-  vex::this_thread::sleep_for(500);
-  idrive.turnTo(0, 0.0, false);
   
 }
 
@@ -176,7 +173,7 @@ void toggleclawcontrol() {
       }
   }};
 
-  if (isOpen)
+  if (!isOpen)
     rumbleThread.interrupt();
   else {
     rumbleThread = vex::thread(rumbleFunc);
@@ -237,8 +234,6 @@ void drivercontrol() {
     }
   });
   robot::primary.ButtonB.released([]{ robot::intake.stop(); });
-      
-  
 
 
   while (1) {
@@ -247,7 +242,7 @@ void drivercontrol() {
 
     if (robot::primary.Axis1.value() == 0 && robot::primary.Axis2.value() == 0 && 
         robot::primary.Axis3.value() == 0 && robot::primary.Axis4.value() == 0) {
-      robot::idrive.stop();
+      robot::idrive.stop(vex::brakeType::hold);
     }
     else {
 #if defined(ARCADE)
@@ -273,6 +268,13 @@ int main() {
   robot::init();
   competition.autonomous(autonomous);
   competition.drivercontrol(drivercontrol);
+  
+  vex::thread locPrintThread([]{
+    while (1)  {
+      locPrint();
+      vex::this_thread::sleep_for(500); //sleeps to minimize cpu usage and network usage
+    }
+  });
 
   //renders tiles and sets correct auton
   std::array<vex::color, 6> autonColors{ vex::color::red  , vex::color::orange, vex::color::yellow, 
@@ -283,7 +285,6 @@ int main() {
     const auto color = autonColors[i];
     robot::brain.Screen.drawRectangle((i % 3) * tileWidth, (i / 3) * tileHeight, tileWidth, tileHeight, color);
   }
-  //robot::brain.Screen.render();
   until(robot::brain.Screen.pressing());
   int tileX = robot::brain.Screen.xPosition() / tileWidth;
   int tileY = robot::brain.Screen.yPosition() / tileHeight;
@@ -296,17 +297,10 @@ int main() {
   //waits until it is done calibrating
   until(!robot::idrive.inertialSensor.isCalibrating());
 
-  vex::thread rainbowThread([]{
-    while (1)  {
-      static int hue = 0;
-      //cycles through hues and clears screen with color
-      robot::brain.Screen.clearScreen(++hue %= 360); 
-      vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a non-epileptic rate
-    }
-  });
-
   while (1)  {
-    locPrint();
-    vex::this_thread::sleep_for(500); //sleeps to minimize cpu usage and network usage
+    static int hue = 0;
+    //cycles through hues and clears screen with color
+    robot::brain.Screen.clearScreen(++hue %= 360); 
+    vex::this_thread::sleep_for(20); //sleeps to slow rainbow to a non-epileptic rate
   }
 }
