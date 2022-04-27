@@ -15,7 +15,7 @@
 #include "deltaTracker.h"
 
 // type of auton, fallback is auton red
-int autonType = 1;
+int autonType = 3;
 
 // prints mode as given; string of mode
 const void modePrint(const char* mode) {
@@ -33,11 +33,12 @@ const void locPrint() {
 }
 
 // rush goal
-void goalRush() {
+void goalRush(double dist, double clawDist, double retreatDist) {
   using namespace robot;
   idrive.reset();
+  static double cd = clawDist;
   vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 38.0);
+    until(idrive.position() >= idrive.getDistanceRatio() * cd);
     frontClaw.set(false);
   });
 
@@ -45,17 +46,17 @@ void goalRush() {
 
   //idrive.driveTo(48.0);
   idrive.drive(110);
-  until(idrive.position() >= idrive.getDistanceRatio() * 40.0);
+  until(idrive.position() >= idrive.getDistanceRatio() * dist);
   frontClaw.set(false);
   idrive.drive(-100);
   clawThread.interrupt();
-  until(idrive.position() <= idrive.getDistanceRatio() * 20.0);
+  until(idrive.position() <= idrive.getDistanceRatio() * retreatDist);
 }
 
 // rush auton
 void autonred() {
   using namespace robot;
-  goalRush();
+  goalRush(40.0, 38.0, 20.0);
   idrive.driveTo({0.0, 0.0}, true);
   idrive.stop();
 }
@@ -64,7 +65,7 @@ void autonred() {
 void autonorange() {
   using namespace robot;
   
-  goalRush();
+  goalRush(40.0, 38.0, 20.0);
 
   //grab alliance mogo
   double goalXPos = 14.5;
@@ -94,27 +95,39 @@ void autonyellow() {
   //starts tilted
   idrive.inertialSensor.setRotation(-20.0, vex::rotationUnits::deg);
   idrive.reset();
-  vex::thread clawThread([]{
-    until(idrive.position() >= idrive.getDistanceRatio() * 41.0);
-    frontClaw.set(true);
-  });
+  
+  goalRush(44.0, 41.0, 35.0);
 
-  frontClaw.set(false);
-
-  //idrive.driveTo(48.0);
-  idrive.drive(110);
-  until(idrive.position() >= idrive.getDistanceRatio() * 44.0);
-  clawThread.interrupt();
-  idrive.drive(-100);
-  until(idrive.position() <= idrive.getDistanceRatio() * 35.0);
-  //idrive.driveTo({0.0, 16.0}, true);
   idrive.turnTo(0.0, 0.0, false);
   idrive.stop();
 }
 
+// left side auton
 void autongreen() {
   using namespace robot;
-  
+  goalRush(41.0, 39.0, 20.0);
+
+  lift.spinTo(0.8, vex::rotationUnits::rev, false);
+  idrive.driveTo({-5.0, -20.0}, true);
+  idrive.turnTo(-0.25, 50.0, false);
+  backClaw.set(true);
+  vex::this_thread::sleep_for(500);
+  idrive.drive(-40);
+  vex::this_thread::sleep_for(1200);
+  idrive.stop();
+  backClaw.set(false);
+  vex::this_thread::sleep_for(500);
+  idrive.driveTo(15.0);
+  intake.spin(directionType::fwd);
+
+  for (int i = 0; i < 3; i++) {
+    idrive.driveTo(15.0, 50.0);
+    idrive.driveTo(-15.0, 50.0);
+    vex::this_thread::sleep_for(500);
+  }
+  backClaw.set(true);
+  intake.stop();
+
 }
 
 void autonblue() {
@@ -131,7 +144,7 @@ void autonpurple() {
   //  vec2 a{robot::primary.Axis3.value()/100.0, robot::primary.Axis4.value()/100.0};
   //  idrive.turnTo(rad2rev(a.ang()), 0.0, false);
   //}
-  idrive.turnTo(.25);
+  idrive.turnTo(0.25);
   
 }
 

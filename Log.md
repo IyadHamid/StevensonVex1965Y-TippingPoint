@@ -713,6 +713,18 @@
   - Goal rush is consistent
   - Alliance mogo is inconsistent
   - Rings are consistent
+
+### 4/27/22
+- Created Auton Green (for left side)
+  - Grabs yellow mogo
+  - Places rings on left alliance mogo
+  - Moves back and forth to collect rings
+#### Testing
+- Confirmed Auton Orange was working
+- Tuned Auton Green
+  - Works moderately effectively
+  - Suspected most error comes from setup
+
 ## TODO
 - Brain selector for auton types
 - Remove 2 PID system 
