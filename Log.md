@@ -725,6 +725,15 @@
   - Works moderately effectively
   - Suspected most error comes from setup
 
+### 4/26/22
+#### Testing
+- Tuned Auton Green
+  - Encountered random lift jamming events
+  - Set up is main difficult
+  - Need to make sure that robot always has contact with ground
+- Tested Auton Orange
+- Tested Auton Yellow
+  - Ring hits robot and mogo
 ## TODO
 - Brain selector for auton types
 - Remove 2 PID system 

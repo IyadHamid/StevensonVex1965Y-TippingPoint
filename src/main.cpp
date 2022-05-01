@@ -15,7 +15,7 @@
 #include "deltaTracker.h"
 
 // type of auton, fallback is auton red
-int autonType = 3;
+int autonType = 2;
 
 // prints mode as given; string of mode
 const void modePrint(const char* mode) {
@@ -93,36 +93,44 @@ void autonorange() {
 void autonyellow() {
   using namespace robot;
   //starts tilted
-  idrive.inertialSensor.setRotation(-20.0, vex::rotationUnits::deg);
-  idrive.reset();
-  
-  goalRush(44.0, 41.0, 35.0);
+  idrive.inertialSensor.setHeading(-29.1, vex::rotationUnits::deg);
+  //vex::thread liftThread([]{
+  //  until(idrive.position() >= idrive.getDistanceRatio() * 22.0);
+  //  lift.spinTo(0.0, vex::rotationUnits::rev, 100.0, vex::velocityUnits::pct, false);
+  //});
+  //lift.spinTo(0.2, vex::rotationUnits::rev, 100.0, vex::velocityUnits::pct, false);
+  goalRush(46.0, 43.0, 25.0);
+  return;
 
-  idrive.turnTo(0.0, 0.0, false);
+  idrive.driveTo({24.0, 0.0}, true);
   idrive.stop();
 }
 
 // left side auton
 void autongreen() {
   using namespace robot;
-  goalRush(41.0, 39.0, 20.0);
+  goalRush(42.5, 40.5, 20.0);
 
-  lift.spinTo(0.8, vex::rotationUnits::rev, false);
-  idrive.driveTo({-5.0, -20.0}, true);
+  // grab alliance goal
+  lift.spinTo(1.4, vex::rotationUnits::rev, false);
+  idrive.driveTo({-5.0, -20.0}, true, 70.0);
+  vex::this_thread::sleep_for(200);
+  until(lift.position(vex::rotationUnits::rev) > 1.3); // guarentee we can swing mogo over wall
   idrive.turnTo(-0.25, 50.0, false);
   backClaw.set(true);
   vex::this_thread::sleep_for(500);
   idrive.drive(-40);
-  vex::this_thread::sleep_for(1200);
+  vex::this_thread::sleep_for(1400);
   idrive.stop();
   backClaw.set(false);
   vex::this_thread::sleep_for(500);
-  idrive.driveTo(15.0);
+  idrive.driveTo(18.0);
   intake.spin(directionType::fwd);
 
-  for (int i = 0; i < 3; i++) {
-    idrive.driveTo(15.0, 50.0);
-    idrive.driveTo(-15.0, 50.0);
+  // intake placed rings
+  for (int i = 0; i < 4; i++) {
+    idrive.driveTo(15.0, 25.0);
+    idrive.driveTo(-15.0, 25.0);
     vex::this_thread::sleep_for(500);
   }
   backClaw.set(true);
