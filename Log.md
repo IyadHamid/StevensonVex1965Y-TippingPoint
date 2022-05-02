@@ -725,7 +725,7 @@
   - Works moderately effectively
   - Suspected most error comes from setup
 
-### 4/26/22
+### 4/30/22
 #### Testing
 - Tuned Auton Green
   - Encountered random lift jamming events
@@ -734,12 +734,27 @@
 - Tested Auton Orange
 - Tested Auton Yellow
   - Ring hits robot and mogo
+
+
+### 5/1/22
+- Created Auton Blue
+  - Gets win point (both sides alliance mogo)
+  - Picks up center mogo
+- Fixed `4/30/22` date in `Log.md`
+  - Used to read `4/26/22`
+#### Testing
+- Tuned Auton Yellow
+  - Using steeper angle
+- Tuned Auton Blue
+  - Grabbing center mogo sketchy
+- Tuned Auton Green
+  - Trimmed to under 15 seconds
+
 ## TODO
 - Brain selector for auton types
 - Remove 2 PID system 
 - Need to add controller config to `README.md`
   - Create diagrams 
-- Refine turn PID values
 - Finish reimplementing `inteldrive::driveTo(vec2...)`
   - Maybe with curvature
   - Implement real-time autocorrecting `inteldrive::driveTo` 

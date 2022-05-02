@@ -15,7 +15,7 @@
 #include "deltaTracker.h"
 
 // type of auton, fallback is auton red
-int autonType = 2;
+int autonType = 4;
 
 // prints mode as given; string of mode
 const void modePrint(const char* mode) {
@@ -35,7 +35,6 @@ const void locPrint() {
 // rush goal
 void goalRush(double dist, double clawDist, double retreatDist) {
   using namespace robot;
-  idrive.reset();
   static double cd = clawDist;
   vex::thread clawThread([]{
     until(idrive.position() >= idrive.getDistanceRatio() * cd);
@@ -93,17 +92,28 @@ void autonorange() {
 void autonyellow() {
   using namespace robot;
   //starts tilted
-  idrive.inertialSensor.setHeading(-29.1, vex::rotationUnits::deg);
-  //vex::thread liftThread([]{
-  //  until(idrive.position() >= idrive.getDistanceRatio() * 22.0);
-  //  lift.spinTo(0.0, vex::rotationUnits::rev, 100.0, vex::velocityUnits::pct, false);
-  //});
-  //lift.spinTo(0.2, vex::rotationUnits::rev, 100.0, vex::velocityUnits::pct, false);
-  goalRush(46.0, 43.0, 25.0);
-  return;
+  idrive.inertialSensor.setHeading(326.3, vex::rotationUnits::deg);
+  goalRush(49.0, 47.0, 30.0);
+  
+  double goalXPos = 24.0;
+  lift.spinTo(.5, vex::rotationUnits::rev, false);
+  backClaw.set(true);
+  idrive.driveTo({goalXPos, 10.0}, true, 50.0);
+  vex::this_thread::sleep_for(100);
+  idrive.turnTo(-0.25, 50.0, false);
+  idrive.drive(-35);
+  vex::this_thread::sleep_for(1000); //time based as using wall to align
+  backClaw.set(false);
+  
+  //pick up rings
+  double ringYPos = 13.0;
+  idrive.driveTo({goalXPos, ringYPos});
+  intake.spin(vex::directionType::fwd);
+  idrive.driveTo({60.0, ringYPos}, false, 30.0);
+  idrive.driveTo({0.0, ringYPos}, true);
 
-  idrive.driveTo({24.0, 0.0}, true);
-  idrive.stop();
+  intake.stop();
+  backClaw.set(true);
 }
 
 // left side auton
@@ -113,47 +123,67 @@ void autongreen() {
 
   // grab alliance goal
   lift.spinTo(1.4, vex::rotationUnits::rev, false);
-  idrive.driveTo({-5.0, -20.0}, true, 70.0);
+  idrive.driveTo({-6.5, -19.0}, true, 70.0);
   vex::this_thread::sleep_for(200);
   until(lift.position(vex::rotationUnits::rev) > 1.3); // guarentee we can swing mogo over wall
-  idrive.turnTo(-0.25, 50.0, false);
+  idrive.turnTo(-0.25, 40.0, false);
   backClaw.set(true);
   vex::this_thread::sleep_for(500);
-  idrive.drive(-40);
-  vex::this_thread::sleep_for(1400);
-  idrive.stop();
+  idrive.driveTo(-28, 70.0);
   backClaw.set(false);
   vex::this_thread::sleep_for(500);
   idrive.driveTo(18.0);
   intake.spin(directionType::fwd);
 
   // intake placed rings
-  for (int i = 0; i < 4; i++) {
-    idrive.driveTo(15.0, 25.0);
-    idrive.driveTo(-15.0, 25.0);
-    vex::this_thread::sleep_for(500);
+  for (int i = 0; i < 3; i++) {
+    idrive.driveTo(16.0, 30.0);
+    idrive.driveTo(-16.0);
+    vex::this_thread::sleep_for(200);
   }
   backClaw.set(true);
   intake.stop();
 
 }
 
-void autonblue() {
+void winPointAuton() {
   using namespace robot;
-  
+  lift.spinTo(.5, vex::rotationUnits::rev, false);
+  //idrive.driveTo(2.0);
+  until(lift.position(vex::rotationUnits::rev) > 0.45);
+  frontClaw.set(true);
+  vex::this_thread::sleep_for(100);
+  idrive.driveTo({0.0, -22.0}, true);
+  idrive.driveTo({75.0, -22.0}, true);
+  backClaw.set(true);
+  vex::this_thread::sleep_for(200);
+  idrive.drive(-35);
+  vex::this_thread::sleep_for(1500);
+  idrive.stop();
+  backClaw.set(false);
+  vex::this_thread::sleep_for(200);
+  intake.spin(vex::directionType::fwd);
+  idrive.driveTo({75.0, -22.0});
+  //idrive.turnTo(.625, 0.0, false);
+  lift.spinTo(0.0, vex::rotationUnits::rev, false);
+  intake.stop();
+  vex::this_thread::sleep_for(100);
+  //idrive.driveTo(40.0);
+  idrive.driveTo({51.0, -51.0});
+  frontClaw.set(false);
+  idrive.driveTo({52.0, -22.0}, true);
 }
 
-// debug auton
+// win point auton with center left mogo
+void autonblue() {
+  using namespace robot;
+  winPointAuton();
+}
+
+// win point auton with center mid mogo
 void autonpurple() {
   using namespace robot;
-  //idrive.driveTo({0, 0}, true);
-  //while (1) {
-  //  until(robot::primary.ButtonX.pressing());
-  //  vec2 a{robot::primary.Axis3.value()/100.0, robot::primary.Axis4.value()/100.0};
-  //  idrive.turnTo(rad2rev(a.ang()), 0.0, false);
-  //}
-  idrive.turnTo(0.25);
-  
+  winPointAuton();
 }
 
 void autonomous() {
