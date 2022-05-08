@@ -96,8 +96,10 @@ void inteldrive::drive(double vel, double ratio) {
     return;
   }
   //drives left and right motor groups at percent velocity skewed right at ratio
-  left .spin(vex::directionType::fwd, vel / ratio * 150.0, vex::voltageUnits::mV);
-  right.spin(vex::directionType::fwd, vel * ratio * 150.0, vex::voltageUnits::mV);
+  //left .spin(vex::directionType::fwd, vel / ratio * 150.0, vex::voltageUnits::mV);
+  //right.spin(vex::directionType::fwd, vel * ratio * 150.0, vex::voltageUnits::mV);
+  left .spin(vex::directionType::fwd, vel / ratio, vex::velocityUnits::pct);
+  right.spin(vex::directionType::fwd, vel * ratio, vex::velocityUnits::pct);
 }
 
 void inteldrive::drive(double vel) {
@@ -106,8 +108,10 @@ void inteldrive::drive(double vel) {
     return;
   }
   //drives left and right motor groups at percent velocity
-  left .spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
-  right.spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
+  //left .spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
+  //right.spin(vex::directionType::fwd, vel * 150.0, vex::voltageUnits::mV);
+  left .spin(vex::directionType::fwd, vel, vex::velocityUnits::pct);
+  right.spin(vex::directionType::fwd, vel, vex::velocityUnits::pct);
 }
 
 void inteldrive::drive_percentage(double vel) {

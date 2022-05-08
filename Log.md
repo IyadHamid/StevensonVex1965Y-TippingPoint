@@ -750,8 +750,24 @@
 - Tuned Auton Green
   - Trimmed to under 15 seconds
 
+### 5/5/22 (Worlds Inspection)
+- Made new intake control
+  - Reasoning: allows for easier control
+#### Testing
+- Worked on Autons
+  - Reduced error
+  
+### 5/6/22 (Worlds)
+#### Competition
+- Autons works semi-consistently
+  - Refined
+  
+### 5/7/22 (Worlds)
+- Made stick Auton
+#### Competition
+- Autons more consistently
+
 ## TODO
-- Brain selector for auton types
 - Remove 2 PID system 
 - Need to add controller config to `README.md`
   - Create diagrams 
@@ -759,4 +775,3 @@
   - Maybe with curvature
   - Implement real-time autocorrecting `inteldrive::driveTo` 
 - Project distance for `inteldrive::driveTo(double...)`
-- Test new competition firmware/software
